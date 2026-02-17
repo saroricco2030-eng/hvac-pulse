@@ -1,0 +1,296 @@
+// ===================================================
+// HVAC Pulse — Internationalization (i18n)
+// Supports 10 languages with Korean as source language
+// Copyright (c) 2024-2026. All rights reserved.
+// ===================================================
+
+const I18n = (() => {
+
+  // Supported languages
+  const LANGUAGES = [
+    { code: 'ko', name: '한국어',     flag: '🇰🇷' },
+    { code: 'en', name: 'English',    flag: '🇺🇸' },
+    { code: 'ja', name: '日本語',     flag: '🇯🇵' },
+    { code: 'zh', name: '中文简体',   flag: '🇨🇳' },
+    { code: 'es', name: 'Español',    flag: '🇪🇸' },
+    { code: 'fr', name: 'Français',   flag: '🇫🇷' },
+    { code: 'de', name: 'Deutsch',    flag: '🇩🇪' },
+    { code: 'pt', name: 'Português',  flag: '🇧🇷' },
+    { code: 'ar', name: 'العربية',    flag: '🇸🇦' },
+    { code: 'hi', name: 'हिन्दी',      flag: '🇮🇳' }
+  ];
+
+  let currentLang = 'ko';
+  let packs = {}; // { en: { key: 'translation', ... }, ja: {...}, ... }
+  let observer = null;
+
+  // =============================================
+  // Initialize
+  // =============================================
+  function init() {
+    // Register available language packs
+    if (typeof LANG_EN !== 'undefined') packs.en = LANG_EN;
+    if (typeof LANG_JA !== 'undefined') packs.ja = LANG_JA;
+    if (typeof LANG_ZH !== 'undefined') packs.zh = LANG_ZH;
+    if (typeof LANG_ES !== 'undefined') packs.es = LANG_ES;
+    if (typeof LANG_FR !== 'undefined') packs.fr = LANG_FR;
+    if (typeof LANG_DE !== 'undefined') packs.de = LANG_DE;
+    if (typeof LANG_PT !== 'undefined') packs.pt = LANG_PT;
+    if (typeof LANG_AR !== 'undefined') packs.ar = LANG_AR;
+    if (typeof LANG_HI !== 'undefined') packs.hi = LANG_HI;
+
+    // Restore saved language preference
+    const saved = localStorage.getItem('hvac-lang');
+    if (saved && (saved === 'ko' || packs[saved])) {
+      currentLang = saved;
+    } else {
+      // Auto-detect from browser language
+      const browserLang = (navigator.language || '').slice(0, 2).toLowerCase();
+      if (browserLang && packs[browserLang]) {
+        currentLang = browserLang;
+      }
+    }
+
+    // Apply if not Korean
+    if (currentLang !== 'ko') {
+      applyToStaticDOM();
+      startObserver();
+    }
+  }
+
+  // =============================================
+  // Core translate function
+  // Korean text is always the fallback
+  // =============================================
+  function t(key, koreanFallback) {
+    if (currentLang === 'ko') return koreanFallback;
+    return packs[currentLang]?.[key] || packs.en?.[key] || koreanFallback;
+  }
+
+  // =============================================
+  // Switch language
+  // =============================================
+  function setLanguage(lang) {
+    if (lang === currentLang) return;
+    currentLang = lang;
+    localStorage.setItem('hvac-lang', lang);
+
+    if (lang === 'ko') {
+      stopObserver();
+    } else {
+      startObserver();
+    }
+
+    // Re-render entire app
+    applyToStaticDOM();
+    reRenderModules();
+
+    if (typeof App !== 'undefined') {
+      App.showToast(t('settings.langChanged', '언어가 변경되었습니다.'), 'success');
+    }
+  }
+
+  // =============================================
+  // Apply translations to static DOM elements
+  // Elements with [data-i18n] get their text replaced
+  // Elements with [data-i18n-ph] get their placeholder replaced
+  // =============================================
+  function applyToStaticDOM() {
+    if (currentLang === 'ko') {
+      // Restore Korean — reload page is the safest way
+      // But for now, re-render modules handles this
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        const koText = el.dataset.i18nKo; // Stored original Korean
+        if (koText) restoreElement(el, koText);
+      });
+      return;
+    }
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      const pack = packs[currentLang] || packs.en;
+      const translated = pack?.[key];
+      if (!translated) return;
+
+      // Store original Korean text for restoration
+      if (!el.dataset.i18nKo) {
+        el.dataset.i18nKo = getTextOnly(el);
+      }
+
+      setTextPreservingChildren(el, translated);
+    });
+
+    // Placeholders
+    document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+      const key = el.dataset.i18nPh;
+      const pack = packs[currentLang] || packs.en;
+      const translated = pack?.[key];
+      if (translated) {
+        if (!el.dataset.i18nKoPh) el.dataset.i18nKoPh = el.placeholder;
+        el.placeholder = translated;
+      }
+    });
+  }
+
+  // Get text content without child element text
+  function getTextOnly(el) {
+    let text = '';
+    el.childNodes.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        text += node.textContent;
+      }
+    });
+    return text.trim() || el.textContent;
+  }
+
+  // Set text while preserving child elements (like SVG icons)
+  function setTextPreservingChildren(el, newText) {
+    const children = Array.from(el.childNodes);
+    const hasElementChildren = children.some(n => n.nodeType === Node.ELEMENT_NODE);
+
+    if (!hasElementChildren) {
+      el.textContent = newText;
+      return;
+    }
+
+    // Replace only text nodes
+    let replaced = false;
+    children.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+        node.textContent = (node.textContent.startsWith(' ') ? ' ' : '') + newText;
+        replaced = true;
+      }
+    });
+
+    if (!replaced) {
+      el.appendChild(document.createTextNode(' ' + newText));
+    }
+  }
+
+  function restoreElement(el, koText) {
+    setTextPreservingChildren(el, koText);
+  }
+
+  // =============================================
+  // MutationObserver — translate dynamic content
+  // =============================================
+  function startObserver() {
+    if (observer) return;
+    observer = new MutationObserver(mutations => {
+      if (currentLang === 'ko') return;
+      mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            // Translate data-i18n elements in new nodes
+            node.querySelectorAll?.('[data-i18n]')?.forEach(el => {
+              const key = el.dataset.i18n;
+              const pack = packs[currentLang] || packs.en;
+              const translated = pack?.[key];
+              if (translated) {
+                if (!el.dataset.i18nKo) el.dataset.i18nKo = getTextOnly(el);
+                setTextPreservingChildren(el, translated);
+              }
+            });
+            node.querySelectorAll?.('[data-i18n-ph]')?.forEach(el => {
+              const key = el.dataset.i18nPh;
+              const pack = packs[currentLang] || packs.en;
+              const translated = pack?.[key];
+              if (translated) el.placeholder = translated;
+            });
+          }
+        });
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  function stopObserver() {
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
+  }
+
+  // =============================================
+  // Re-render all dynamic modules
+  // =============================================
+  function reRenderModules() {
+    // Re-initialize modules that render Korean text dynamically
+    // Each module's initUI() re-renders its content
+
+    // Tab labels
+    document.querySelectorAll('.tab-item[data-tab]').forEach(tab => {
+      const key = 'nav.' + tab.dataset.tab;
+      const label = tab.querySelector('.tab-label');
+      if (label) {
+        const translated = t(key, label.textContent);
+        label.textContent = translated;
+      }
+    });
+
+    // Re-render modules if they exist
+    if (typeof PTCalculator !== 'undefined') PTCalculator.initUI?.();
+    if (typeof DiagnosticEngine !== 'undefined') DiagnosticEngine.initUI?.();
+    if (typeof NISTDiagnostic !== 'undefined') NISTDiagnostic.initUI?.();
+    if (typeof TXVWizard !== 'undefined') TXVWizard.initUI?.();
+    if (typeof ErrorCodeSearch !== 'undefined') ErrorCodeSearch.initUI?.();
+    if (typeof CycleVisualization !== 'undefined') CycleVisualization.initUI?.();
+    if (typeof ServiceHistory !== 'undefined') ServiceHistory.renderList?.();
+    if (typeof FieldNotes !== 'undefined') FieldNotes.renderList?.();
+    if (typeof MaintenanceChecklist !== 'undefined') MaintenanceChecklist.initUI?.();
+    if (typeof PartsCrossRef !== 'undefined') PartsCrossRef.initUI?.();
+    if (typeof PipeCalculator !== 'undefined') PipeCalculator.initUI?.();
+    if (typeof Settings !== 'undefined') Settings.initUI?.();
+    if (typeof Auth !== 'undefined') Auth.renderSection?.();
+
+    // Re-apply static DOM translations after modules re-render
+    setTimeout(() => applyToStaticDOM(), 100);
+  }
+
+  // =============================================
+  // Render language selector UI (for settings page)
+  // =============================================
+  function renderSelector(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="glass-card">
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="setting-title" data-i18n="settings.language">${t('settings.language', '언어')}</div>
+            <div class="setting-desc" data-i18n="settings.langDesc">${t('settings.langDesc', '앱 표시 언어 선택')}</div>
+          </div>
+        </div>
+        <div class="lang-grid">
+          ${LANGUAGES.map(lang => `
+            <button class="lang-btn ${lang.code === currentLang ? 'active' : ''}"
+              onclick="I18n.setLanguage('${lang.code}')"
+              ${lang.code !== 'ko' && !packs[lang.code] ? 'disabled title="Coming soon"' : ''}>
+              <span class="lang-flag">${lang.flag}</span>
+              <span class="lang-name">${lang.name}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>`;
+  }
+
+  // =============================================
+  // Public API
+  // =============================================
+  return {
+    init,
+    t,
+    setLanguage,
+    getLang: () => currentLang,
+    getLanguages: () => LANGUAGES,
+    applyToStaticDOM,
+    renderSelector
+  };
+})();
+
+// Global shortcut — all modules use t() directly
+function t(key, fallback) {
+  return I18n.t(key, fallback);
+}

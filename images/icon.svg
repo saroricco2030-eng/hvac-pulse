@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#0a0e1a"/>
+  <!-- Snowflake / cooling -->
+  <g transform="translate(256,240)" stroke="#06b6d4" stroke-width="5" fill="none" opacity="0.9">
+    <line x1="0" y1="-90" x2="0" y2="90"/>
+    <line x1="-78" y1="-45" x2="78" y2="45"/>
+    <line x1="-78" y1="45" x2="78" y2="-45"/>
+    <!-- branches -->
+    <line x1="0" y1="-90" x2="-18" y2="-65"/>
+    <line x1="0" y1="-90" x2="18" y2="-65"/>
+    <line x1="0" y1="90" x2="-18" y2="65"/>
+    <line x1="0" y1="90" x2="18" y2="65"/>
+    <line x1="-78" y1="-45" x2="-60" y2="-62"/>
+    <line x1="-78" y1="-45" x2="-58" y2="-28"/>
+    <line x1="78" y1="45" x2="60" y2="62"/>
+    <line x1="78" y1="45" x2="58" y2="28"/>
+    <line x1="-78" y1="45" x2="-60" y2="62"/>
+    <line x1="-78" y1="45" x2="-58" y2="28"/>
+    <line x1="78" y1="-45" x2="60" y2="-62"/>
+    <line x1="78" y1="-45" x2="58" y2="-28"/>
+  </g>
+  <!-- Thermometer -->
+  <g transform="translate(256,240)">
+    <rect x="-8" y="-55" width="16" height="80" rx="8" fill="none" stroke="#ef4444" stroke-width="4"/>
+    <circle cx="0" cy="40" r="18" fill="none" stroke="#ef4444" stroke-width="4"/>
+    <rect x="-4" y="-30" width="8" height="65" rx="4" fill="#ef4444" opacity="0.7"/>
+    <circle cx="0" cy="40" r="12" fill="#ef4444" opacity="0.7"/>
+  </g>
+  <!-- Cycle arrow ring -->
+  <circle cx="256" cy="240" r="120" fill="none" stroke="#3b82f6" stroke-width="3" stroke-dasharray="16,8" opacity="0.4"/>
+  <!-- App name -->
+  <text x="256" y="410" text-anchor="middle" fill="#e8ecf4" font-family="system-ui,sans-serif" font-size="42" font-weight="700">HVAC</text>
+  <text x="256" y="450" text-anchor="middle" fill="#06b6d4" font-family="system-ui,sans-serif" font-size="30" font-weight="600">Pulse</text>
+</svg>

@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0a0e1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="HVAC Pulse — 과열도/과냉도 계산, 교차 진단, NIST 비침습 진단, TXV 트러블슈팅, 정비 관리">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; font-src 'self'; worker-src 'self'; manifest-src 'self'; frame-src 'self' https://*.firebaseapp.com">
+  <meta name="author" content="HVAC Pulse">
+  <meta name="copyright" content="Copyright (c) 2024-2026 HVAC Pulse. All rights reserved.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <title>HVAC Pulse</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="./images/icon-192.png">
+  <link rel="apple-touch-icon" href="./images/icon-192.png">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+<!-- Splash Screen -->
+<div id="splash-screen" class="splash-screen">
+  <div class="splash-content">
+    <div class="splash-icon">
+      <svg viewBox="0 0 120 120" width="80" height="80">
+        <circle cx="60" cy="60" r="55" fill="none" stroke="#06b6d4" stroke-width="2" stroke-dasharray="12,6" opacity="0.4"/>
+        <g transform="translate(60,55)" stroke="#06b6d4" stroke-width="3" fill="none" opacity="0.9">
+          <line x1="0" y1="-28" x2="0" y2="28"/>
+          <line x1="-24" y1="-14" x2="24" y2="14"/>
+          <line x1="-24" y1="14" x2="24" y2="-14"/>
+        </g>
+        <text x="60" y="100" text-anchor="middle" fill="#e8ecf4" font-family="system-ui,sans-serif" font-size="11" font-weight="700">HVAC Pulse</text>
+      </svg>
+    </div>
+    <div class="splash-text" data-i18n="splash.title">HVAC Pulse</div>
+    <div class="splash-sub" data-i18n="splash.loading">로딩 중...</div>
+  </div>
+</div>
+
+<!-- Onboarding Overlay (first-time users) -->
+<div id="onboarding-overlay" class="onboarding-overlay" style="display:none">
+  <div class="onboarding-slides">
+    <!-- Slide 1: Welcome -->
+    <div class="onboarding-slide active" data-slide="0">
+      <div class="onboarding-icon">
+        <svg viewBox="0 0 120 120" width="72" height="72">
+          <circle cx="60" cy="60" r="55" fill="none" stroke="#06b6d4" stroke-width="2" stroke-dasharray="12,6" opacity="0.4"/>
+          <g transform="translate(60,55)" stroke="#06b6d4" stroke-width="3" fill="none" opacity="0.9">
+            <line x1="0" y1="-28" x2="0" y2="28"/>
+            <line x1="-24" y1="-14" x2="24" y2="14"/>
+            <line x1="-24" y1="14" x2="24" y2="-14"/>
+          </g>
+        </svg>
+      </div>
+      <div class="onboarding-title" data-i18n="onboarding.title">HVAC Pulse</div>
+      <div class="onboarding-desc" data-i18n="onboarding.desc1">
+        현장 기술자를 위한 올인원 진단 도구입니다.<br>
+        게이지, 온도계만 있으면 즉시 진단이 가능합니다.
+      </div>
+    </div>
+    <!-- Slide 2: Key Features -->
+    <div class="onboarding-slide" data-slide="1">
+      <div class="onboarding-title" data-i18n="onboarding.features">핵심 기능</div>
+      <div class="onboarding-features">
+        <div class="onboarding-feat">
+          <div class="onboarding-feat-icon" style="background:rgba(239,68,68,0.12);color:#ef4444">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div><strong>교차진단</strong> — 과열도 × 과냉도로 즉시 고장 분류</div>
+        </div>
+        <div class="onboarding-feat">
+          <div class="onboarding-feat-icon" style="background:rgba(16,185,129,0.12);color:#10b981">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z"/></svg>
+          </div>
+          <div><strong>NIST 비침습 진단</strong> — 게이지 없이 온도만으로 진단</div>
+        </div>
+        <div class="onboarding-feat">
+          <div class="onboarding-feat-icon" style="background:rgba(6,182,212,0.12);color:#06b6d4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <div><strong>P-H 선도</strong> — CoolProp NIST급 열역학 시각화</div>
+        </div>
+      </div>
+    </div>
+    <!-- Slide 3: How to Start -->
+    <div class="onboarding-slide" data-slide="2">
+      <div class="onboarding-icon">
+        <svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round">
+          <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+        </svg>
+      </div>
+      <div class="onboarding-title" data-i18n="onboarding.start_title">시작하기</div>
+      <div class="onboarding-desc">
+        홈 화면의 <strong>빠른 진단</strong>으로 즉시 시작하거나,<br>
+        <strong>도구</strong> 탭에서 원하는 기능을 선택하세요.<br><br>
+        용어가 어려우면 <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(59,130,246,0.15);color:#3b82f6;font-size:0.65rem;font-weight:700;border:1px solid rgba(59,130,246,0.3)">?</span> 아이콘을 터치하세요.
+      </div>
+    </div>
+    <!-- Dots & Actions -->
+    <div class="onboarding-dots">
+      <div class="onboarding-dot active" data-dot="0"></div>
+      <div class="onboarding-dot" data-dot="1"></div>
+      <div class="onboarding-dot" data-dot="2"></div>
+    </div>
+    <div class="onboarding-actions">
+      <button class="onboarding-skip" id="onboarding-skip" data-i18n="onboarding.skip">건너뛰기</button>
+      <button class="onboarding-next" id="onboarding-next" data-i18n="onboarding.next">다음</button>
+    </div>
+  </div>
+</div>
+
+<!-- Search Overlay -->
+<div id="search-overlay" class="search-overlay">
+  <div class="search-bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search-input" placeholder="도구, 기능, 냉매 검색..." data-i18n-ph="search.placeholder" autocomplete="off">
+    <button class="search-close" id="search-close" data-i18n="search.cancel">취소</button>
+  </div>
+  <div class="search-results" id="search-results"></div>
+</div>
+
+<!-- Offline Bar -->
+<div id="offline-bar" class="offline-bar">
+  <span data-i18n="offline.bar">⚡ 오프라인 모드 — 저장된 데이터로 작동 중</span>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<div class="app-container">
+
+  <!-- ===================================== -->
+  <!-- PAGE: HOME -->
+  <!-- ===================================== -->
+  <section id="page-home" class="page-section active">
+
+    <!-- 1. Quick Diagnosis (top 40%) -->
+    <div class="glass-card home-hero home-hero-glow">
+      <div class="hero-title">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
+          <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+          <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
+          <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
+        </svg>
+        <span data-i18n="home.quickDiag">빠른 진단</span>
+      </div>
+      <div class="form-group mb-12">
+        <select id="home-ref-select" class="form-select">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+      <div class="input-row mb-12">
+        <div class="form-group mb-0">
+          <label class="form-label form-label-row"><span data-i18n="home.sh.label">과열도 (°F)</span><span class="help-trigger" data-help="석션라인 실측온도 − 포화온도(이슬점). 정상 범위: 5~15°F">?</span></label>
+          <input type="number" id="home-sh" class="form-input" placeholder="일반적 5~25" data-i18n-ph="home.sh.placeholder" step="0.1">
+          <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span></span></div>
+        </div>
+        <div class="form-group mb-0">
+          <label class="form-label form-label-row"><span data-i18n="home.sc.label">과냉도 (°F)</span><span class="help-trigger" data-help="포화온도(비등점) − 리퀴드라인 실측온도. 정상 범위: 8~14°F">?</span></label>
+          <input type="number" id="home-sc" class="form-input" placeholder="일반적 5~20" data-i18n-ph="home.sc.placeholder" step="0.1">
+          <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span></span></div>
+        </div>
+      </div>
+      <button id="home-quick-diag-btn" class="btn btn-primary btn-ripple" data-i18n="home.diagRun">진단 실행</button>
+      <div id="home-quick-result" class="mt-12" aria-live="polite"></div>
+    </div>
+
+    <!-- 2. Recent Activity (shown when data exists) -->
+    <div class="glass-card" id="home-recent" style="display:none">
+      <div class="section-title" data-i18n="home.recent.title">최근 활동</div>
+      <div id="home-recent-list"></div>
+    </div>
+
+    <!-- 3. Quick Tools (3 shortcuts) -->
+    <div class="glass-card">
+      <div class="section-title" data-i18n="home.tools.title">자주 쓰는 도구</div>
+      <div class="quick-tools">
+        <button class="quick-tool-btn" data-nav="tools" data-category="calc" data-sub="pt">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
+            <line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/>
+            <line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/>
+            <line x1="8" y1="18" x2="10" y2="18"/><line x1="14" y1="18" x2="16" y2="18"/>
+          </svg>
+          <span data-i18n="tool.pt">P-T 계산</span>
+        </button>
+        <button class="quick-tool-btn" data-nav="tools" data-category="diag" data-sub="errorcode">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <span data-i18n="nav.errorcode">에러코드</span>
+        </button>
+        <button class="quick-tool-btn" data-nav="tools" data-category="visual" data-sub="cycle">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          <span data-i18n="nav.cycle">사이클</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 4. Normal Range Reference (compact) -->
+    <div class="glass-card">
+      <div class="section-title" data-i18n="home.normalrange.title">정상 범위</div>
+      <div class="ref-compact">
+        <span class="ref-item"><strong style="color:var(--accent-green)">SH</strong> 5~15°F</span>
+        <span class="ref-divider">·</span>
+        <span class="ref-item"><strong style="color:var(--accent-green)">SC</strong> 8~14°F</span>
+        <span class="ref-divider">·</span>
+        <span class="ref-item"><strong style="color:var(--accent-green)">ΔT</strong> 15~22°F</span>
+        <span class="ref-divider">·</span>
+        <span class="ref-item"><strong style="color:var(--accent-green)">DTD</strong> 35°F</span>
+      </div>
+    </div>
+
+    <!-- 5. Engine Status -->
+    <div style="text-align:center;padding:8px">
+      <span class="engine-badge" id="home-engine-status">로딩 중...</span>
+    </div>
+
+    <div class="version-info">HVAC Pulse v1.0.0</div>
+  </section>
+
+
+  <!-- ===================================== -->
+  <!-- PAGE: TOOLS -->
+  <!-- ===================================== -->
+  <section id="page-tools" class="page-section">
+
+    <!-- Category Hub -->
+    <div id="tools-hub">
+      <div class="tools-page-header" style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <h1 data-i18n="tools.title">도구</h1>
+          <p class="subtitle" data-i18n="tools.subtitle">진단 · 계산 · 시각화 · 정비</p>
+        </div>
+        <button class="search-trigger-btn" id="search-trigger" aria-label="검색">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+      </div>
+
+      <div class="tools-categories">
+      <!-- Category: 진단 (primary emphasis) -->
+      <div class="glass-card tool-category tool-category--primary" data-category="diag">
+        <div class="category-header">
+          <div class="category-icon" style="background:rgba(239,68,68,0.12);color:var(--accent-red)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+          </div>
+          <div>
+            <div class="category-title" data-i18n="tools.diag.title">진단</div>
+            <div class="category-desc" data-i18n="tools.diag.desc">교차진단 · NIST · TXV · 에러코드</div>
+          </div>
+          <span class="category-arrow">›</span>
+        </div>
+      </div>
+
+      <!-- Category: 계산 -->
+      <div class="glass-card tool-category" data-category="calc">
+        <div class="category-header">
+          <div class="category-icon" style="background:rgba(59,130,246,0.12);color:var(--accent-blue)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
+              <line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/>
+              <line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/>
+              <line x1="8" y1="18" x2="10" y2="18"/><line x1="14" y1="18" x2="16" y2="18"/>
+            </svg>
+          </div>
+          <div>
+            <div class="category-title" data-i18n="tools.calc.title">계산</div>
+            <div class="category-desc" data-i18n="tools.calc.desc">P-T 계산기 · 냉매 비교 · 배관 계산</div>
+          </div>
+          <span class="category-arrow">›</span>
+        </div>
+      </div>
+
+      <!-- Category: 시각화 (featured) -->
+      <div class="glass-card tool-category tool-category--featured" data-category="visual">
+        <div class="category-header">
+          <div class="category-icon" style="background:rgba(6,182,212,0.15);color:var(--accent-cyan)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
+            </svg>
+          </div>
+          <div>
+            <div class="category-title" data-i18n="tools.visual.title">시각화</div>
+            <div class="category-desc" data-i18n="tools.visual.desc">사이클 다이어그램 · P-H 선도 · P-H 학습</div>
+          </div>
+          <span class="category-badge-new">CoolProp</span>
+          <span class="category-arrow">›</span>
+        </div>
+      </div>
+
+      <!-- Category: 정비 -->
+      <div class="glass-card tool-category" data-category="maint">
+        <div class="category-header">
+          <div class="category-icon" style="background:rgba(16,185,129,0.12);color:var(--accent-green)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+              <path d="M9 14l2 2 4-4"/>
+            </svg>
+          </div>
+          <div>
+            <div class="category-title" data-i18n="tools.maint.title">정비관리</div>
+            <div class="category-desc" data-i18n="tools.maint.desc">체크리스트 · 부품호환</div>
+          </div>
+          <span class="category-arrow">›</span>
+        </div>
+      </div>
+      </div><!-- /.tools-categories -->
+    </div>
+
+    <!-- Category View (shown when a category is selected) -->
+    <div id="tools-category-view" style="display:none">
+      <!-- Back button -->
+      <button class="category-back" onclick="App.backToHub()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        <span id="category-back-label" data-i18n="tools.back">도구</span>
+      </button>
+
+      <!-- Dynamic sub-tabs -->
+      <div class="sub-tab-bar" id="tools-sub-tabs"></div>
+
+      <!-- ======= ALL SUB-PAGES (tools-sub-*) ======= -->
+
+      <!-- Sub: P-T Calculator -->
+      <div id="tools-sub-pt" class="sub-page">
+        <div class="page-header">
+          <h1 data-i18n="pt.title">P-T 계산기</h1>
+          <p class="subtitle" data-i18n="pt.subtitle">압력-온도 변환 · 과열도 · 과냉도</p>
+        </div>
+
+        <!-- 냉매 선택 (항상 표시) -->
+        <div class="glass-card">
+          <div class="form-group">
+            <label class="form-label" data-i18n="pt.refselect.label">냉매 선택</label>
+            <select id="pt-ref-select" class="form-select"></select>
+          </div>
+          <div id="pt-ref-info" style="margin-top:8px"></div>
+          <div id="pt-ref-warnings"></div>
+        </div>
+
+        <!-- Accordion: 변환 / 과열도 / 과냉도 -->
+        <div class="glass-card">
+          <!-- 섹션 1: 압력↔온도 (기본 열림) -->
+          <div class="accordion-section open" id="acc-pt-convert">
+            <button class="accordion-header" onclick="toggleAccordion('acc-pt-convert')">
+              <span class="accordion-title" data-i18n="pt.convert.title">압력 ↔ 온도 변환</span>
+              <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="accordion-body">
+              <div class="input-row">
+                <div class="form-group">
+                  <label class="form-label form-label-row"><span data-i18n="pt.temp.label">온도 (°F)</span><span class="help-trigger" data-help="온도 입력 시 해당 포화압력을 계산합니다. 비공비 혼합물은 Bubble/Dew 분리 표시.">?</span></label>
+                  <input type="number" id="pt-temp-input" class="form-input" placeholder="ex: 75" data-i18n-ph="pt.temp.placeholder" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label class="form-label form-label-row"><span data-i18n="pt.pressure.label">압력 (psig)</span><span class="help-trigger" data-help="게이지 압력(psig) 입력 시 해당 포화온도를 계산합니다.">?</span></label>
+                  <input type="number" id="pt-press-input" class="form-input" placeholder="ex: 120" data-i18n-ph="pt.pressure.placeholder" step="0.1">
+                </div>
+              </div>
+              <div id="pt-result-area" aria-live="polite"></div>
+            </div>
+          </div>
+
+          <div class="accordion-divider"></div>
+
+          <!-- 섹션 2: 과열도 (기본 닫힘) -->
+          <div class="accordion-section" id="acc-pt-sh">
+            <button class="accordion-header" onclick="toggleAccordion('acc-pt-sh')">
+              <span class="accordion-title" data-i18n="pt.sh.title">과열도 (Superheat)</span>
+              <span class="accordion-preview" id="sh-preview">—</span>
+              <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="accordion-body">
+              <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:10px">
+                과열도 = 석션라인 실측온도 − 포화온도(Dew Point)
+              </p>
+              <div class="input-row">
+                <div class="form-group">
+                  <label class="form-label form-label-row">흡입압력 (psig)<span class="help-trigger" data-help="저압 게이지 값. 이 값으로 포화온도(이슬점)를 계산합니다.">?</span></label>
+                  <input type="number" id="pt-sh-pressure" class="form-input" placeholder="저압" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label class="form-label form-label-row">석션라인 온도 (°F)<span class="help-trigger" data-help="증발기 출구 배관에 클램프 온도계를 부착하여 측정.">?</span></label>
+                  <input type="number" id="pt-sh-temp" class="form-input" placeholder="실측" step="0.1">
+                </div>
+              </div>
+              <button id="pt-calc-sh-btn" class="btn btn-primary btn-ripple" data-i18n="pt.sh.calculate">과열도 계산</button>
+              <div id="pt-sh-result"></div>
+            </div>
+          </div>
+
+          <div class="accordion-divider"></div>
+
+          <!-- 섹션 3: 과냉도 (기본 닫힘) -->
+          <div class="accordion-section" id="acc-pt-sc">
+            <button class="accordion-header" onclick="toggleAccordion('acc-pt-sc')">
+              <span class="accordion-title" data-i18n="pt.sc.title">과냉도 (Subcooling)</span>
+              <span class="accordion-preview" id="sc-preview">—</span>
+              <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="accordion-body">
+              <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:10px">
+                과냉도 = 포화온도(Bubble Point) − 리퀴드라인 실측온도
+              </p>
+              <div class="input-row">
+                <div class="form-group">
+                  <label class="form-label form-label-row">토출압력 (psig)<span class="help-trigger" data-help="고압 게이지 값. 이 값으로 포화온도(비등점)를 계산합니다.">?</span></label>
+                  <input type="number" id="pt-sc-pressure" class="form-input" placeholder="고압" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label class="form-label form-label-row">리퀴드라인 온도 (°F)<span class="help-trigger" data-help="응축기 출구 배관에 클램프 온도계를 부착하여 측정.">?</span></label>
+                  <input type="number" id="pt-sc-temp" class="form-input" placeholder="실측" step="0.1">
+                </div>
+              </div>
+              <button id="pt-calc-sc-btn" class="btn btn-primary btn-ripple" data-i18n="pt.sc.calculate">과냉도 계산</button>
+              <div id="pt-sc-result"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub: Cross Diagnostic -->
+      <div id="tools-sub-cross" class="sub-page">
+        <div class="page-header">
+          <h1 data-i18n="cross.title">교차 진단 엔진</h1>
+          <p class="subtitle" data-i18n="cross.subtitle">과열도 × 과냉도 자동 진단</p>
+        </div>
+
+        <div class="glass-card">
+          <div class="form-group">
+            <label class="form-label" data-i18n="cross.refselect.label">냉매 선택</label>
+            <select id="diag-ref-select" class="form-select"></select>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="section-title" data-i18n="cross.input.title">측정값 입력</div>
+          <div class="input-row">
+            <div class="form-group">
+              <label class="form-label form-label-row">흡입압력 (psig)<span class="help-trigger" data-help="저압 게이지 값 (psig = 대기압 기준 게이지 압력). R-410A 일반적 100~150 psig">?</span></label>
+              <input type="number" id="diag-suction-p" class="form-input" placeholder="R-410A: ~120" step="0.1">
+              <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span></span></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-row">토출압력 (psig)<span class="help-trigger" data-help="고압 게이지 값. R-410A 일반적 300~450 psig. 흡입압력보다 반드시 높아야 합니다.">?</span></label>
+              <input type="number" id="diag-discharge-p" class="form-input" placeholder="R-410A: ~380" step="0.1">
+              <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span></span></div>
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="form-group">
+              <label class="form-label form-label-row">석션라인 온도 (°F)<span class="help-trigger" data-help="증발기 출구~컴프레서 사이 배관 온도. 클램프 온도계로 측정.">?</span></label>
+              <input type="number" id="diag-suction-t" class="form-input" placeholder="실측" step="0.1">
+              <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span></span></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-row">리퀴드라인 온도 (°F)<span class="help-trigger" data-help="응축기 출구~팽창장치 사이 배관 온도. 클램프 온도계로 측정.">?</span></label>
+              <input type="number" id="diag-liquid-t" class="form-input" placeholder="실측" step="0.1">
+              <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span></span></div>
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="form-group">
+              <label class="form-label form-label-row">외기온도 (°F)<span class="help-trigger" data-help="실외 건구 온도. 응축기 주변 공기 온도를 측정합니다.">?</span></label>
+              <input type="number" id="diag-outdoor-t" class="form-input" placeholder="실외" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-row">리턴공기 온도 (°F)<span class="help-trigger" data-help="실내 리턴 그릴에서 측정한 건구 온도.">?</span></label>
+              <input type="number" id="diag-return-t" class="form-input" placeholder="실내 리턴" step="0.1">
+            </div>
+          </div>
+          <button id="diag-calc-btn" class="btn btn-primary btn-ripple mt-8" data-i18n="cross.calculate">
+            진단 실행
+          </button>
+        </div>
+        <div id="diag-result-area" aria-live="polite"></div>
+      </div>
+
+      <!-- Sub: NIST Non-Invasive -->
+      <div id="tools-sub-nist" class="sub-page">
+        <div class="page-header">
+          <h1 data-i18n="nist.title">NIST 비침습 진단</h1>
+          <p class="subtitle" data-i18n="nist.subtitle">게이지 없이 온도만으로 진단</p>
+        </div>
+
+        <div class="glass-card nist-hero-glow">
+          <div class="text-center mb-16">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2" stroke-linecap="round"><path d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z"/></svg>
+            <p class="text-xs text-secondary mt-8">
+              <span data-i18n="nist.hero">온도 측정만으로 시스템 상태를 판정합니다</span>
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label form-label-row">SEER 등급<span class="help-trigger" data-help="장비 명판에서 확인. SEER이 높을수록 CTOA(응축온도-외기온도 차이)가 작아 고효율.">?</span></label>
+            <select id="nist-seer" class="form-select">
+              <option value="low">6-10 SEER (~1991 이전)</option>
+              <option value="medium">10-12 SEER (1992~2005)</option>
+              <option value="high" selected>13-15 SEER (2006~)</option>
+              <option value="ultra">16+ SEER (고효율)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label form-label-row">리턴공기 온도 (°F)<span class="help-trigger" data-help="실내기 리턴 그릴에서 측정한 건구 온도. DTD 계산의 기준점입니다.">?</span></label>
+            <input type="number" id="nist-return-t" class="form-input" placeholder="일반적 72~78" step="0.1">
+            <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span></span></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label form-label-row">석션라인 온도 (°F)<span class="help-trigger" data-help="증발기 출구~컴프레서 사이 배관 온도. 예상값과 비교하여 시스템 상태를 판정합니다.">?</span></label>
+            <input type="number" id="nist-suction-t" class="form-input" placeholder="증발기 출구 배관" step="0.1">
+            <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span></span></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label form-label-row">리퀴드라인 온도 (°F)<span class="help-trigger" data-help="응축기 출구~팽창장치 사이 배관 온도. 예상 응축온도와 비교합니다.">?</span></label>
+            <input type="number" id="nist-liquid-t" class="form-input" placeholder="응축기 출구 배관" step="0.1">
+            <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span></span></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label form-label-row">외기온도 (°F)<span class="help-trigger" data-help="실외기 주변 공기 온도. CTOA 계산에 사용됩니다.">?</span></label>
+            <input type="number" id="nist-outdoor-t" class="form-input" placeholder="실외" step="0.1">
+            <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span></span></div>
+          </div>
+
+          <button id="nist-calc-btn" class="btn btn-success btn-ripple mt-8" data-i18n="nist.calculate">
+            비침습 진단 실행
+          </button>
+        </div>
+        <div id="nist-result-area" aria-live="polite"></div>
+      </div>
+
+      <!-- Sub: TXV Wizard -->
+      <div id="tools-sub-txv" class="sub-page">
+        <div id="txv-content">
+          <!-- Rendered by TXVWizard.initUI() -->
+        </div>
+      </div>
+
+      <!-- Sub: Error Code Search -->
+      <div id="tools-sub-errorcode" class="sub-page">
+        <div id="errorcode-content">
+          <!-- Rendered by ErrorCodeSearch.initUI() -->
+        </div>
+      </div>
+
+      <!-- Sub: Cycle Visualization -->
+      <div id="tools-sub-cycle" class="sub-page">
+        <div id="cycle-content">
+          <!-- Rendered by CycleVisualization.initUI() -->
+        </div>
+      </div>
+
+      <!-- Sub: P-H Diagram -->
+      <div id="tools-sub-ph" class="sub-page">
+        <div id="ph-diagram-content">
+          <!-- Rendered by PHDiagram.initUI() -->
+        </div>
+      </div>
+
+      <!-- Sub: P-H Interactive Learning -->
+      <div id="tools-sub-phlearn" class="sub-page">
+        <div id="ph-interactive-content">
+          <!-- Rendered by PHInteractive.initUI() -->
+        </div>
+      </div>
+
+      <!-- Sub: Refrigerant Compare -->
+      <div id="tools-sub-compare" class="sub-page">
+        <div id="ref-compare-content">
+          <!-- Rendered by RefrigerantCompare.initUI() -->
+        </div>
+      </div>
+
+      <!-- Sub: Checklist -->
+      <div id="tools-sub-checklist" class="sub-page">
+        <div id="checklist-content">
+          <!-- Rendered by MaintenanceChecklist.initUI() -->
+        </div>
+      </div>
+
+      <!-- Sub: Parts Cross Ref -->
+      <div id="tools-sub-parts" class="sub-page">
+        <div id="parts-content">
+          <!-- Rendered by PartsCrossRef.initUI() -->
+        </div>
+      </div>
+
+      <!-- Sub: Pipe Calculator -->
+      <div id="tools-sub-pipe" class="sub-page">
+        <div id="pipe-content">
+          <!-- Rendered by PipeCalculator.initUI() -->
+        </div>
+      </div>
+
+    </div><!-- /#tools-category-view -->
+  </section>
+
+
+  <!-- ===================================== -->
+  <!-- PAGE: 기록 (Records) -->
+  <!-- ===================================== -->
+  <section id="page-records" class="page-section">
+    <!-- Sub-tabs -->
+    <div class="sub-tab-bar" id="records-sub-tabs">
+      <button class="sub-tab-btn active" data-sub="service" onclick="App.showSub('records','service')" data-i18n="tab.service">📝 수리이력</button>
+      <button class="sub-tab-btn" data-sub="notes" onclick="App.showSub('records','notes')" data-i18n="tab.notes">📒 현장메모</button>
+    </div>
+
+    <!-- Sub: Service History -->
+    <div id="records-sub-service" class="sub-page active">
+      <div id="service-content">
+        <!-- Rendered by ServiceHistory.initUI() -->
+      </div>
+    </div>
+
+    <!-- Sub: Field Notes -->
+    <div id="records-sub-notes" class="sub-page">
+      <div id="notes-content">
+        <!-- Rendered by FieldNotes.initUI() -->
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================================== -->
+  <!-- PAGE: SETTINGS -->
+  <!-- ===================================== -->
+  <section id="page-settings" class="page-section">
+    <div class="page-header">
+      <h1>⚙️ <span data-i18n="settings.title">설정</span></h1>
+      <p class="subtitle" data-i18n="settings.subtitle">앱 환경 설정</p>
+    </div>
+
+    <!-- Account & Cloud Sync (rendered by Auth.renderSection()) -->
+    <div id="auth-section"></div>
+
+    <!-- Language Selector (rendered by I18n.renderSelector()) -->
+    <div id="lang-section"></div>
+
+    <div class="glass-card">
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title" data-i18n="settings.unit_temp.title">온도 단위</div>
+          <div class="setting-desc" data-i18n="settings.unit_temp.desc">표시 온도 단위 선택</div>
+        </div>
+        <div class="unit-toggle">
+          <button id="setting-unit-f" class="active">°F</button>
+          <button id="setting-unit-c">°C</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Settings (rendered by Settings.initUI()) -->
+    <div id="settings-extra"></div>
+
+    <!-- Refrigerant Quick Reference -->
+    <div class="glass-card">
+      <div class="section-title" data-i18n="settings.ref_table.title">냉매 빠른 참조</div>
+      <div style="overflow-x:auto">
+        <table class="settings-table">
+          <thead>
+            <tr>
+              <th data-i18n="settings.ref_table.col1">냉매</th>
+              <th class="center" data-i18n="settings.ref_table.col2">유형</th>
+              <th class="center" data-i18n="settings.ref_table.col3">GWP</th>
+              <th class="center" data-i18n="settings.ref_table.col4">안전</th>
+              <th class="center" data-i18n="settings.ref_table.col5">글라이드</th>
+            </tr>
+          </thead>
+          <tbody id="settings-ref-table">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Diagnostic Matrix Reference -->
+    <div class="glass-card">
+      <div class="section-title" data-i18n="settings.diag_matrix.title">진단 매트릭스 참조</div>
+      <div style="overflow-x:auto">
+        <table class="settings-table">
+          <thead>
+            <tr>
+              <th data-i18n="settings.matrix.col1">과열도</th>
+              <th data-i18n="settings.matrix.col2">과냉도</th>
+              <th data-i18n="settings.matrix.col3">진단</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--accent-green)">정상</td>
+              <td style="color:var(--accent-green)">정상</td>
+              <td>✅ 정상</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent-red)">높음</td>
+              <td style="color:var(--accent-cyan)">낮음</td>
+              <td>🔴 냉매 부족</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent-red)">높음</td>
+              <td style="color:var(--accent-red)">높음</td>
+              <td>🟠 계량장치 제한</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent-cyan)">낮음</td>
+              <td style="color:var(--accent-red)">높음</td>
+              <td>🔴 냉매 과충전</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent-cyan)">낮음</td>
+              <td style="color:var(--accent-cyan)">낮음</td>
+              <td>🔴 컴프레서 불량</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent-cyan)">낮음</td>
+              <td style="color:var(--accent-green)">정상</td>
+              <td>🟡 TXV 오버피딩</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent-red)">높음</td>
+              <td style="color:var(--accent-green)">정상</td>
+              <td>🟠 에어플로우 부족</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Data Management (rendered by Settings.initUI()) -->
+    <div class="glass-card">
+      <div class="section-title" data-i18n="settings.data_mgmt.title">데이터 관리</div>
+      <div id="settings-data-mgmt"></div>
+    </div>
+
+    <!-- About -->
+    <div class="glass-card">
+      <div class="section-title" data-i18n="settings.about.title">앱 정보</div>
+      <div style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8">
+        <strong style="color:var(--text-primary)">HVAC Pulse — 현장 진단 도구</strong><br>
+        <span id="about-version">Version 1.0.0</span><br><br>
+        <strong>데이터 소스:</strong><br>
+        HVAC School (Bryan Orr), AC Service Tech,<br>
+        HVAC Know It All (Gary McCreadie),<br>
+        Sporlan/Parker, MEP Academy,<br>
+        Engineering Mindset, Refrigeration Mentor<br><br>
+        <strong>학술 데이터:</strong><br>
+        Bulgurcu (2014) P-H Diagram FDD,<br>
+        ASHRAE RP-1043 (Comstock &amp; Braun),<br>
+        LBNL FDD Severity Framework,<br>
+        CoolProp WASM (NIST-grade calculations)
+      </div>
+    </div>
+
+    <div class="version-info">
+      HVAC Pulse v1.0.0
+    </div>
+  </section>
+
+</div><!-- /.app-container -->
+
+
+<!-- ===================================== -->
+<!-- BOTTOM TAB BAR -->
+<!-- ===================================== -->
+<nav class="tab-bar" aria-label="메인 내비게이션">
+  <div class="tab-bar-inner" role="tablist">
+    <button class="tab-item active" data-tab="home" role="tab" aria-selected="true" aria-label="홈">
+      <span class="tab-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </span>
+      <span class="tab-label" data-i18n="nav.home">홈</span>
+    </button>
+    <button class="tab-item" data-tab="tools" role="tab" aria-selected="false" aria-label="도구">
+      <span class="tab-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+        </svg>
+      </span>
+      <span class="tab-label" data-i18n="nav.tools">도구</span>
+    </button>
+    <button class="tab-item" data-tab="records" role="tab" aria-selected="false" aria-label="기록">
+      <span class="tab-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>
+          <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+          <line x1="8" y1="10" x2="16" y2="10"/>
+          <line x1="8" y1="14" x2="16" y2="14"/>
+          <line x1="8" y1="18" x2="12" y2="18"/>
+        </svg>
+      </span>
+      <span class="tab-label" data-i18n="nav.records">기록</span>
+    </button>
+    <button class="tab-item" data-tab="settings" role="tab" aria-selected="false" aria-label="설정">
+      <span class="tab-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+      </span>
+      <span class="tab-label" data-i18n="nav.settings">설정</span>
+    </button>
+  </div>
+</nav>
+
+
+<!-- ===================================== -->
+<!-- Settings Ref Table Populate (inline) -->
+<!-- ===================================== -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const tbody = document.getElementById('settings-ref-table');
+  if (!tbody) return;
+
+  // Use RefrigerantCatalog if available, else legacy REFRIGERANT_DB
+  const refs = (typeof RefrigerantCatalog !== 'undefined')
+    ? RefrigerantCatalog.getAll()
+    : (typeof REFRIGERANT_DB !== 'undefined')
+      ? Object.keys(REFRIGERANT_DB).map(k => REFRIGERANT_DB[k])
+      : [];
+
+  refs.forEach(r => {
+    const name = r.name_kr || r.name || r.id || '';
+    const safety = r.safety || '';
+    const safetyColor = safety === 'A1' ? 'var(--accent-green)' : safety === 'A2L' ? 'var(--accent-orange)' : 'var(--accent-red)';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-weight:600;font-family:var(--font-mono)">${name}</td>
+      <td class="center" style="color:var(--text-secondary)">${r.type || ''}</td>
+      <td class="center" style="font-family:var(--font-mono)">${r.gwp !== undefined ? r.gwp : '—'}</td>
+      <td class="center" style="color:${safetyColor};font-weight:600">${safety}</td>
+      <td class="center">${r.isZeotropic ? `~${r.glide_f || r.glide || 0}°F` : '—'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+});
+</script>
+
+<!-- ===================================== -->
+<!-- Firebase SDK (optional — cloud sync) -->
+<!-- ===================================== -->
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
+
+<!-- ===================================== -->
+<!-- JS Modules (order matters) -->
+<!-- ===================================== -->
+<!-- i18n Language Packs -->
+<script src="./data/lang/en.js"></script>
+<script src="./data/lang/ja.js"></script>
+<script src="./data/lang/zh.js"></script>
+<script src="./data/lang/es.js"></script>
+<script src="./data/lang/fr.js"></script>
+<script src="./data/lang/de.js"></script>
+<script src="./data/lang/pt.js"></script>
+<script src="./data/lang/ar.js"></script>
+<script src="./data/lang/hi.js"></script>
+<script src="./js/i18n.js"></script>
+<!-- Core data -->
+<script src="./js/refrigerant-data.js"></script>
+<script src="./data/refrigerant-catalog.js"></script>
+<script src="./data/fault-signatures.js"></script>
+<script src="./js/coolprop-engine.js"></script>
+<!-- Calculators & diagnostics -->
+<script src="./js/pt-calculator.js"></script>
+<script src="./js/advanced-diagnostic.js"></script>
+<script src="./js/diagnostic-engine.js"></script>
+<script src="./js/nist-diagnostic.js"></script>
+<script src="./js/txv-wizard.js"></script>
+<!-- DB & management -->
+<script src="./js/db-helper.js"></script>
+<script src="./js/maintenance-checklist.js"></script>
+<script src="./js/service-history.js"></script>
+<script src="./js/parts-cross-ref.js"></script>
+<script src="./js/pipe-calculator.js"></script>
+<script src="./js/field-notes.js"></script>
+<!-- Error codes -->
+<script src="./data/error-codes-data.js"></script>
+<script src="./js/error-codes.js"></script>
+<!-- Cycle visualization -->
+<script src="./js/cycle-data.js"></script>
+<script src="./js/cycle-visualization.js"></script>
+<script src="./js/cycle-animation.js"></script>
+<script src="./js/gauge-dashboard.js"></script>
+<script src="./js/diagnostic-report.js"></script>
+<!-- Interactive tools -->
+<script src="./js/ph-interactive.js"></script>
+<script src="./js/ph-diagram.js"></script>
+<script src="./js/refrigerant-compare.js"></script>
+<!-- PWA & settings -->
+<script src="./js/install-prompt.js"></script>
+<script src="./js/settings.js"></script>
+<!-- Auth & cloud sync -->
+<script src="./js/firebase-config.js"></script>
+<script src="./js/auth.js"></script>
+<script src="./js/sync.js"></script>
+<!-- Security & protection -->
+<script src="./js/security.js"></script>
+<!-- Integration & main -->
+<script src="./js/data-bridge.js"></script>
+<script src="./js/app.js"></script>
+<!-- CoolProp WASM: ES Module loader -->
+<script type="module">
+import ModuleFactory from './lib/coolprop.js';
+window.CoolPropModuleFactory = ModuleFactory;
+window.dispatchEvent(new Event('coolprop-factory-ready'));
+</script>
+
+<!-- Install Banner -->
+<div id="install-banner" class="install-banner">
+  <div id="install-banner-body" style="flex:1"></div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button id="install-btn" class="btn btn-primary" onclick="InstallPrompt.install()" style="font-size:0.8rem;padding:8px 16px;white-space:nowrap" data-i18n="install.button">설치</button>
+    <button class="btn" onclick="InstallPrompt.dismiss()" style="font-size:0.8rem;padding:8px 12px;background:transparent;border:1px solid var(--border);color:var(--text-secondary)" data-i18n="install.close">닫기</button>
+  </div>
+</div>
+
+</body>
+</html>
