@@ -120,7 +120,7 @@ body {
 .app-container {
   max-width: 480px;
   margin: 0 auto;
-  padding-bottom: calc(var(--tabbar-height) + var(--safe-area-bottom) + 16px);
+  padding-bottom: calc(var(--tabbar-height) + var(--safe-area-bottom) + 48px);
   min-height: 100vh;
 }
 
