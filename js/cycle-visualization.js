@@ -24,9 +24,9 @@ const CycleVisualization = (() => {
 
   // --- Status colors ---
   const STATUS_COLORS = {
-    normal:  { fill: '#10b981', stroke: '#059669', label: '정상' },
-    caution: { fill: '#f59e0b', stroke: '#d97706', label: '주의' },
-    danger:  { fill: '#ef4444', stroke: '#dc2626', label: '위험' },
+    normal:  { fill: '#10b981', stroke: '#059669', get label() { return t('status.normal', '정상'); } },
+    caution: { fill: '#f59e0b', stroke: '#d97706', get label() { return t('status.caution', '주의'); } },
+    danger:  { fill: '#ef4444', stroke: '#dc2626', get label() { return t('status.danger', '위험'); } },
     info:    { fill: '#3b82f6', stroke: '#2563eb', label: '—' }
   };
 
@@ -60,17 +60,17 @@ const CycleVisualization = (() => {
           <h1 class="cycle-page-title">🔄 ${t('cycle.title', '냉동 사이클')}</h1>
           <p class="cycle-page-sub">${t('cycle.subtitle', '부품 터치 → 정보 · 배지 터치 → 값 입력')}</p>
         </div>
-        <select id="cycle-ref-select" class="form-select cycle-ref-sel">${getRefrigerantOptions()}</select>
+        <select id="cycle-ref-select" class="form-select cycle-ref-sel" aria-label="Refrigerant">${getRefrigerantOptions()}</select>
       </div>
 
       <div class="cycle-flow-strip">
-        <div class="cfs-step cfs-red"><span class="cfs-num">①</span>압축</div>
+        <div class="cfs-step cfs-red"><span class="cfs-num">①</span>${t('cycle.compress', '압축')}</div>
         <span class="cfs-sep">→</span>
-        <div class="cfs-step cfs-orange"><span class="cfs-num">②</span>응축</div>
+        <div class="cfs-step cfs-orange"><span class="cfs-num">②</span>${t('cycle.condense', '응축')}</div>
         <span class="cfs-sep">→</span>
-        <div class="cfs-step cfs-purple"><span class="cfs-num">③</span>팽창</div>
+        <div class="cfs-step cfs-purple"><span class="cfs-num">③</span>${t('cycle.expand', '팽창')}</div>
         <span class="cfs-sep">→</span>
-        <div class="cfs-step cfs-blue"><span class="cfs-num">④</span>증발</div>
+        <div class="cfs-step cfs-blue"><span class="cfs-num">④</span>${t('cycle.evaporate', '증발')}</div>
         <span class="cfs-sep cfs-loop">↩</span>
       </div>
 
@@ -79,10 +79,10 @@ const CycleVisualization = (() => {
           ${generateSVG()}
         </div>
         <div class="cycle-legend">
-          <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>고압가스</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span>고압액체</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span>혼합</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span>저압가스</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>${t('cycle.high_gas', '고압가스')}</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span>${t('cycle.high_liquid', '고압액체')}</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span>${t('cycle.mixed', '혼합')}</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span>${t('cycle.low_gas', '저압가스')}</span>
         </div>
       </div>
 
@@ -218,7 +218,7 @@ const CycleVisualization = (() => {
       <line x1="30" y1="260" x2="730" y2="260" stroke="rgba(255,255,255,0.04)" stroke-width="1" stroke-dasharray="8,5"/>
       <text x="735" y="35" text-anchor="end" fill="rgba(239,68,68,0.2)" font-size="9" font-weight="600" letter-spacing="1.5">HIGH SIDE</text>
       <text x="735" y="295" text-anchor="end" fill="rgba(59,130,246,0.2)" font-size="9" font-weight="600" letter-spacing="1.5">LOW SIDE</text>
-      <text x="380" y="265" text-anchor="middle" fill="rgba(255,255,255,0.1)" font-size="8">● 배지를 터치하여 측정값을 입력하세요</text>
+      <text x="380" y="265" text-anchor="middle" fill="rgba(255,255,255,0.1)" font-size="8">● ${t('cycle.badge_hint', '배지를 터치하여 측정값을 입력하세요')}</text>
     `;
   }
 
@@ -297,7 +297,7 @@ const CycleVisualization = (() => {
       <circle cx="582" cy="415" r="20" fill="none" stroke="#334155" stroke-width="1.5"/>
       <text x="582" y="420" text-anchor="middle" fill="#64748b" font-size="14" font-weight="bold">M</text>
       <rect x="622" y="385" width="7" height="18" rx="2" fill="#475569"/>
-      <text x="582" y="485" text-anchor="middle" fill="#e8ecf4" font-size="11" font-weight="600"><tspan fill="#ef4444">① </tspan>컴프레서</text>
+      <text x="582" y="485" text-anchor="middle" fill="#e8ecf4" font-size="11" font-weight="600"><tspan fill="#ef4444">① </tspan>${t('cycle.compressor', '컴프레서')}</text>
       <!-- Touch area -->
       <rect x="525" y="345" width="115" height="130" rx="22" fill="transparent"/>
     </g>`;
@@ -320,7 +320,7 @@ const CycleVisualization = (() => {
       <line x1="681" y1="107" x2="719" y2="107" stroke="#64748b" stroke-width="1.5"/>
       <line x1="686" y1="92" x2="714" y2="122" stroke="#64748b" stroke-width="1"/>
       <line x1="714" y1="92" x2="686" y2="122" stroke="#64748b" stroke-width="1"/>
-      <text x="575" y="185" text-anchor="middle" fill="#e8ecf4" font-size="11" font-weight="600"><tspan fill="#f59e0b">② </tspan>응축기</text>
+      <text x="575" y="185" text-anchor="middle" fill="#e8ecf4" font-size="11" font-weight="600"><tspan fill="#f59e0b">② </tspan>${t('cycle.condenser', '응축기')}</text>
       <rect x="465" y="38" width="220" height="138" rx="6" fill="transparent"/>
     </g>`;
   }
@@ -336,7 +336,7 @@ const CycleVisualization = (() => {
       <circle cx="85" cy="155" r="7" fill="#1e293b" stroke="#06b6d4" stroke-width="1.5"/>
       <!-- Capillary -->
       <path d="M92,152 Q110,140 96,112" stroke="#06b6d4" stroke-width="1" fill="none" stroke-dasharray="3,2"/>
-      <text x="130" y="185" text-anchor="middle" fill="#e8ecf4" font-size="10" font-weight="600"><tspan fill="#8b5cf6">③ </tspan>팽창밸브</text>
+      <text x="130" y="185" text-anchor="middle" fill="#e8ecf4" font-size="10" font-weight="600"><tspan fill="#8b5cf6">③ </tspan>${t('cycle.expansion_valve', '팽창밸브')}</text>
       <rect x="80" y="70" width="100" height="108" rx="4" fill="transparent"/>
     </g>`;
   }
@@ -355,7 +355,7 @@ const CycleVisualization = (() => {
       <circle cx="38" cy="395" r="20" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
       <line x1="38" y1="378" x2="38" y2="412" stroke="#64748b" stroke-width="1.5"/>
       <line x1="21" y1="395" x2="55" y2="395" stroke="#64748b" stroke-width="1.5"/>
-      <text x="157" y="470" text-anchor="middle" fill="#e8ecf4" font-size="11" font-weight="600"><tspan fill="#3b82f6">④ </tspan>증발기</text>
+      <text x="157" y="470" text-anchor="middle" fill="#e8ecf4" font-size="11" font-weight="600"><tspan fill="#3b82f6">④ </tspan>${t('cycle.evaporator', '증발기')}</text>
       <rect x="15" y="330" width="260" height="130" rx="6" fill="transparent"/>
     </g>`;
   }
@@ -367,7 +367,7 @@ const CycleVisualization = (() => {
       <rect x="330" y="55" width="50" height="78" rx="14" fill="url(#grad-comp)" stroke="#f59e0b" stroke-width="1.5" filter="url(#shadow)"/>
       <line x1="340" y1="75" x2="370" y2="75" stroke="#475569" stroke-width="1"/>
       <line x1="340" y1="113" x2="370" y2="113" stroke="#475569" stroke-width="1"/>
-      <text x="355" y="152" text-anchor="middle" fill="#e8ecf4" font-size="9" font-weight="600">수액기</text>
+      <text x="355" y="152" text-anchor="middle" fill="#e8ecf4" font-size="9" font-weight="600">${t('cycle.receiver', '수액기')}</text>
       <rect x="320" y="45" width="70" height="100" rx="14" fill="transparent"/>
     </g>`;
   }
@@ -390,7 +390,7 @@ const CycleVisualization = (() => {
     <g id="comp-accumulator" class="cv-comp-hover" onclick="CycleVisualization.showComponent('accumulator')">
       <rect x="383" y="390" width="44" height="72" rx="12" fill="url(#grad-comp)" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)"/>
       <line x1="393" y1="405" x2="417" y2="405" stroke="#475569" stroke-width="1"/>
-      <text x="405" y="480" text-anchor="middle" fill="#e8ecf4" font-size="9" font-weight="600">어큐뮬</text>
+      <text x="405" y="480" text-anchor="middle" fill="#e8ecf4" font-size="9" font-weight="600">${t('cycle.accumulator', '어큐뮬')}</text>
       <rect x="373" y="380" width="64" height="94" rx="12" fill="transparent"/>
     </g>`;
   }
@@ -400,14 +400,14 @@ const CycleVisualization = (() => {
     return `
       <!-- Condenser outdoor air -->
       <g opacity="0.4">
-        <text x="738" y="178" fill="#ef4444" font-size="8" text-anchor="middle">외기온도</text>
+        <text x="738" y="178" fill="#ef4444" font-size="8" text-anchor="middle">${t('cycle.outdoor_temp', '외기온도')}</text>
         <line x1="728" y1="70" x2="728" y2="130" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>
       </g>
 
       <!-- Evaporator indoor air (top → bottom through coil) -->
       <g opacity="0.4">
-        <text x="15" y="335" fill="#3b82f6" font-size="9">리턴↓</text>
-        <text x="20" y="458" fill="#06b6d4" font-size="9">공급↓</text>
+        <text x="15" y="335" fill="#3b82f6" font-size="9">${t('cycle.return_air', '리턴')}↓</text>
+        <text x="20" y="458" fill="#06b6d4" font-size="9">${t('cycle.supply_air', '공급')}↓</text>
       </g>
     `;
   }
@@ -476,8 +476,8 @@ const CycleVisualization = (() => {
     const content = document.getElementById('cycle-panel-content');
     content.innerHTML = `
       <div style="margin-bottom:12px">
-        <div style="font-size:var(--text-lg);font-weight:700;color:var(--text-primary)">${data.name_kr}</div>
-        <div style="font-size:var(--text-sm);color:var(--text-secondary)">${data.name_en}</div>
+        <div style="font-size:var(--text-lg);font-weight:700;color:var(--text-primary)">${I18n.getLang() === 'ko' ? data.name_kr : data.name_en}</div>
+        <div style="font-size:var(--text-sm);color:var(--text-secondary)">${I18n.getLang() === 'ko' ? data.name_en : data.name_kr}</div>
       </div>
       <div style="font-size:var(--text-sm);color:var(--text-primary);margin-bottom:14px;line-height:1.6">${data.role}</div>
 
@@ -530,34 +530,35 @@ const CycleVisualization = (() => {
     const title = document.getElementById('cycle-modal-title');
     const body = document.getElementById('cycle-modal-body');
 
-    title.textContent = `${mp.abbr} — ${mp.name_kr}`;
+    title.textContent = `${mp.abbr} — ${(I18n.getLang() !== 'ko' && mp.name_en) ? mp.name_en : mp.name_kr}`;
 
     const currentVal = measurements[pointId];
-    let inputLabel = `${mp.name_kr} (${mp.unit})`;
+    const mpName = (I18n.getLang() !== 'ko' && mp.name_en) ? mp.name_en : mp.name_kr;
+    let inputLabel = `${mpName} (${mp.unit})`;
     let helpText = mp.description;
     let showCalcToggle = false;
 
     // For SH/SC, offer auto-calc if pressure is available
     if (pointId === 'SH' && measurements.Ps != null) {
       showCalcToggle = true;
-      inputLabel = '석션라인 실측온도 (°F)';
-      helpText = `Ps=${measurements.Ps} psig → 포화온도에서 자동 계산`;
+      inputLabel = t('cycle.suction_line_temp', '석션라인 실측온도') + ' (°F)';
+      helpText = `Ps=${measurements.Ps} psig → ${t('cycle.auto_calc_from_sat', '포화온도에서 자동 계산')}`;
     } else if (pointId === 'SC' && measurements.Pd != null) {
       showCalcToggle = true;
-      inputLabel = '리퀴드라인 실측온도 (°F)';
-      helpText = `Pd=${measurements.Pd} psig → 포화온도에서 자동 계산`;
+      inputLabel = t('cycle.liquid_line_temp', '리퀴드라인 실측온도') + ' (°F)';
+      helpText = `Pd=${measurements.Pd} psig → ${t('cycle.auto_calc_from_sat', '포화온도에서 자동 계산')}`;
     } else if (pointId === 'SH' || pointId === 'SC') {
-      inputLabel = `${mp.name_kr} 직접 입력 (${mp.unit})`;
-      helpText = `압력 미입력 — ${pointId === 'SH' ? 'Ps 먼저 입력 시 자동 계산 가능' : 'Pd 먼저 입력 시 자동 계산 가능'}`;
+      inputLabel = `${mpName} ${t('cycle.direct_input', '직접 입력')} (${mp.unit})`;
+      helpText = `${t('cycle.pressure_not_entered', '압력 미입력')} — ${pointId === 'SH' ? t('cycle.enter_ps_first', 'Ps 먼저 입력 시 자동 계산 가능') : t('cycle.enter_pd_first', 'Pd 먼저 입력 시 자동 계산 가능')}`;
     }
 
     body.innerHTML = `
       <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:12px">${helpText}</div>
-      <div style="font-size:var(--text-xs);color:var(--accent-green);margin-bottom:12px">정상 범위: ${mp.normalRange}</div>
+      <div style="font-size:var(--text-xs);color:var(--accent-green);margin-bottom:12px">${t('cycle.normal_range', '정상 범위')}: ${mp.normalRange}</div>
       <div class="form-group">
         <label class="form-label">${inputLabel}</label>
         <input type="number" id="cycle-input-val" class="form-input" style="font-size:var(--text-xl);text-align:center"
-               value="${currentVal != null ? currentVal : ''}" placeholder="값 입력" step="0.1" inputmode="decimal"
+               value="${currentVal != null ? currentVal : ''}" placeholder="${t('cycle.enter_value', '값 입력')}" step="0.1" inputmode="decimal"
                onkeydown="if(event.key==='Enter')CycleVisualization.submitMeasure('${pointId}')">
       </div>
       <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="CycleVisualization.submitMeasure('${pointId}')">
@@ -753,8 +754,8 @@ const CycleVisualization = (() => {
       const sc = STATUS_COLORS[status];
 
       let extra = '';
-      if (pid === 'Pd' && computed.condensingSatTemp != null) extra = `<div style="font-size:var(--text-xs);color:var(--text-secondary)">포화 ${computed.condensingSatTemp}°F</div>`;
-      if (pid === 'Ps' && computed.suctionSatTemp != null) extra = `<div style="font-size:var(--text-xs);color:var(--text-secondary)">포화 ${computed.suctionSatTemp}°F</div>`;
+      if (pid === 'Pd' && computed.condensingSatTemp != null) extra = `<div style="font-size:var(--text-xs);color:var(--text-secondary)">${t('cycle.saturation', '포화')} ${computed.condensingSatTemp}°F</div>`;
+      if (pid === 'Ps' && computed.suctionSatTemp != null) extra = `<div style="font-size:var(--text-xs);color:var(--text-secondary)">${t('cycle.saturation', '포화')} ${computed.suctionSatTemp}°F</div>`;
 
       html += `
         <div class="cycle-val-item">
@@ -769,7 +770,7 @@ const CycleVisualization = (() => {
       const crColor = computed.compressionRatio > 12 ? '#ef4444' : computed.compressionRatio > 10 ? '#f59e0b' : '#10b981';
       html += `
         <div class="cycle-val-item">
-          <div class="cycle-val-label">압축비</div>
+          <div class="cycle-val-label">${t('cycle.compression_ratio', '압축비')}</div>
           <div class="cycle-val-num" style="color:${crColor}">${computed.compressionRatio}</div>
           <div class="cycle-val-unit">:1</div>
         </div>`;
@@ -826,13 +827,13 @@ const CycleVisualization = (() => {
     // Extra warnings
     let warnings = '';
     if (measurements.DLT != null && measurements.DLT > 275) {
-      warnings += `<div class="alert-box alert-danger"><span>🚨</span><span>DLT ${measurements.DLT}°F (>275°F) — 오일 파괴 위험!</span></div>`;
+      warnings += `<div class="alert-box alert-danger"><span>🚨</span><span>DLT ${measurements.DLT}°F (>275°F) — ${t('cycle.warn_oil_breakdown', '오일 파괴 위험!')}</span></div>`;
     }
     if (computed.compressionRatio != null && computed.compressionRatio > 12) {
-      warnings += `<div class="alert-box alert-danger"><span>🔴</span><span>압축비 ${computed.compressionRatio}:1 (>12:1) — 컴프레서 과부하!</span></div>`;
+      warnings += `<div class="alert-box alert-danger"><span>🔴</span><span>${t('cycle.compression_ratio', '압축비')} ${computed.compressionRatio}:1 (>12:1) — ${t('cycle.warn_compressor_overload', '컴프레서 과부하!')}</span></div>`;
     }
     if (measurements.DT != null && (measurements.DT < 10 || measurements.DT > 28)) {
-      const dtStatus = measurements.DT < 10 ? '과소 (결빙?)' : '과대 (에어플로우?)';
+      const dtStatus = measurements.DT < 10 ? t('cycle.warn_dt_low', '과소 (결빙?)') : t('cycle.warn_dt_high', '과대 (에어플로우?)');
       warnings += `<div class="alert-box alert-warning"><span>⚠️</span><span>ΔT ${measurements.DT}°F — ${dtStatus}</span></div>`;
     }
 
@@ -848,7 +849,10 @@ const CycleVisualization = (() => {
     };
 
     const diag = DIAG_DISPLAY[diagKey];
-    const affectedNames = affectedComps.map(cid => CYCLE_COMPONENTS[cid]?.name_kr || cid).join(', ');
+    const affectedNames = affectedComps.map(cid => {
+      const comp = CYCLE_COMPONENTS[cid];
+      return comp ? ((I18n.getLang() !== 'ko' && comp.name_en) ? comp.name_en : comp.name_kr) : cid;
+    }).join(', ');
 
     // --- Advanced Diagnostic enrichment ---
     let severityHtml = '';
@@ -903,7 +907,7 @@ const CycleVisualization = (() => {
         ${affectedComps.length ? `
         <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:8px">
           <strong style="color:var(--accent-orange)">${t('cycle.check_target', '점검 대상')}:</strong> ${affectedNames}
-          <div style="font-size:var(--text-xs);margin-top:4px">↑ 다이어그램에서 깜빡이는 부품을 터치하면 상세 정보를 볼 수 있습니다.</div>
+          <div style="font-size:var(--text-xs);margin-top:4px">↑ ${t('cycle.touch_blinking_hint', '다이어그램에서 깜빡이는 부품을 터치하면 상세 정보를 볼 수 있습니다.')}</div>
         </div>` : ''}
 
         ${fieldTipsHtml}

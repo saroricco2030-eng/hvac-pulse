@@ -1,33 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Snowflake / cooling — fills the canvas -->
-  <g transform="translate(256,256)" stroke="#06b6d4" stroke-width="10" fill="none" stroke-linecap="round">
-    <!-- Main axes -->
+  <!-- Background for maskable icon -->
+  <rect width="512" height="512" fill="#0a0e1a"/>
+  <!-- Snowflake — sized to 80% safe zone -->
+  <g transform="translate(256,256) scale(0.72)" stroke="#06b6d4" stroke-width="10" fill="none" stroke-linecap="round">
     <line x1="0" y1="-200" x2="0" y2="200"/>
     <line x1="-173" y1="-100" x2="173" y2="100"/>
     <line x1="-173" y1="100" x2="173" y2="-100"/>
-    <!-- Branches top/bottom -->
     <line x1="0" y1="-200" x2="-40" y2="-155"/>
     <line x1="0" y1="-200" x2="40" y2="-155"/>
     <line x1="0" y1="200" x2="-40" y2="155"/>
     <line x1="0" y1="200" x2="40" y2="155"/>
-    <!-- Branches top-left / bottom-right -->
     <line x1="-173" y1="-100" x2="-133" y2="-137"/>
     <line x1="-173" y1="-100" x2="-130" y2="-63"/>
     <line x1="173" y1="100" x2="133" y2="137"/>
     <line x1="173" y1="100" x2="130" y2="63"/>
-    <!-- Branches bottom-left / top-right -->
     <line x1="-173" y1="100" x2="-133" y2="137"/>
     <line x1="-173" y1="100" x2="-130" y2="63"/>
     <line x1="173" y1="-100" x2="133" y2="-137"/>
     <line x1="173" y1="-100" x2="130" y2="-63"/>
-    <!-- Mid-branches -->
     <line x1="0" y1="-120" x2="-28" y2="-92"/>
     <line x1="0" y1="-120" x2="28" y2="-92"/>
     <line x1="0" y1="120" x2="-28" y2="92"/>
     <line x1="0" y1="120" x2="28" y2="92"/>
   </g>
   <!-- Thermometer center -->
-  <g transform="translate(256,256)">
+  <g transform="translate(256,256) scale(0.72)">
     <rect x="-14" y="-95" width="28" height="140" rx="14" fill="#0a0e1a" stroke="#ef4444" stroke-width="7"/>
     <circle cx="0" cy="65" r="32" fill="#0a0e1a" stroke="#ef4444" stroke-width="7"/>
     <rect x="-7" y="-55" width="14" height="110" rx="7" fill="#ef4444" opacity="0.85"/>

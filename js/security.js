@@ -55,7 +55,7 @@ const AppSecurity = (() => {
         return false;
       }
       // Block Ctrl+S (Save page)
-      if (e.ctrlKey && (e.key === 'S' || e.key === 's') && !e.target.closest('input, textarea')) {
+      if (e.ctrlKey && (e.key === 'S' || e.key === 's') && !(e.target.closest && e.target.closest('input, textarea'))) {
         e.preventDefault();
         return false;
       }
@@ -66,10 +66,12 @@ const AppSecurity = (() => {
   function setupSelectionProtection() {
     // Allow selection in input/textarea, block elsewhere
     document.addEventListener('selectstart', (e) => {
-      const tag = e.target.tagName;
+      const el = e.target.nodeType === 1 ? e.target : e.target.parentElement;
+      if (!el) return;
+      const tag = el.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       // Allow selection in result areas (for copying diagnosis results)
-      if (e.target.closest('.diag-result, .calc-result, .result-box, [data-selectable]')) return;
+      if (el.closest('.diag-result, .calc-result, .result-box, [data-selectable]')) return;
       e.preventDefault();
     });
   }
@@ -163,7 +165,8 @@ const AppSecurity = (() => {
   // ---- Copy Protection on Page Source ----
   function setupCopyProtection() {
     document.addEventListener('copy', (e) => {
-      const target = e.target;
+      const target = e.target.nodeType === 1 ? e.target : e.target.parentElement;
+      if (!target) return;
       // Allow copy in inputs, textareas, and designated result areas
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
       if (target.closest('.diag-result, .calc-result, .result-box, [data-selectable]')) return;

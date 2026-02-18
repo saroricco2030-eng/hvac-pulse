@@ -275,6 +275,35 @@ const PHInteractive = (() => {
 
 
   // ============================================================
+  // TRANSLATION HELPERS
+  // ============================================================
+  function getTranslatedContent(key) {
+    const base = EDUCATIONAL_CONTENT[key];
+    if (!base) return null;
+    return {
+      ...base,
+      title: t('phi.' + key + '.title', base.title),
+      description: t('phi.' + key + '.desc', base.description),
+      details: base.details.map((d, i) => t('phi.' + key + '.d' + (i + 1), d)),
+      valueLabel: base.valueLabel ? t('phi.' + key + '.vlabel', base.valueLabel) : '',
+      normalRange: base.normalRange ? t('phi.' + key + '.range', base.normalRange) : ''
+    };
+  }
+
+  function getTranslatedFault(faultKey) {
+    const base = FAULT_EDUCATION[faultKey];
+    if (!base) return null;
+    return {
+      name: t('phi.fault_ed.' + faultKey + '.name', base.name),
+      point1: t('phi.fault_ed.' + faultKey + '.p1', base.point1),
+      point2: t('phi.fault_ed.' + faultKey + '.p2', base.point2),
+      point3: t('phi.fault_ed.' + faultKey + '.p3', base.point3),
+      point4: t('phi.fault_ed.' + faultKey + '.p4', base.point4)
+    };
+  }
+
+
+  // ============================================================
   // INITIALIZATION
   // ============================================================
   function initUI() {
@@ -283,15 +312,15 @@ const PHInteractive = (() => {
 
     container.innerHTML = `
       <div class="page-header">
-        <h1>📈 P-H 학습 도구</h1>
-        <p class="subtitle">터치하여 각 포인트/프로세스의 교육 설명 확인</p>
+        <h1>${t('phi.title', '📈 P-H 학습 도구')}</h1>
+        <p class="subtitle">${t('phi.subtitle', '터치하여 각 포인트/프로세스의 교육 설명 확인')}</p>
       </div>
 
       <div class="glass-card phi-main-card">
         <div class="phi-toolbar">
           <select id="phi-ref-select" class="form-select phi-ref-sel" onchange="PHInteractive.onRefChange()"></select>
-          <button class="phi-btn phi-fullscreen-btn" onclick="PHInteractive.toggleFullscreen()" title="전체화면">⛶</button>
-          <button class="phi-btn phi-reset-btn" onclick="PHInteractive.resetZoom()" title="줌 리셋">⟲</button>
+          <button class="phi-btn phi-fullscreen-btn" onclick="PHInteractive.toggleFullscreen()" title="${t('phi.fullscreen', '전체화면')}">⛶</button>
+          <button class="phi-btn phi-reset-btn" onclick="PHInteractive.resetZoom()" title="${t('phi.reset_zoom', '줌 리셋')}">⟲</button>
         </div>
 
         <div class="phi-canvas-wrap" id="phi-canvas-wrap">
@@ -301,25 +330,25 @@ const PHInteractive = (() => {
 
         <div class="phi-engine-badge" id="phi-engine-badge">
           <span class="phi-badge-dot"></span>
-          <span id="phi-engine-status">확인 중...</span>
+          <span id="phi-engine-status">${t('phi.checking', '확인 중...')}</span>
         </div>
       </div>
 
       <!-- Fault Simulation Controls -->
       <div class="glass-card phi-fault-card">
-        <div class="section-title" style="margin-bottom:8px">고장 시뮬레이션</div>
-        <p class="phi-fault-desc">고장을 선택하면 정상(실선) 위에 고장(점선)이 겹쳐집니다.</p>
+        <div class="section-title" style="margin-bottom:8px">${t('phi.fault_sim', '고장 시뮬레이션')}</div>
+        <p class="phi-fault-desc">${t('phi.fault_desc', '고장을 선택하면 정상(실선) 위에 고장(점선)이 겹쳐집니다.')}</p>
         <select id="phi-fault-select" class="form-select" onchange="PHInteractive.onFaultChange()">
-          <option value="">없음 (정상)</option>
-          <option value="refrigerant_low">냉매 부족</option>
-          <option value="refrigerant_high">냉매 과충전</option>
-          <option value="condenser_fouling">응축기 오염</option>
-          <option value="evaporator_fouling">증발기 기류 부족</option>
-          <option value="compressor_valve_leak">압축기 밸브 누설</option>
-          <option value="non_condensable">비응축가스 혼입</option>
+          <option value="">${t('phi.fault_none', '없음 (정상)')}</option>
+          <option value="refrigerant_low">${t('phi.fault.low', '냉매 부족')}</option>
+          <option value="refrigerant_high">${t('phi.fault.high', '냉매 과충전')}</option>
+          <option value="condenser_fouling">${t('phi.fault.cond', '응축기 오염')}</option>
+          <option value="evaporator_fouling">${t('phi.fault.evap', '증발기 기류 부족')}</option>
+          <option value="compressor_valve_leak">${t('phi.fault.comp', '압축기 밸브 누설')}</option>
+          <option value="non_condensable">${t('phi.fault.ncg', '비응축가스 혼입')}</option>
         </select>
         <div class="phi-severity-wrap" id="phi-severity-wrap" style="display:none">
-          <label class="phi-severity-label">심각도: <span id="phi-severity-text">SL3</span></label>
+          <label class="phi-severity-label">${t('phi.severity', '심각도:')} <span id="phi-severity-text">SL3</span></label>
           <input type="range" id="phi-severity-slider" class="phi-slider" min="0" max="3" step="1" value="2" oninput="PHInteractive.onSeverityChange()">
           <div class="phi-severity-ticks"><span>SL1</span><span>SL2</span><span>SL3</span><span>SL4</span></div>
         </div>
@@ -327,11 +356,11 @@ const PHInteractive = (() => {
       </div>
 
       <div class="glass-card phi-legend-card">
-        <div class="phi-legend-title">사용법</div>
+        <div class="phi-legend-title">${t('phi.usage', '사용법')}</div>
         <div class="phi-legend-items">
-          <div class="phi-legend-item"><span class="phi-legend-dot phi-dot-blue"></span>포인트/라인 터치 → 교육 설명</div>
-          <div class="phi-legend-item"><span class="phi-legend-dot phi-dot-red"></span>영역 터치 → 영역 설명</div>
-          <div class="phi-legend-item"><span class="phi-legend-dot phi-dot-gray"></span>핀치 줌 · 더블탭 리셋</div>
+          <div class="phi-legend-item"><span class="phi-legend-dot phi-dot-blue"></span>${t('phi.usage1', '포인트/라인 터치 → 교육 설명')}</div>
+          <div class="phi-legend-item"><span class="phi-legend-dot phi-dot-red"></span>${t('phi.usage2', '영역 터치 → 영역 설명')}</div>
+          <div class="phi-legend-item"><span class="phi-legend-dot phi-dot-gray"></span>${t('phi.usage3', '핀치 줌 · 더블탭 리셋')}</div>
         </div>
       </div>
     `;
@@ -388,16 +417,19 @@ const PHInteractive = (() => {
     if (!sel) return;
     sel.innerHTML = '';
 
+    const lang = typeof I18n !== 'undefined' ? I18n.getLang() : 'ko';
     if (typeof RefrigerantCatalog !== 'undefined') {
       const grouped = RefrigerantCatalog.getGroupedByCategory();
       for (const [, groupData] of Object.entries(grouped)) {
         const cat = groupData.category;
         const group = document.createElement('optgroup');
-        group.label = `${cat.icon} ${cat.name_kr}`;
+        const catName = (lang !== 'ko' && cat.name_en) ? cat.name_en : cat.name_kr;
+        group.label = `${cat.icon} ${catName}`;
         groupData.refrigerants.forEach(r => {
           const opt = document.createElement('option');
           opt.value = r.id;
-          opt.textContent = `${r.name_kr} (${r.safety})`;
+          const rName = (lang !== 'ko' && r.name_en) ? r.name_en : r.name_kr;
+          opt.textContent = `${rName} (${r.safety})`;
           if (r.id === currentRef) opt.selected = true;
           group.appendChild(opt);
         });
@@ -421,10 +453,10 @@ const PHInteractive = (() => {
     const ready = typeof CoolPropEngine !== 'undefined' && CoolPropEngine.isReady();
     if (ready) {
       badge.className = 'phi-engine-badge phi-engine-ready';
-      status.textContent = '🔬 NIST급 정밀 계산 (CoolProp)';
+      status.textContent = t('phi.engine_nist', '🔬 NIST급 정밀 계산 (CoolProp)');
     } else {
       badge.className = 'phi-engine-badge phi-engine-demo';
-      status.textContent = '📐 데모 모드 — CoolProp 로딩 시 정밀 선도로 전환';
+      status.textContent = t('phi.engine_demo', '📐 데모 모드 — CoolProp 로딩 시 정밀 선도로 전환');
     }
   }
 
@@ -577,9 +609,9 @@ const PHInteractive = (() => {
 
     el.innerHTML = `
       <div class="phi-cop-row">
-        <span class="phi-cop-normal">정상 COP <b>${normalCOP.toFixed(2)}</b></span>
+        <span class="phi-cop-normal">${t('phi.cop_normal', '정상 COP')} <b>${normalCOP.toFixed(2)}</b></span>
         <span class="phi-cop-arrow">→</span>
-        <span class="phi-cop-fault">고장 COP <b>${faultCOP.toFixed(2)}</b></span>
+        <span class="phi-cop-fault">${t('phi.cop_fault', '고장 COP')} <b>${faultCOP.toFixed(2)}</b></span>
         <span class="phi-cop-drop">(▼${pct}%)</span>
       </div>`;
   }
@@ -721,7 +753,7 @@ const PHInteractive = (() => {
       ctx.fillStyle = '#ef4444';
       ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
       ctx.font = '9px system-ui'; ctx.fillStyle = '#ef4444'; ctx.textAlign = 'center';
-      ctx.fillText('임계점', cx, cy - 8);
+      ctx.fillText(t('phi.critical', '임계점'), cx, cy - 8);
     }
   }
 
@@ -734,7 +766,7 @@ const PHInteractive = (() => {
     const liqMid = curveData.saturatedLiquid[Math.floor(curveData.saturatedLiquid.length / 3)];
     if (liqMid) {
       ctx.fillStyle = '#f59e0b';
-      ctx.fillText('과냉 액체', scaleH(liqMid.h) - 30, scaleP(liqMid.p));
+      ctx.fillText(t('phi.subcooled', '과냉 액체'), scaleH(liqMid.h) - 30, scaleP(liqMid.p));
     }
 
     // Two-phase (inside dome)
@@ -743,14 +775,14 @@ const PHInteractive = (() => {
     const vap = curveData.saturatedVapor[midIdx];
     if (liq && vap) {
       ctx.fillStyle = '#06b6d4';
-      ctx.fillText('2상 혼합', scaleH((liq.h + vap.h) / 2), scaleP(liq.p) + 5);
+      ctx.fillText(t('phi.twophase', '2상 혼합'), scaleH((liq.h + vap.h) / 2), scaleP(liq.p) + 5);
     }
 
     // Superheated (right of dome)
     const vapMid = curveData.saturatedVapor[Math.floor(curveData.saturatedVapor.length / 3)];
     if (vapMid) {
       ctx.fillStyle = '#8b5cf6';
-      ctx.fillText('과열 증기', scaleH(vapMid.h) + 35, scaleP(vapMid.p));
+      ctx.fillText(t('phi.superheated', '과열 증기'), scaleH(vapMid.h) + 35, scaleP(vapMid.p));
     }
     ctx.globalAlpha = 1;
   }
@@ -810,19 +842,19 @@ const PHInteractive = (() => {
     ctx.font = '11px system-ui';
     ctx.fillStyle = '#8896b3';
     ctx.textAlign = 'center';
-    ctx.fillText('엔탈피 h (kJ/kg)', canvasW / 2, canvasH - 6);
+    ctx.fillText(t('phi.axis_h', '엔탈피 h (kJ/kg)'), canvasW / 2, canvasH - 6);
 
     ctx.save();
     ctx.translate(12, canvasH / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillText('압력 P (kPa)', 0, 0);
+    ctx.fillText(t('phi.axis_p', '압력 P (kPa)'), 0, 0);
     ctx.restore();
 
     // Title
     ctx.font = 'bold 12px system-ui';
     ctx.fillStyle = '#e8ecf4';
     ctx.textAlign = 'center';
-    ctx.fillText(`${currentRef} P-H 선도`, canvasW / 2, 18);
+    ctx.fillText(`${currentRef} ${t('phi.chart_title', 'P-H 선도')}`, canvasW / 2, 18);
   }
 
   function drawLegend() {
@@ -832,12 +864,12 @@ const PHInteractive = (() => {
     ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 2; ctx.setLineDash([]);
     ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 20, y); ctx.stroke();
     ctx.fillStyle = '#8896b3'; ctx.textAlign = 'left';
-    ctx.fillText('정상', x + 24, y + 3);
+    ctx.fillText(t('phi.legend_normal', '정상'), x + 24, y + 3);
 
     ctx.strokeStyle = '#ef4444'; ctx.setLineDash([4, 3]);
     ctx.beginPath(); ctx.moveTo(x + 50, y); ctx.lineTo(x + 70, y); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillText('고장', x + 74, y + 3);
+    ctx.fillText(t('phi.legend_fault', '고장'), x + 74, y + 3);
   }
 
 
@@ -957,18 +989,18 @@ const PHInteractive = (() => {
     const popover = document.getElementById('phi-popover');
     if (!popover) return;
 
-    let content = EDUCATIONAL_CONTENT[key];
+    let content = getTranslatedContent(key);
     if (!content) return;
 
     // If fault is active and this is a cycle point, add fault-specific info
     let faultNote = '';
     if (activeFault && isFaultPoint && FAULT_EDUCATION[activeFault]) {
-      const fe = FAULT_EDUCATION[activeFault];
+      const fe = getTranslatedFault(activeFault);
       const pointKey = key; // 'point1'..'point4'
       if (fe[pointKey]) {
         faultNote = `
           <div class="phi-pop-fault">
-            <div class="phi-pop-fault-title">⚠️ ${fe.name} 시</div>
+            <div class="phi-pop-fault-title">⚠️ ${t('phi.fault_when', '{name} 시').replace('{name}', fe.name)}</div>
             <div class="phi-pop-fault-text">${fe[pointKey]}</div>
           </div>`;
       }
@@ -997,7 +1029,7 @@ const PHInteractive = (() => {
       </ul>
       ${valueHtml}
       ${faultNote}
-      <button class="phi-pop-close" onclick="PHInteractive.closePopover()">닫기</button>
+      <button class="phi-pop-close" onclick="PHInteractive.closePopover()">${t('common.close', '닫기')}</button>
     `;
 
     // Position — relative to canvas-wrap

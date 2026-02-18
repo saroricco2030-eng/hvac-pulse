@@ -65,8 +65,9 @@ const AdvancedDiagnostic = (() => {
     return {
       faultId,
       name_kr: fault.name_kr,
+      name_en: fault.name_en,
       signatures: fault.signatures,
-      fieldTips: fault.field_tips_kr || [],
+      fieldTips: (I18n.getLang() !== 'ko' && fault.field_tips_en) ? fault.field_tips_en : (fault.field_tips_kr || []),
       ph_effect: fault.ph_effect || null
     };
   }
@@ -77,20 +78,26 @@ const AdvancedDiagnostic = (() => {
 
     const levels = (typeof FaultSignatures !== 'undefined') ?
       FaultSignatures.SEVERITY_LEVELS : {
-        SL1: { icon: '🟡', label_kr: '경미', color: '#FFD700' },
-        SL2: { icon: '🟠', label_kr: '주의', color: '#FFA500' },
-        SL3: { icon: '🔴', label_kr: '심각', color: '#FF4500' },
-        SL4: { icon: '⛔', label_kr: '위험', color: '#FF0000' }
+        SL1: { icon: '🟡', label_kr: '경미', label_en: 'Minor', color: '#FFD700' },
+        SL2: { icon: '🟠', label_kr: '주의', label_en: 'Caution', color: '#FFA500' },
+        SL3: { icon: '🔴', label_kr: '심각', label_en: 'Severe', color: '#FF4500' },
+        SL4: { icon: '⛔', label_kr: '위험', label_en: 'Critical', color: '#FF0000' }
       };
 
     const sl = levels[severity.level];
     if (!sl) return '';
 
+    const lang = (typeof I18n !== 'undefined') ? I18n.getLang() : 'ko';
+    const slLabel = (lang !== 'ko' && sl.label_en) ? sl.label_en : sl.label_kr;
+    const descText = (lang !== 'ko' && (severity.info?.desc_en || sl.desc_en))
+      ? (severity.info?.desc_en || sl.desc_en)
+      : severity.info?.desc_kr;
+
     return `
       <div class="severity-badge severity-${severity.level.toLowerCase()}" style="border-color:${sl.color}">
         <span class="severity-icon">${sl.icon}</span>
-        <span class="severity-label">${sl.label_kr} (${severity.level})</span>
-        ${severity.info?.desc_kr ? `<span class="severity-desc">${severity.info.desc_kr}</span>` : ''}
+        <span class="severity-label">${slLabel} (${severity.level})</span>
+        ${descText ? `<span class="severity-desc">${descText}</span>` : ''}
       </div>`;
   }
 
@@ -101,7 +108,18 @@ const AdvancedDiagnostic = (() => {
     const arrowMap = { up: '↑', down: '↓', same: '→' };
     const colorMap = { up: 'var(--accent-red)', down: 'var(--accent-cyan)', same: 'var(--text-secondary)' };
 
-    const labels = {
+    const lang = (typeof I18n !== 'undefined') ? I18n.getLang() : 'ko';
+    const labels = lang !== 'ko' ? {
+      suction_superheat: 'Superheat',
+      suction_pressure: 'Suct. Press.',
+      discharge_pressure: 'Disch. Press.',
+      subcooling: 'Subcooling',
+      discharge_temp: 'Disch. Temp',
+      compressor_current: 'Current',
+      cop: 'COP',
+      evaporator_temp: 'Evap. Temp',
+      condenser_temp: 'Cond. Temp'
+    } : {
       suction_superheat: '과열도',
       suction_pressure: '흡입압',
       discharge_pressure: '토출압',
@@ -132,14 +150,17 @@ const AdvancedDiagnostic = (() => {
   function renderDifferentialHints(hints) {
     if (!hints || hints.length === 0) return '';
 
+    const lang = (typeof I18n !== 'undefined') ? I18n.getLang() : 'ko';
     let html = '<div class="differential-hints">';
-    html += '<div class="diff-title">감별 진단 힌트</div>';
+    html += `<div class="diff-title">${lang !== 'ko' ? 'Differential Diagnosis Hints' : '감별 진단 힌트'}</div>`;
 
     hints.forEach(hint => {
-      html += `<div class="diff-symptom">${hint.symptom_kr}</div>`;
+      const symptom = (lang !== 'ko' && hint.symptom_en) ? hint.symptom_en : hint.symptom_kr;
+      html += `<div class="diff-symptom">${symptom}</div>`;
       html += '<div class="diff-faults">';
       hint.faults.forEach(f => {
-        html += `<div class="diff-fault-item">${f.key_kr}</div>`;
+        const fKey = (lang !== 'ko' && f.key_en) ? f.key_en : f.key_kr;
+        html += `<div class="diff-fault-item">${fKey}</div>`;
       });
       html += '</div>';
     });
@@ -152,9 +173,10 @@ const AdvancedDiagnostic = (() => {
   function renderFieldTips(tips) {
     if (!tips || tips.length === 0) return '';
 
+    const lang = (typeof I18n !== 'undefined') ? I18n.getLang() : 'ko';
     let html = `
       <div class="field-tips-section">
-        <div class="field-tips-title">현장 점검 절차</div>
+        <div class="field-tips-title">${lang !== 'ko' ? 'Field Inspection Procedure' : '현장 점검 절차'}</div>
         <ol class="field-tips-list">`;
     tips.forEach(tip => {
       html += `<li>${tip}</li>`;
@@ -164,18 +186,31 @@ const AdvancedDiagnostic = (() => {
   }
 
   // --- Map diagnosis result to diagKey ---
-  function getDiagKey(diagResult) {
-    const d = diagResult.diagnosis;
-    if (!d) return null;
+  const VALID_DIAG_KEYS = new Set([
+    'normal', 'lowCharge', 'meteringRestriction', 'overcharge',
+    'compressorWeak', 'txvOverfeed', 'lowAirflow'
+  ]);
 
-    // Match by title to known keys
-    if (d.title === '시스템 정상') return 'normal';
-    if (d.title.includes('냉매 부족')) return 'lowCharge';
-    if (d.title.includes('계량장치 제한')) return 'meteringRestriction';
-    if (d.title.includes('냉매 과충전')) return 'overcharge';
-    if (d.title.includes('컴프레서 불량')) return 'compressorWeak';
-    if (d.title.includes('TXV 오버피딩')) return 'txvOverfeed';
-    if (d.title.includes('에어플로우 부족')) return 'lowAirflow';
+  function getDiagKey(diagResult) {
+    // Prefer diagKey already set by DiagnosticEngine
+    if (diagResult.diagKey && VALID_DIAG_KEYS.has(diagResult.diagKey)) {
+      return diagResult.diagKey;
+    }
+
+    // Fallback: infer from SH/SC classification
+    const sh = diagResult.shClass;
+    const sc = diagResult.scClass;
+    if (sh && sc) {
+      if (sh === 'normal' && sc === 'normal') return 'normal';
+      if (sh === 'high' && sc === 'low') return 'lowCharge';
+      if (sh === 'high' && sc === 'high') return 'meteringRestriction';
+      if (sh === 'low' && sc === 'high') return 'overcharge';
+      if (sh === 'low' && sc === 'low') return 'compressorWeak';
+      if (sh === 'low' && sc === 'normal') return 'txvOverfeed';
+      if (sh === 'high' && sc === 'normal') return 'lowAirflow';
+      if (sh === 'normal' && sc === 'high') return 'overcharge';
+      if (sh === 'normal' && sc === 'low') return 'lowCharge';
+    }
 
     return null;
   }

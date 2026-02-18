@@ -114,7 +114,9 @@ const DiagnosticReport = (() => {
     if (!diagResult) return null;
 
     const now = new Date();
-    const timestamp = now.toLocaleString('ko-KR', {
+    const lang = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : 'ko';
+    const localeMap = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN', es: 'es-ES', fr: 'fr-FR', de: 'de-DE', pt: 'pt-BR', ar: 'ar-SA', hi: 'hi-IN' };
+    const timestamp = now.toLocaleString(localeMap[lang] || 'ko-KR', {
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit'
     });
@@ -378,7 +380,7 @@ const DiagnosticReport = (() => {
 
     // P-H effect from academic data
     if (faultInfo && faultInfo.ph_effect) {
-      items.push(`P-H 효과: ${faultInfo.ph_effect.desc_kr}`);
+      items.push(`${t('report.ph_effect', 'P-H 효과')}: ${(I18n.getLang() !== 'ko' && faultInfo.ph_effect.desc_en) ? faultInfo.ph_effect.desc_en : faultInfo.ph_effect.desc_kr}`);
     }
 
     return items;
@@ -569,7 +571,7 @@ const DiagnosticReport = (() => {
       <!-- META INFO -->
       <div class="dr-meta">
         <div class="dr-meta-row"><span class="dr-meta-label">진단일시</span><span class="dr-meta-value">${report.timestamp}</span></div>
-        <div class="dr-meta-row"><span class="dr-meta-label">장비유형</span><span class="dr-meta-value">${report.equip.icon} ${report.equip.name_kr}</span></div>
+        <div class="dr-meta-row"><span class="dr-meta-label">${t('report.equip_type', '장비유형')}</span><span class="dr-meta-value">${report.equip.icon} ${(I18n.getLang() !== 'ko' && report.equip.name_en) ? report.equip.name_en : report.equip.name_kr}</span></div>
         <div class="dr-meta-row"><span class="dr-meta-label">냉매</span><span class="dr-meta-value">${report.refDisplay}</span></div>
       </div>
 
@@ -641,7 +643,7 @@ const DiagnosticReport = (() => {
         <div class="dr-checklist" data-diagkey="${report.diagKey}">
           ${report.prescription.map((step, i) => `
             <label class="dr-check-item ${step.checked ? 'checked' : ''}">
-              <input type="checkbox" ${step.checked ? 'checked' : ''} data-step="${i}" onchange="DiagnosticReport.toggleCheck('${report.diagKey}', ${i}, this.checked)">
+              <input type="checkbox" name="dr-step-${i}" ${step.checked ? 'checked' : ''} data-step="${i}" onchange="DiagnosticReport.toggleCheck('${report.diagKey}', ${i}, this.checked)">
               <span class="dr-check-box">${step.checked ? '✅' : '☐'}</span>
               <span class="dr-check-text">${i + 1}. ${step.text}</span>
             </label>
@@ -729,7 +731,7 @@ const DiagnosticReport = (() => {
       <div class="dr-severity" style="border-left-color: ${sl.color}">
         <span class="dr-severity-icon">${sl.icon}</span>
         <span class="dr-severity-level">${severity.level} — ${sl.label_kr}</span>
-        ${severity.info?.desc_kr ? `<span class="dr-severity-desc">${severity.info.desc_kr}</span>` : ''}
+        ${severity.info?.desc_kr ? `<span class="dr-severity-desc">${(I18n.getLang() !== 'ko' && severity.info.desc_en) ? severity.info.desc_en : severity.info.desc_kr}</span>` : ''}
       </div>`;
   }
 
@@ -842,7 +844,7 @@ const DiagnosticReport = (() => {
     let text = `🔬 HVAC Pulse 시스템 진단서\n`;
     text += `━━━━━━━━━━━━━━━━━━━\n`;
     text += `진단일시: ${report.timestamp}\n`;
-    text += `장비: ${report.equip.name_kr}\n`;
+    text += `${t('report.equip_label', '장비')}: ${(I18n.getLang() !== 'ko' && report.equip.name_en) ? report.equip.name_en : report.equip.name_kr}\n`;
     text += `냉매: ${report.refDisplay}\n\n`;
 
     text += `━━━ 측정결과 ━━━\n`;
@@ -945,7 +947,7 @@ const DiagnosticReport = (() => {
       html += `
         <button class="dr-equip-btn" onclick="DiagnosticReport.generateFromSelector('${key}')">
           <span class="dr-equip-icon">${equip.icon}</span>
-          <span class="dr-equip-name">${equip.name_kr}</span>
+          <span class="dr-equip-name">${(I18n.getLang() !== 'ko' && equip.name_en) ? equip.name_en : equip.name_kr}</span>
         </button>`;
     }
 

@@ -389,7 +389,7 @@ const MaintenanceChecklist = (() => {
             ${EQUIP_TYPES.map(e => `
               <button class="choice-btn" onclick="MaintenanceChecklist.selectEquip('${e.id}')"
                 style="flex-direction:row;justify-content:flex-start;min-height:48px;padding:12px 16px;gap:12px;font-size:var(--text-base);border:1px solid var(--border)">
-                <span>${e.icon}</span><span>${e.label}</span>
+                <span>${e.icon}</span><span>${t('equip.' + e.id, e.label)}</span>
               </button>
             `).join('')}
           </div>
@@ -422,7 +422,7 @@ const MaintenanceChecklist = (() => {
           ${EQUIP_TYPES.map(e => `
             <button class="choice-btn" onclick="MaintenanceChecklist.selectEquip('${e.id}')"
               style="flex-direction:row;justify-content:flex-start;min-height:48px;padding:12px 16px;gap:12px;font-size:var(--text-base);border:1px solid var(--border)">
-              <span>${e.icon}</span><span>${e.label}</span>
+              <span>${e.icon}</span><span>${t('equip.' + e.id, e.label)}</span>
             </button>
           `).join('')}
         </div>
@@ -441,14 +441,14 @@ const MaintenanceChecklist = (() => {
       <div class="glass-card">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
           <button class="btn btn-sm btn-secondary" onclick="MaintenanceChecklist.renderEquipSelect()" style="width:auto;padding:8px 12px">← ${t('common.back', '뒤로')}</button>
-          <span style="font-weight:600">${equip?.icon} ${equip?.label}</span>
+          <span style="font-weight:600">${equip?.icon} ${t('equip.' + equipId, equip?.label)}</span>
         </div>
         <div class="section-title">${t('checklist.select_period', '점검 주기 선택')}</div>
         <div style="display:grid;gap:8px">
           ${periods.map(p => `
             <button class="choice-btn" onclick="MaintenanceChecklist.selectPeriod('${p.id}')"
               style="flex-direction:row;justify-content:flex-start;min-height:48px;padding:12px 16px;gap:12px;font-size:var(--text-base);border:1px solid var(--border)">
-              <span>${p.icon}</span><span>${p.label}</span>
+              <span>${p.icon}</span><span>${t('period.' + p.id, p.label)}</span>
             </button>
           `).join('')}
         </div>
@@ -476,7 +476,7 @@ const MaintenanceChecklist = (() => {
       <div class="glass-card">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
           <button class="btn btn-sm btn-secondary" onclick="MaintenanceChecklist.selectEquip('${currentEquip}')" style="width:auto;padding:8px 12px">← ${t('common.back', '뒤로')}</button>
-          <span style="font-size:var(--text-sm);color:var(--text-secondary)">${equip?.icon} ${equip?.label} · ${period?.label}</span>
+          <span style="font-size:var(--text-sm);color:var(--text-secondary)">${equip?.icon} ${t('equip.' + currentEquip, equip?.label)} · ${t('period.' + currentPeriod, period?.label)}</span>
         </div>
 
         <!-- Progress -->
@@ -500,7 +500,7 @@ const MaintenanceChecklist = (() => {
               </div>
               ${item.memo ? `<div style="margin-top:6px;margin-left:32px;font-size:var(--text-sm);color:var(--accent-cyan);background:rgba(6,182,212,0.08);padding:4px 8px;border-radius:4px">${item.memo}</div>` : ''}
               <div style="margin-top:6px;margin-left:32px">
-                <input type="text" placeholder="${t('checklist.add_memo', '메모 추가...')}" value="${item.memo || ''}"
+                <input type="text" name="checklist-memo-${i}" placeholder="${t('checklist.add_memo', '메모 추가...')}" value="${item.memo || ''}"
                   onchange="MaintenanceChecklist.setMemo(${i}, this.value)"
                   style="width:100%;padding:6px 8px;background:var(--bg-deep);border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);font-size:var(--text-sm);font-family:var(--font-sans);outline:none">
               </div>
@@ -574,10 +574,10 @@ const MaintenanceChecklist = (() => {
         return `
           <div class="glass-card" style="padding:16px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <span style="font-size:var(--text-sm);font-weight:600">${equip?.icon || ''} ${equip?.label || r.equipType}</span>
+              <span style="font-size:var(--text-sm);font-weight:600">${equip?.icon || ''} ${t('equip.' + r.equipType, equip?.label || r.equipType)}</span>
               <span style="font-size:var(--text-xs);color:var(--text-muted);font-family:var(--font-mono)">${dateStr}</span>
             </div>
-            <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:8px">${period?.label || r.period}</div>
+            <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:8px">${t('period.' + r.period, period?.label || r.period)}</div>
             <div style="display:flex;align-items:center;gap:8px">
               <div style="flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden">
                 <div style="height:100%;width:${pct}%;background:${pct === 100 ? 'var(--accent-green)' : 'var(--accent-blue)'};border-radius:2px"></div>

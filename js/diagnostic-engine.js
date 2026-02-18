@@ -147,25 +147,25 @@ const DiagnosticEngine = (() => {
     if (dtd > 40) {
       warnings.push({
         type: 'warning',
-        text: `DTD ${dtd.toFixed(1)}°F (>40°F) — 에어플로우 심각 부족 또는 증발기 결빙 의심`
+        text: `DTD ${dtd.toFixed(1)}°F (>40°F) — ${t('warn.dtd_high', '에어플로우 심각 부족 또는 증발기 결빙 의심')}`
       });
     }
     if (compressionRatio > 12) {
       warnings.push({
         type: 'danger',
-        text: `압축비 ${compressionRatio.toFixed(1)}:1 (>12:1) — 컴프레서 과부하 위험! 즉시 원인 파악 필요`
+        text: `${t('warn.cr_label', '압축비')} ${compressionRatio.toFixed(1)}:1 (>12:1) — ${t('warn.cr_high', '컴프레서 과부하 위험! 즉시 원인 파악 필요')}`
       });
     }
     if (dlt > 275) {
       warnings.push({
         type: 'danger',
-        text: `추정 DLT ${dlt.toFixed(0)}°F (>275°F) — 오일 파괴 위험! 즉시 시스템 정지`
+        text: `${t('warn.dlt_label', '추정 DLT')} ${dlt.toFixed(0)}°F (>275°F) — ${t('warn.dlt_high', '오일 파괴 위험! 즉시 시스템 정지')}`
       });
     }
     if (suctionSatTemp < 32) {
       warnings.push({
         type: 'warning',
-        text: `흡입 포화온도 ${suctionSatTemp.toFixed(1)}°F (<32°F) — 증발기 결빙 위험`
+        text: `${t('warn.sat_label', '흡입 포화온도')} ${suctionSatTemp.toFixed(1)}°F (<32°F) — ${t('warn.sat_low', '증발기 결빙 위험')}`
       });
     }
 
@@ -416,7 +416,7 @@ const DiagnosticEngine = (() => {
     }
 
     // Copy / Export button row
-    const diagText = `[${r.diagnosis.title}] 과열도:${r.superheat.toFixed(1)}°F 과냉도:${r.subcooling.toFixed(1)}°F 압축비:${r.compressionRatio.toFixed(1)} DTD:${r.dtd.toFixed(1)}°F CTOA:${r.ctoa.toFixed(1)}°F — ${r.diagnosis.cause}`;
+    const diagText = `[${diagTitle}] ${t('settings.matrix.col1', '과열도')}:${r.superheat.toFixed(1)}°F ${t('settings.matrix.col2', '과냉도')}:${r.subcooling.toFixed(1)}°F ${t('warn.cr_label', '압축비')}:${r.compressionRatio.toFixed(1)} DTD:${r.dtd.toFixed(1)}°F CTOA:${r.ctoa.toFixed(1)}°F — ${diagCause}`;
     const copyLabel = t('copy.cross_diag', '교차 진단 결과').replace(/'/g, '&#39;');
     const safeDiagText = diagText.replace(/`/g, "'").replace(/'/g, '&#39;');
     html += `
@@ -457,11 +457,13 @@ const DiagnosticEngine = (() => {
     else if (shClass === 'normal' && scClass === 'low') diagKey = 'lowCharge';
 
     const d = DIAGNOSIS_MAP[diagKey];
+    const prefix = DIAG_KEY_MAP[diagKey];
+    const translatedTitle = prefix ? t(`${prefix}.title`, d.title) : d.title;
     return {
-      title: d.title,
+      title: translatedTitle,
       summary: diagKey === 'normal'
-        ? '측정값이 정상 범위입니다'
-        : `과열도 ${sh}°F (${shClass === 'high' ? '↑' : shClass === 'low' ? '↓' : '→'}) · 과냉도 ${sc}°F (${scClass === 'high' ? '↑' : scClass === 'low' ? '↓' : '→'})`,
+        ? t('quick.normal_summary', '측정값이 정상 범위입니다')
+        : `${t('settings.matrix.col1', '과열도')} ${sh}°F (${shClass === 'high' ? '↑' : shClass === 'low' ? '↓' : '→'}) · ${t('settings.matrix.col2', '과냉도')} ${sc}°F (${scClass === 'high' ? '↑' : scClass === 'low' ? '↓' : '→'})`,
       level: d.level,
       diagKey
     };

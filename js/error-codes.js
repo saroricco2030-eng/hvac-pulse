@@ -93,7 +93,7 @@ const ErrorCodeSearch = (() => {
       <!-- Search bar -->
       <div class="glass-card" style="padding:16px">
         <div class="form-group" style="margin-bottom:8px">
-          <input type="text" id="ec-search" class="form-input" placeholder="${t('errorcode.search_placeholder', '에러코드 또는 증상 검색 (예: E3, 고압, 통신...)')}"
+          <input type="text" id="ec-search" class="form-input" aria-label="Error code search" placeholder="${t('errorcode.search_placeholder', '에러코드 또는 증상 검색 (예: E3, 고압, 통신...)')}"
             style="font-family:var(--font-sans);font-size:var(--text-base)"
             oninput="ErrorCodeSearch.search()">
         </div>
@@ -131,7 +131,7 @@ const ErrorCodeSearch = (() => {
                 <span>${m.icon}</span>
                 <div style="flex:1">
                   <div style="font-weight:600;font-size:var(--text-sm)">${m.id}</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted)">${m.series} · ${count}개</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted)">${m.series} · ${count}</div>
                 </div>
               </button>
             `;
@@ -204,7 +204,7 @@ const ErrorCodeSearch = (() => {
     resultEl.innerHTML = `
       <div style="font-size:var(--text-sm);color:var(--text-muted);margin:8px 0">${matches.length} ${t('errorcode.results', '개 결과')}</div>
       ${matches.slice(0, 50).map(e => renderCodeCard(e, false)).join('')}
-      ${matches.length > 50 ? `<div style="text-align:center;color:var(--text-muted);font-size:var(--text-sm);padding:12px">... 외 ${matches.length - 50}개 결과</div>` : ''}
+      ${matches.length > 50 ? `<div style="text-align:center;color:var(--text-muted);font-size:var(--text-sm);padding:12px">... +${matches.length - 50} ${t('errorcode.results', '개 결과')}</div>` : ''}
     `;
   }
 
@@ -229,13 +229,13 @@ const ErrorCodeSearch = (() => {
         <span style="font-size:var(--text-base)">${mfrInfo?.icon || ''}</span>
         <div>
           <div style="font-size:var(--text-base);font-weight:700">${mfr}</div>
-          <div style="font-size:var(--text-xs);color:var(--text-muted)">${mfrInfo?.series || ''} · ${codes.length}개 에러코드</div>
+          <div style="font-size:var(--text-xs);color:var(--text-muted)">${mfrInfo?.series || ''} · ${codes.length} ${t('errorcode.codes_label', '에러코드')}</div>
         </div>
       </div>
 
       <!-- Search within brand -->
       <div style="margin-bottom:16px">
-        <input type="text" id="ec-brand-search" class="form-input" placeholder="${mfr} 코드 내 검색..."
+        <input type="text" id="ec-brand-search" class="form-input" aria-label="Brand code search" placeholder="${t('errorcode.brand_search', `${mfr} 코드 내 검색...`)}"
           style="font-family:var(--font-sans);font-size:var(--text-sm);min-height:40px"
           oninput="ErrorCodeSearch.filterBrand()">
       </div>
@@ -288,12 +288,12 @@ const ErrorCodeSearch = (() => {
               <span style="font-size:var(--text-xs);padding:2px 8px;border-radius:10px;background:${sev.bg};color:${sev.color};border:1px solid ${sev.border}">${sev.label}</span>
             </div>
             <div style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:4px">${e.manufacturer} · ${e.series}</div>
-            <div style="font-size:var(--text-sm);color:var(--text-primary);line-height:1.5">${e.description_kr}</div>
-            <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">${e.description_en}</div>
+            <div style="font-size:var(--text-sm);color:var(--text-primary);line-height:1.5">${I18n.getLang() === 'ko' ? e.description_kr : e.description_en}</div>
+            <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">${I18n.getLang() === 'ko' ? e.description_en : e.description_kr}</div>
           </div>
           <button onclick="ErrorCodeSearch.toggleBookmark('${e.manufacturer}','${e.code.replace(/'/g, "\\'")}')"
             style="background:none;border:none;font-size:var(--text-xl);cursor:pointer;padding:4px;flex-shrink:0;color:${bookmarked ? 'var(--accent-orange)' : 'var(--text-muted)'}"
-            title="${bookmarked ? '즐겨찾기 해제' : '즐겨찾기 추가'}">${bookmarked ? '⭐' : '☆'}</button>
+            title="${bookmarked ? t('errorcode.unbookmark', '즐겨찾기 해제') : t('errorcode.bookmark', '즐겨찾기 추가')}">${bookmarked ? '⭐' : '☆'}</button>
         </div>
 
         <button onclick="ErrorCodeSearch.toggleExpand('${cardId}')"
@@ -419,7 +419,7 @@ const ErrorCodeSearch = (() => {
 
     comps.forEach(c => {
       html += `<button class="ec-comp-pill" onclick="App.switchTab('tools');setTimeout(()=>{App.showCategory('visual');setTimeout(()=>App.showSub('tools','cycle'),50)},50)">
-        🔄 ${c.component.name_kr}
+        🔄 ${(I18n.getLang() !== 'ko' && c.component.name_en) ? c.component.name_en : c.component.name_kr}
       </button>`;
     });
 

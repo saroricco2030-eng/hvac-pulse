@@ -8,6 +8,13 @@ const APP_VERSION = '1.0.0';
 
 const App = (() => {
 
+  // HTML escape to prevent XSS
+  function esc(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
   // Main tab → page element mapping
   const TAB_MAP = {
     'home':     'page-home',
@@ -69,27 +76,27 @@ const App = (() => {
   // Search Index
   // =============================================
   const SEARCH_INDEX = [
-    { title: 'P-T 계산기', desc: '압력-온도 변환, 포화온도', keywords: 'pt 계산 압력 온도 포화 변환 calculator pressure temperature', cat: 'calc', sub: 'pt', icon: '🔢' },
-    { title: '과열도 계산', desc: '석션라인 과열도', keywords: '과열 superheat 석션 suction', cat: 'calc', sub: 'pt', icon: '🌡️' },
-    { title: '과냉도 계산', desc: '리퀴드라인 과냉도', keywords: '과냉 subcooling 리퀴드 liquid', cat: 'calc', sub: 'pt', icon: '🌡️' },
-    { title: '교차 진단', desc: '과열도 × 과냉도 자동 진단', keywords: '교차 진단 diagnostic cross 매트릭스 matrix', cat: 'diag', sub: 'cross', icon: '📊' },
-    { title: 'NIST 비침습 진단', desc: '게이지 없이 온도만으로', keywords: 'nist 비침습 온도 게이지 없이 non-invasive DTD CTOA', cat: 'diag', sub: 'nist', icon: '🌡️' },
-    { title: 'TXV 마법사', desc: 'TXV 트러블슈팅 12단계', keywords: 'txv 팽창밸브 마법사 wizard sporlan 언더피딩 플러딩', cat: 'diag', sub: 'txv', icon: '🔧' },
-    { title: '에러코드 검색', desc: '제조사별 에러코드 DB', keywords: '에러코드 error code 삼성 LG 다이킨 캐리어 트레인', cat: 'diag', sub: 'errorcode', icon: '⚠️' },
-    { title: '냉동 사이클', desc: 'SVG 사이클 다이어그램', keywords: '사이클 cycle 다이어그램 diagram 압축 응축 팽창 증발', cat: 'visual', sub: 'cycle', icon: '🔄' },
-    { title: 'P-H 선도', desc: 'CoolProp 실시간 P-H 다이어그램', keywords: 'ph 선도 diagram 엔탈피 압력 coolprop', cat: 'visual', sub: 'ph', icon: '📈' },
-    { title: 'P-H 학습', desc: '인터랙티브 P-H 학습', keywords: 'ph 학습 interactive 인터랙티브', cat: 'visual', sub: 'phlearn', icon: '📚' },
-    { title: '냉매 비교', desc: '냉매 물성 비교 차트', keywords: '냉매 비교 compare refrigerant GWP 안전 safety', cat: 'calc', sub: 'compare', icon: '⚖️' },
-    { title: '배관 계산', desc: '배관 사이즈 계산', keywords: '배관 pipe 계산 사이즈 size', cat: 'calc', sub: 'pipe', icon: '📏' },
-    { title: '정비 체크리스트', desc: '정기 정비 항목', keywords: '체크리스트 checklist 정비 maintenance 점검', cat: 'maint', sub: 'checklist', icon: '✅' },
-    { title: '부품 호환', desc: '부품 호환 정보', keywords: '부품 parts 호환 cross reference', cat: 'maint', sub: 'parts', icon: '🔩' },
-    { title: '수리 이력', desc: '서비스 기록 관리', keywords: '수리 이력 기록 service history record', tab: 'records', icon: '📝' },
-    { title: '현장 메모', desc: '현장 메모 기록', keywords: '메모 notes 현장 field', tab: 'records', icon: '📒' },
+    { tkey: 'tool.pt', title: 'P-T 계산기', desc: '압력-온도 변환, 포화온도', keywords: 'pt 계산 압력 온도 포화 변환 calculator pressure temperature', cat: 'calc', sub: 'pt', icon: '🔢' },
+    { tkey: 'tool.superheat', title: '과열도 계산', desc: '석션라인 과열도', keywords: '과열 superheat 석션 suction', cat: 'calc', sub: 'pt', icon: '🌡️' },
+    { tkey: 'tool.subcooling', title: '과냉도 계산', desc: '리퀴드라인 과냉도', keywords: '과냉 subcooling 리퀴드 liquid', cat: 'calc', sub: 'pt', icon: '🌡️' },
+    { tkey: 'tool.cross', title: '교차 진단', desc: '과열도 × 과냉도 자동 진단', keywords: '교차 진단 diagnostic cross 매트릭스 matrix', cat: 'diag', sub: 'cross', icon: '📊' },
+    { tkey: 'tool.nist', title: 'NIST 비침습 진단', desc: '게이지 없이 온도만으로', keywords: 'nist 비침습 온도 게이지 없이 non-invasive DTD CTOA', cat: 'diag', sub: 'nist', icon: '🌡️' },
+    { tkey: 'tool.txv', title: 'TXV 마법사', desc: 'TXV 트러블슈팅 12단계', keywords: 'txv 팽창밸브 마법사 wizard sporlan 언더피딩 플러딩', cat: 'diag', sub: 'txv', icon: '🔧' },
+    { tkey: 'tool.errorcode', title: '에러코드 검색', desc: '제조사별 에러코드 DB', keywords: '에러코드 error code 삼성 LG 다이킨 캐리어 트레인', cat: 'diag', sub: 'errorcode', icon: '⚠️' },
+    { tkey: 'tool.cycle', title: '냉동 사이클', desc: 'SVG 사이클 다이어그램', keywords: '사이클 cycle 다이어그램 diagram 압축 응축 팽창 증발', cat: 'visual', sub: 'cycle', icon: '🔄' },
+    { tkey: 'tool.ph', title: 'P-H 선도', desc: 'CoolProp 실시간 P-H 다이어그램', keywords: 'ph 선도 diagram 엔탈피 압력 coolprop', cat: 'visual', sub: 'ph', icon: '📈' },
+    { tkey: 'tool.phlearn', title: 'P-H 학습', desc: '인터랙티브 P-H 학습', keywords: 'ph 학습 interactive 인터랙티브', cat: 'visual', sub: 'phlearn', icon: '📚' },
+    { tkey: 'tool.compare', title: '냉매 비교', desc: '냉매 물성 비교 차트', keywords: '냉매 비교 compare refrigerant GWP 안전 safety', cat: 'calc', sub: 'compare', icon: '⚖️' },
+    { tkey: 'tool.pipe', title: '배관 계산', desc: '배관 사이즈 계산', keywords: '배관 pipe 계산 사이즈 size', cat: 'calc', sub: 'pipe', icon: '📏' },
+    { tkey: 'tool.checklist', title: '정비 체크리스트', desc: '정기 정비 항목', keywords: '체크리스트 checklist 정비 maintenance 점검', cat: 'maint', sub: 'checklist', icon: '✅' },
+    { tkey: 'tool.parts', title: '부품 호환', desc: '부품 호환 정보', keywords: '부품 parts 호환 cross reference', cat: 'maint', sub: 'parts', icon: '🔩' },
+    { tkey: 'tool.service', title: '수리 이력', desc: '서비스 기록 관리', keywords: '수리 이력 기록 service history record', tab: 'records', icon: '📝' },
+    { tkey: 'tool.notes', title: '현장 메모', desc: '현장 메모 기록', keywords: '메모 notes 현장 field', tab: 'records', icon: '📒' },
     // Refrigerant shortcuts
-    { title: 'R-410A', desc: '가장 많이 사용되는 냉매', keywords: 'r410a r-410a 410', cat: 'calc', sub: 'pt', icon: '❄️' },
-    { title: 'R-22', desc: '단계적 퇴출 냉매', keywords: 'r22 r-22 프레온', cat: 'calc', sub: 'pt', icon: '❄️' },
-    { title: 'R-32', desc: '차세대 냉매 (A2L)', keywords: 'r32 r-32', cat: 'calc', sub: 'pt', icon: '❄️' },
-    { title: 'R-454B', desc: 'R-410A 대체 냉매', keywords: 'r454b r-454b 대체', cat: 'calc', sub: 'pt', icon: '❄️' },
+    { tkey: 'tool.r410a', title: 'R-410A', desc: '가장 많이 사용되는 냉매', keywords: 'r410a r-410a 410', cat: 'calc', sub: 'pt', icon: '❄️' },
+    { tkey: 'tool.r22', title: 'R-22', desc: '단계적 퇴출 냉매', keywords: 'r22 r-22 프레온', cat: 'calc', sub: 'pt', icon: '❄️' },
+    { tkey: 'tool.r32', title: 'R-32', desc: '차세대 냉매 (A2L)', keywords: 'r32 r-32', cat: 'calc', sub: 'pt', icon: '❄️' },
+    { tkey: 'tool.r454b', title: 'R-454B', desc: 'R-410A 대체 냉매', keywords: 'r454b r-454b 대체', cat: 'calc', sub: 'pt', icon: '❄️' },
   ];
 
   // =============================================
@@ -137,6 +144,12 @@ const App = (() => {
       });
     });
 
+    // i18n — initialize BEFORE modules so t() returns correct language from first render
+    if (typeof I18n !== 'undefined') {
+      I18n.init();
+      I18n.renderSelector('lang-section');
+    }
+
     // Populate home refrigerant dropdown
     initHomeRefDropdown();
 
@@ -146,7 +159,7 @@ const App = (() => {
       quickDiagBtn.addEventListener('click', runQuickDiagnosis);
     }
 
-    // Initialize core modules
+    // Initialize core modules (I18n already active — renders in correct language)
     PTCalculator.initUI();
     DiagnosticEngine.initUI();
     NISTDiagnostic.initUI();
@@ -172,11 +185,6 @@ const App = (() => {
       Settings.initUI();
       // Auth & Cloud Sync (optional — gracefully degrades if Firebase not configured)
       if (typeof Auth !== 'undefined') Auth.init();
-      // i18n — render language selector & apply saved language
-      if (typeof I18n !== 'undefined') {
-        I18n.init();
-        I18n.renderSelector('lang-section');
-      }
     }).catch(err => {
       console.warn('DB open failed, initializing modules without DB:', err);
       MaintenanceChecklist.initUI();
@@ -186,10 +194,6 @@ const App = (() => {
       FieldNotes.initUI();
       Settings.initUI();
       if (typeof Auth !== 'undefined') Auth.init();
-      if (typeof I18n !== 'undefined') {
-        I18n.init();
-        I18n.renderSelector('lang-section');
-      }
     });
 
     // Security protections
@@ -246,7 +250,7 @@ const App = (() => {
       if (slides[idx]) slides[idx].classList.add('active');
       if (dots[idx]) dots[idx].classList.add('active');
       currentSlide = idx;
-      if (nextBtn) nextBtn.textContent = idx === slides.length - 1 ? '시작하기' : '다음';
+      if (nextBtn) nextBtn.textContent = idx === slides.length - 1 ? t('onboarding.start', '시작하기') : t('onboarding.next', '다음');
     }
 
     if (nextBtn) {
@@ -333,18 +337,22 @@ const App = (() => {
       if (!resultsEl) return;
 
       if (query.length < 1) {
-        resultsEl.innerHTML = '<div class="search-empty">도구명, 냉매, 기능을 검색하세요</div>';
+        resultsEl.innerHTML = `<div class="search-empty">${t('search.hint', '도구명, 냉매, 기능을 검색하세요')}</div>`;
         return;
       }
 
       const matches = SEARCH_INDEX.filter(item => {
+        const tTitle = t(item.tkey, item.title).toLowerCase();
+        const tDesc = t(item.tkey + '.desc', item.desc).toLowerCase();
         return item.title.toLowerCase().includes(query) ||
+               tTitle.includes(query) ||
                item.desc.toLowerCase().includes(query) ||
+               tDesc.includes(query) ||
                item.keywords.toLowerCase().includes(query);
       });
 
       if (matches.length === 0) {
-        resultsEl.innerHTML = `<div class="search-empty">\"${input.value}\"에 대한 결과가 없습니다</div>`;
+        resultsEl.innerHTML = `<div class="search-empty">"${input.value}" — ${t('search.noresults', '결과가 없습니다')}</div>`;
         return;
       }
 
@@ -352,8 +360,8 @@ const App = (() => {
         <div class="search-result-item" data-cat="${item.cat || ''}" data-sub="${item.sub || ''}" data-tab="${item.tab || ''}">
           <div class="sr-icon">${item.icon}</div>
           <div>
-            <div class="sr-title">${highlightMatch(item.title, query)}</div>
-            <div class="sr-desc">${item.desc}</div>
+            <div class="sr-title">${highlightMatch(t(item.tkey, item.title), query)}</div>
+            <div class="sr-desc">${t(item.tkey + '.desc', item.desc)}</div>
           </div>
         </div>
       `).join('');
@@ -504,7 +512,7 @@ const App = (() => {
       const errSpan = group?.querySelector('.field-error span');
       if (!el || isNaN(parseFloat(el.value))) {
         if (group) group.classList.add('has-error');
-        if (errSpan) errSpan.textContent = '값을 입력하세요';
+        if (errSpan) errSpan.textContent = t('validation.required', '값을 입력하세요');
         hasError = true;
       } else {
         if (group) group.classList.remove('has-error');
@@ -523,45 +531,60 @@ const App = (() => {
     const levelClass = result.level === 'normal' ? 'result-normal' : result.level === 'caution' ? 'result-caution' : 'result-danger';
     const iconHtml = diagIcon(result.level);
 
+    const safeTitle = esc(result.title);
+    const safeSummary = esc(result.summary);
+    const copyDetail = `SH ${sh}°F / SC ${sc}°F — ${result.summary}`;
+
     resultEl.innerHTML = `
       <div class="diag-result ${levelClass} anim-fade-up" style="padding:14px;border-radius:var(--radius-md)">
         <div style="display:flex;align-items:center;gap:12px">
           ${iconHtml}
           <div>
-            <div class="fw-700" style="font-size:var(--text-base)">${result.title}</div>
-            <div class="text-xs text-secondary mt-4">${result.summary}</div>
+            <div class="fw-700" style="font-size:var(--text-base)">${safeTitle}</div>
+            <div class="text-xs text-secondary mt-4">${safeSummary}</div>
           </div>
         </div>
         <div class="diag-actions-row">
-          <button class="diag-action-btn btn-detail"
-            onclick="App.switchTab('tools');setTimeout(()=>{App.showCategory('diag');setTimeout(()=>App.showSub('tools','cross'),100)},100)">
-            ${SVG_ICONS.arrowRight} 상세 진단
+          <button class="diag-action-btn btn-detail" data-action="detail">
+            ${SVG_ICONS.arrowRight} ${t('home.detail', '상세 진단')}
           </button>
-          <button class="diag-action-btn btn-copy" onclick="App.copyDiagText(this, '${result.title}', 'SH ${sh}°F / SC ${sc}°F — ${result.summary}')">
-            ${SVG_ICONS.copy} 복사
+          <button class="diag-action-btn btn-copy" data-action="copy">
+            ${SVG_ICONS.copy} ${t('home.copy', '복사')}
           </button>
         </div>
       </div>
     `;
+
+    // Event delegation — no inline handlers
+    resultEl.querySelector('[data-action="detail"]').addEventListener('click', () => {
+      App.switchTab('tools');
+      setTimeout(() => { App.showCategory('diag'); setTimeout(() => App.showSub('tools', 'cross'), 100); }, 100);
+    });
+    resultEl.querySelector('[data-action="copy"]').addEventListener('click', function () {
+      copyDiagText(this, result.title, copyDetail);
+    });
   }
 
   // Fallback if DiagnosticEngine.quickDiagnose not available
   function quickDiagnoseFallback(sh, sc) {
+    const SH = t('pt.superheat', '과열도');
+    const SC = t('pt.subcooling', '과냉도');
+    const NRM = t('status.normal', '정상');
     if (sh >= 5 && sh <= 15 && sc >= 8 && sc <= 14)
-      return { title: '정상', summary: '측정값이 정상 범위입니다', level: 'normal' };
+      return { title: t('diag.normal.title', '정상'), summary: t('quick.normal_summary', '측정값이 정상 범위입니다'), level: 'normal' };
     if (sh > 15 && sc < 8)
-      return { title: '냉매 부족 (누설 의심)', summary: `과열도 ${sh}°F↑ · 과냉도 ${sc}°F↓`, level: 'danger' };
+      return { title: t('diag.lowcharge.title', '냉매 부족 (누설 의심)'), summary: `${SH} ${sh}°F↑ · ${SC} ${sc}°F↓`, level: 'danger' };
     if (sh > 15 && sc > 14)
-      return { title: '계량장치 제한', summary: `과열도 ${sh}°F↑ · 과냉도 ${sc}°F↑`, level: 'danger' };
+      return { title: t('diag.metering.title', '계량장치 제한'), summary: `${SH} ${sh}°F↑ · ${SC} ${sc}°F↑`, level: 'danger' };
     if (sh < 5 && sc > 14)
-      return { title: '냉매 과충전', summary: `과열도 ${sh}°F↓ · 과냉도 ${sc}°F↑`, level: 'danger' };
+      return { title: t('diag.overcharge.title', '냉매 과충전'), summary: `${SH} ${sh}°F↓ · ${SC} ${sc}°F↑`, level: 'danger' };
     if (sh < 5 && sc < 8)
-      return { title: '컴프레서 불량', summary: `과열도 ${sh}°F↓ · 과냉도 ${sc}°F↓`, level: 'danger' };
+      return { title: t('diag.compressor.title', '컴프레서 불량'), summary: `${SH} ${sh}°F↓ · ${SC} ${sc}°F↓`, level: 'danger' };
     if (sh < 5 && sc >= 8 && sc <= 14)
-      return { title: 'TXV 오버피딩', summary: `과열도 ${sh}°F↓ · 과냉도 정상`, level: 'caution' };
+      return { title: t('diag.txvoverfeed.title', 'TXV 오버피딩'), summary: `${SH} ${sh}°F↓ · ${SC} ${NRM}`, level: 'caution' };
     if (sh > 15 && sc >= 8 && sc <= 14)
-      return { title: '에어플로우 부족', summary: `과열도 ${sh}°F↑ · 과냉도 정상`, level: 'caution' };
-    return { title: '비정형 조합', summary: `과열도 ${sh}°F · 과냉도 ${sc}°F — 상세 진단 필요`, level: 'caution' };
+      return { title: t('diag.lowairflow.title', '에어플로우 부족'), summary: `${SH} ${sh}°F↑ · ${SC} ${NRM}`, level: 'caution' };
+    return { title: t('diag.atypical.title', '비정형 조합'), summary: `${SH} ${sh}°F · ${SC} ${sc}°F — ${t('diag.atypical.hint', '상세 진단 필요')}`, level: 'caution' };
   }
 
   // =============================================
@@ -572,7 +595,7 @@ const App = (() => {
     navigator.clipboard.writeText(text).then(() => {
       btn.classList.add('copied');
       const origHtml = btn.innerHTML;
-      btn.innerHTML = `${SVG_ICONS.checkCircle} 복사됨`;
+      btn.innerHTML = `${SVG_ICONS.checkCircle} ${t('home.copied', '복사됨')}`;
       setTimeout(() => {
         btn.classList.remove('copied');
         btn.innerHTML = origHtml;
@@ -611,7 +634,7 @@ const App = (() => {
         console.log('CoolProp WASM not available, using legacy P-T data');
         const badge = document.getElementById('home-engine-status');
         if (badge) {
-          badge.textContent = '레거시 P-T 데이터 모드';
+          badge.textContent = t('app.engine_legacy', '레거시 P-T 데이터 모드');
           badge.style.color = 'var(--text-muted)';
         }
       }
@@ -675,7 +698,7 @@ const App = (() => {
     if (view) view.style.display = 'block';
 
     const backLabel = document.getElementById('category-back-label');
-    if (backLabel) backLabel.textContent = cat.label;
+    if (backLabel) backLabel.textContent = t('tools.' + categoryKey + '.title', cat.label);
 
     const subTabBar = document.getElementById('tools-sub-tabs');
     if (subTabBar) {
@@ -684,7 +707,8 @@ const App = (() => {
         const btn = document.createElement('button');
         btn.className = 'sub-tab-btn' + (i === 0 ? ' active' : '');
         btn.dataset.sub = sub;
-        btn.textContent = SUB_LABELS[sub] || sub;
+        btn.dataset.ko = SUB_LABELS[sub] || sub;
+        btn.textContent = t('nav.' + sub, SUB_LABELS[sub] || sub);
         btn.addEventListener('click', () => showSub('tools', sub));
         subTabBar.appendChild(btn);
       });
@@ -747,7 +771,7 @@ const App = (() => {
 
       listEl.innerHTML = latest.map(r => `
         <div class="recent-item" style="padding:10px;background:var(--bg-card);border-radius:var(--radius-sm);margin-bottom:8px">
-          <div class="fw-600 text-xs">${r.equipment || '장비 미지정'}</div>
+          <div class="fw-600 text-xs">${r.equipment || t('home.no_equipment', '장비 미지정')}</div>
           <div class="text-xxs text-secondary mt-4">${r.date || ''} · ${r.diagnosis || r.techMemo || ''}</div>
         </div>
       `).join('');
@@ -834,12 +858,12 @@ const App = (() => {
 
     window.addEventListener('online', () => {
       updateStatus();
-      showToast('온라인 상태로 복귀했습니다.', 'success');
+      showToast(t('toast.online', '온라인 상태로 복귀했습니다.'), 'success');
     });
 
     window.addEventListener('offline', () => {
       updateStatus();
-      showToast('오프라인 모드입니다. 저장된 데이터로 작동합니다.', 'warning');
+      showToast(t('toast.offline', '오프라인 모드입니다. 저장된 데이터로 작동합니다.'), 'warning');
     });
 
     updateStatus();
@@ -864,9 +888,20 @@ const App = (() => {
   function registerSW() {
     if (!('serviceWorker' in navigator)) return;
 
+    // Auto-reload when a new SW takes control (prevents serving stale cache)
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
+
     navigator.serviceWorker.register('./sw.js')
       .then(reg => {
         console.log('SW registered:', reg.scope);
+
+        // Check for updates every 30 minutes
+        setInterval(() => reg.update(), 30 * 60 * 1000);
 
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
@@ -874,7 +909,8 @@ const App = (() => {
 
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              showToast('새 버전이 있습니다. 새로고침하면 업데이트됩니다.', 'info');
+              // New SW is ready — send skipWaiting and let controllerchange handle reload
+              newWorker.postMessage('SKIP_WAITING');
             }
           });
         });
@@ -890,7 +926,7 @@ const App = (() => {
     const errSpan = group?.querySelector('.field-error span');
     if (!el || isNaN(parseFloat(el.value)) || el.value.trim() === '') {
       if (group) group.classList.add('has-error');
-      if (errSpan) errSpan.textContent = msg || '값을 입력하세요';
+      if (errSpan) errSpan.textContent = msg || t('validation.required', '값을 입력하세요');
       return false;
     }
     if (group) group.classList.remove('has-error');

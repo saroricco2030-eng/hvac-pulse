@@ -65,26 +65,26 @@ const PipeCalculator = (() => {
 
     container.innerHTML = `
       <div class="page-header">
-        <h1>📐 배관/냉매 계산기</h1>
-        <p class="subtitle">추가 충전량 계산 · 배관 사이즈 가이드</p>
+        <h1>${t('pipe.title', '📐 배관/냉매 계산기')}</h1>
+        <p class="subtitle">${t('pipe.subtitle', '추가 충전량 계산 · 배관 사이즈 가이드')}</p>
       </div>
 
       <!-- Charge Calculator -->
       <div class="glass-card">
-        <div class="section-title">추가 냉매 충전량 계산</div>
+        <div class="section-title">${t('pipe.charge_title', '추가 냉매 충전량 계산')}</div>
         <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:12px">
-          배관 연장 시 추가로 필요한 냉매량을 계산합니다. (리퀴드라인 기준)
+          ${t('pipe.charge_desc', '배관 연장 시 추가로 필요한 냉매량을 계산합니다. (리퀴드라인 기준)')}
         </p>
 
         <div class="form-group">
-          <label class="form-label">냉매 선택</label>
+          <label class="form-label" for="pipe-ref">${t('ph.ref_select', '냉매 선택')}</label>
           <select id="pipe-ref" class="form-select" onchange="PipeCalculator.calculate()">
             ${Object.keys(CHARGE_PER_METER).map(r => `<option value="${r}">${r}</option>`).join('')}
           </select>
         </div>
 
         <div class="form-group">
-          <label class="form-label">배관 사이즈 (OD)</label>
+          <label class="form-label" for="pipe-size">${t('pipe.size_label', '배관 사이즈 (OD)')}</label>
           <select id="pipe-size" class="form-select" onchange="PipeCalculator.calculate()">
             ${PIPE_SIZES.map(p => `<option value="${p.id}">${p.label}</option>`).join('')}
           </select>
@@ -92,14 +92,14 @@ const PipeCalculator = (() => {
 
         <div class="input-row">
           <div class="form-group">
-            <label class="form-label">배관 길이</label>
-            <input type="number" id="pipe-length" class="form-input" placeholder="길이" step="0.1" min="0" oninput="PipeCalculator.calculate()">
+            <label class="form-label" for="pipe-length">${t('pipe.length_label', '배관 길이')}</label>
+            <input type="number" id="pipe-length" class="form-input" placeholder="${t('pipe.length_ph', '길이')}" step="0.1" min="0" oninput="PipeCalculator.calculate()">
           </div>
           <div class="form-group">
-            <label class="form-label">단위</label>
+            <label class="form-label" for="pipe-unit">${t('pipe.unit_label', '단위')}</label>
             <select id="pipe-unit" class="form-select" onchange="PipeCalculator.calculate()">
-              <option value="m">미터 (m)</option>
-              <option value="ft">피트 (ft)</option>
+              <option value="m">${t('pipe.unit_m', '미터 (m)')}</option>
+              <option value="ft">${t('pipe.unit_ft', '피트 (ft)')}</option>
             </select>
           </div>
         </div>
@@ -109,17 +109,17 @@ const PipeCalculator = (() => {
 
       <!-- Pipe Size Guide -->
       <div class="glass-card">
-        <div class="section-title">배관 사이즈 가이드</div>
+        <div class="section-title">${t('pipe.guide_title', '배관 사이즈 가이드')}</div>
         <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:12px">
-          냉동 능력별 추천 배관 사이즈 (R-410A 기준, 15m 이내)
+          ${t('pipe.guide_desc', '냉동 능력별 추천 배관 사이즈 (R-410A 기준, 15m 이내)')}
         </p>
         <div style="overflow-x:auto">
           <table style="width:100%;border-collapse:collapse;font-size:var(--text-sm)">
             <thead>
               <tr style="border-bottom:1px solid var(--border)">
-                <th style="text-align:left;padding:8px 4px;color:var(--text-secondary)">냉동 능력</th>
-                <th style="text-align:center;padding:8px 4px;color:var(--accent-orange)">리퀴드</th>
-                <th style="text-align:center;padding:8px 4px;color:var(--accent-cyan)">석션</th>
+                <th style="text-align:left;padding:8px 4px;color:var(--text-secondary)">${t('pipe.col_capacity', '냉동 능력')}</th>
+                <th style="text-align:center;padding:8px 4px;color:var(--accent-orange)">${t('pipe.col_liquid', '리퀴드')}</th>
+                <th style="text-align:center;padding:8px 4px;color:var(--accent-cyan)">${t('pipe.col_suction', '석션')}</th>
               </tr>
             </thead>
             <tbody>
@@ -135,7 +135,7 @@ const PipeCalculator = (() => {
         </div>
         <div class="alert-box alert-info" style="margin-top:12px">
           <span>ℹ️</span>
-          <span>이 값은 일반 참고용입니다. 정확한 사이즈는 제조사 사양을 따르세요. 배관 길이 15m 초과 시 한 사이즈 업 고려.</span>
+          <span>${t('pipe.guide_note', '이 값은 일반 참고용입니다. 정확한 사이즈는 제조사 사양을 따르세요. 배관 길이 15m 초과 시 한 사이즈 업 고려.')}</span>
         </div>
       </div>`;
   }
@@ -155,7 +155,7 @@ const PipeCalculator = (() => {
 
     const chargePerM = CHARGE_PER_METER[ref]?.[size];
     if (!chargePerM) {
-      resultEl.innerHTML = `<div class="alert-box alert-warning"><span>⚠️</span><span>해당 조합의 데이터가 없습니다.</span></div>`;
+      resultEl.innerHTML = `<div class="alert-box alert-warning"><span>⚠️</span><span>${t('pipe.no_data', '해당 조합의 데이터가 없습니다.')}</span></div>`;
       return;
     }
 
@@ -169,11 +169,11 @@ const PipeCalculator = (() => {
       <div class="result-grid" style="margin-top:16px">
         <div class="result-box" style="text-align:center">
           <div class="result-value" style="color:var(--accent-blue);font-size:1.8rem">${chargeG.toFixed(0)}</div>
-          <div class="result-label">그램 (g)</div>
+          <div class="result-label">${t('pipe.grams', '그램')} (g)</div>
         </div>
         <div class="result-box" style="text-align:center">
           <div class="result-value" style="color:var(--accent-cyan);font-size:1.8rem">${chargeOz.toFixed(1)}</div>
-          <div class="result-label">온스 (oz)</div>
+          <div class="result-label">${t('pipe.ounces', '온스')} (oz)</div>
         </div>
       </div>
       ${chargeLb >= 1 ? `
@@ -182,7 +182,7 @@ const PipeCalculator = (() => {
         </div>` : ''}
       <div class="alert-box alert-info" style="margin-top:12px">
         <span>ℹ️</span>
-        <span>리퀴드라인 기준 값입니다. 석션라인은 가스 밀도가 낮아 충전량이 훨씬 적습니다. (약 ${ref}@${size}" = ${chargePerM}g/m)</span>
+        <span>${t('pipe.result_note', '리퀴드라인 기준 값입니다. 석션라인은 가스 밀도가 낮아 충전량이 훨씬 적습니다.')} (${ref}@${size}" = ${chargePerM}g/m)</span>
       </div>`;
   }
 

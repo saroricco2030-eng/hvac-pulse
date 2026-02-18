@@ -244,18 +244,18 @@ const TXVWizard = (() => {
       ${progressHtml}
 
       <div class="glass-card wizard-step animate-slide-up">
-        <div class="step-number">STEP ${currentStepIndex + 1} / ${totalSteps}</div>
-        <div class="step-title">${step.title}</div>
-        <div class="step-desc">${step.desc}</div>
+        <div class="step-number">${t('txv.step.label', 'STEP')} ${currentStepIndex + 1} / ${totalSteps}</div>
+        <div class="step-title">${t(`txv.step${step.id}.title`, step.title)}</div>
+        <div class="step-desc">${t(`txv.step${step.id}.desc`, step.desc)}</div>
 
         <div style="text-align:left;margin-bottom:16px">
           <strong style="font-size:var(--text-sm);color:var(--text-primary)">${t('txv.check_items', '확인 사항')}:</strong>
           <ul style="margin:8px 0 0 16px;font-size:var(--text-sm);color:var(--text-secondary);line-height:1.8">
-            ${step.instructions.map(i => `<li>${i}</li>`).join('')}
+            ${step.instructions.map((instr, idx) => `<li>${t(`txv.step${step.id}.instr${idx+1}`, instr)}</li>`).join('')}
           </ul>
         </div>
 
-        <div class="step-tip">${step.tip}</div>
+        <div class="step-tip">${t(`txv.step${step.id}.tip`, step.tip)}</div>
 
         <p style="text-align:center;color:var(--text-primary);font-weight:600;margin-bottom:16px">
           ${t('txv.resolved_question', '이 단계에서 문제가 해결되었나요?')}

@@ -60,7 +60,9 @@ const RefrigerantCatalog = (() => {
   //   isZeotropic   – true if zeotropic blend (has temperature glide)
   //   glide_f       – Temperature glide in Fahrenheit (0 for azeotropic/pure)
   //   use_kr        – Typical use description (Korean)
+  //   use_en        – Typical use description (English)
   //   notes_kr      – Field-relevant notes (Korean)
+  //   notes_en      – Field-relevant notes (English)
   //   hasLegacyData – true if also exists in the original REFRIGERANT_DB (js/refrigerant-data.js)
   // -------------------------------------------------
   const REFRIGERANTS = [
@@ -83,7 +85,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '구형 에어컨 (2010년 이전)',
+      use_en: 'Legacy AC systems (pre-2010)',
       notes_kr: '2020년 생산 중단. 서비스용 재생 냉매만 사용 가능. 몬트리올 의정서 규제 대상.',
+      notes_en: 'Production ceased in 2020. Only reclaimed refrigerant available for servicing. Regulated under Montreal Protocol.',
       hasLegacyData: true
     },
     {
@@ -101,7 +105,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0.1,
       use_kr: '현행 주거/상업용 에어컨 표준',
+      use_en: 'Current residential/commercial AC standard',
       notes_kr: '근사 공비혼합물. 높은 GWP로 단계적 감축 예정. 고압 냉매(운전압력 ~400psig).',
+      notes_en: 'Near-azeotropic blend. Phase-down planned due to high GWP. High-pressure refrigerant (operating ~400 psig).',
       hasLegacyData: true
     },
     {
@@ -119,7 +125,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '차세대 에어컨 (일본/한국/아시아)',
+      use_en: 'Next-gen AC (Japan/Korea/Asia)',
       notes_kr: 'R-410A 대비 GWP 68% 감소. 단일 성분으로 누설 시 재충전 용이. 미약한 가연성(A2L).',
+      notes_en: '68% lower GWP than R-410A. Single component — easy to top off after leaks. Mildly flammable (A2L).',
       hasLegacyData: true
     },
     {
@@ -137,7 +145,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: true,
       glide_f: 2.5,
       use_kr: 'R-410A 대체 (2025년~ 북미)',
+      use_en: 'R-410A replacement (2025+ North America)',
       notes_kr: 'AIM Act 대응 차세대 냉매. Carrier/Trane 채택. 온도 글라이드 약 2.5°F — Bubble/Dew 구분 필요.',
+      notes_en: 'AIM Act compliant next-gen refrigerant. Adopted by Carrier/Trane. ~2.5°F glide — use Bubble/Dew points.',
       hasLegacyData: true
     },
 
@@ -159,7 +169,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: true,
       glide_f: 0.7,
       use_kr: '상업 냉동 (슈퍼마켓, 저온 저장)',
+      use_en: 'Commercial refrigeration (supermarkets, cold storage)',
       notes_kr: '매우 높은 GWP. EU F-Gas 규정으로 신규 설비 사용 금지. 서비스용만 허용.',
+      notes_en: 'Very high GWP. Banned for new equipment under EU F-Gas regulation. Service use only.',
       hasLegacyData: true
     },
     {
@@ -177,7 +189,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: true,
       glide_f: 8.0,
       use_kr: 'R-22 레트로핏 대체, 패키지 에어컨',
+      use_en: 'R-22 retrofit replacement, packaged AC',
       notes_kr: '큰 온도 글라이드(8°F) — Bubble/Dew 구분 필수. 누설 시 조성 변화로 전량 교체 필요.',
+      notes_en: 'Large temperature glide (8°F) — must use Bubble/Dew points. Full charge replacement required after leaks due to composition shift.',
       hasLegacyData: true
     },
     {
@@ -195,7 +209,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: true,
       glide_f: 12.1,
       use_kr: 'R-404A/R-22 대체 (상업 냉동)',
+      use_en: 'R-404A/R-22 replacement (commercial refrigeration)',
       notes_kr: '큰 온도 글라이드(12.1°F). Honeywell Solstice N40. 중/저온 냉동 겸용. Bubble/Dew 관리 중요.',
+      notes_en: 'Large temperature glide (12.1°F). Honeywell Solstice N40. Medium/low temp refrigeration. Bubble/Dew management critical.',
       hasLegacyData: false
     },
     {
@@ -213,7 +229,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: true,
       glide_f: 10.9,
       use_kr: 'R-404A/R-507A 대체 (상업 냉동)',
+      use_en: 'R-404A/R-507A replacement (commercial refrigeration)',
       notes_kr: '큰 온도 글라이드(10.9°F). Chemours Opteon XP40. R-404A 레트로핏 가능.',
+      notes_en: 'Large temperature glide (10.9°F). Chemours Opteon XP40. Can retrofit R-404A systems.',
       hasLegacyData: false
     },
     {
@@ -231,7 +249,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '저온 냉동 (아이스크림, 급속 동결)',
+      use_en: 'Low-temp refrigeration (ice cream, blast freezing)',
       notes_kr: '공비혼합물(글라이드 없음). R-404A와 유사 성능. 매우 높은 GWP로 규제 대상.',
+      notes_en: 'Azeotropic blend (no glide). Similar performance to R-404A. Very high GWP — subject to regulation.',
       hasLegacyData: false
     },
     {
@@ -249,7 +269,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: true,
       glide_f: 6.0,
       use_kr: '중/저온 상업 냉동',
+      use_en: 'Medium/low-temp commercial refrigeration',
       notes_kr: '온도 글라이드 6°F. R-404A 대비 약간 낮은 GWP. 중온 냉장 케이스에 적합.',
+      notes_en: '6°F temperature glide. Slightly lower GWP than R-404A. Suitable for medium-temp display cases.',
       hasLegacyData: false
     },
 
@@ -271,7 +293,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '차량 에어컨, 칠러, 중온 냉동',
+      use_en: 'Automotive AC, chillers, medium-temp refrigeration',
       notes_kr: 'EU에서 차량용 사용 금지(2017~). R-1234yf로 전환 중. 칠러/중온 냉동에서는 계속 사용.',
+      notes_en: 'Banned for automotive use in EU (2017+). Transitioning to R-1234yf. Still used in chillers and medium-temp systems.',
       hasLegacyData: true
     },
     {
@@ -289,7 +313,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '신형 차량 에어컨 (2017년~ EU 의무)',
+      use_en: 'New automotive AC (EU mandatory since 2017)',
       notes_kr: 'R-134a 직접 대체. 초저 GWP(4). 미약한 가연성(A2L). 냉매 단가 높음.',
+      notes_en: 'Direct R-134a replacement. Ultra-low GWP (4). Mildly flammable (A2L). Higher refrigerant cost.',
       hasLegacyData: false
     },
     {
@@ -307,7 +333,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '칠러, 히트펌프, 중온 냉동',
+      use_en: 'Chillers, heat pumps, medium-temp refrigeration',
       notes_kr: '저압 HFO. R-134a 대비 약 20% 낮은 용량. 칠러/히트펌프에서 R-134a 대체로 주목.',
+      notes_en: 'Low-pressure HFO. ~20% lower capacity than R-134a. Gaining traction as R-134a replacement in chillers/heat pumps.',
       hasLegacyData: false
     },
 
@@ -329,7 +357,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '가정용 냉장고, 소형 상업 시스템',
+      use_en: 'Domestic refrigerators, small commercial systems',
       notes_kr: '가연성(A3) — 충전량 제한 150g(IEC 60335). 우수한 열역학 성능. EU에서 가정용 냉장고 표준.',
+      notes_en: 'Flammable (A3) — charge limit 150g (IEC 60335). Excellent thermodynamic performance. EU standard for domestic refrigerators.',
       hasLegacyData: true
     },
     {
@@ -347,7 +377,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '가정용 냉장고 (유럽/아시아 표준)',
+      use_en: 'Domestic refrigerators (Europe/Asia standard)',
       notes_kr: '가연성(A3). 전 세계 가정용 냉장고에서 R-134a 대체. 소량 충전(~50-80g).',
+      notes_en: 'Flammable (A3). Replacing R-134a in domestic refrigerators worldwide. Small charge (~50-80g).',
       hasLegacyData: false
     },
     {
@@ -365,7 +397,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '산업 냉동, 대형 냉장 창고, 식품 가공',
+      use_en: 'Industrial refrigeration, large cold storage, food processing',
       notes_kr: '독성(B등급) + 가연성. 최고 효율의 냉매. 산업용 대형 시스템 전용. 구리 부식 — 스틸 배관 필수.',
+      notes_en: 'Toxic (B-class) + flammable. Highest efficiency refrigerant. Industrial large systems only. Corrodes copper — steel piping required.',
       hasLegacyData: false
     },
     {
@@ -383,7 +417,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '트랜스크리티컬 냉동, 히트펌프 온수기',
+      use_en: 'Transcritical refrigeration, heat pump water heaters',
       notes_kr: '초고압 운전(고압측 1000-1500psig). 트랜스크리티컬 사이클. 유럽 슈퍼마켓 확산. 특수 장비 필요.',
+      notes_en: 'Ultra-high pressure operation (high side 1000-1500 psig). Transcritical cycle. Expanding in European supermarkets. Requires specialized equipment.',
       hasLegacyData: false
     },
 
@@ -405,7 +441,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '저압 원심 칠러 (Trane/Carrier)',
+      use_en: 'Low-pressure centrifugal chillers (Trane/Carrier)',
       notes_kr: '2030년 생산 중단 예정(HCFC). 독성(B등급). 저압 냉매(대기압 이하 운전). R-1233zd(E)로 대체.',
+      notes_en: 'Production phase-out by 2030 (HCFC). Toxic (B-class). Low-pressure refrigerant (sub-atmospheric operation). Replaced by R-1233zd(E).',
       hasLegacyData: false
     },
     {
@@ -423,7 +461,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '저압 원심 칠러 (R-123 대체)',
+      use_en: 'Low-pressure centrifugal chillers (R-123 replacement)',
       notes_kr: 'R-123 직접 대체. 비독성(A1). 초저 GWP. Trane, Carrier 신형 칠러에 채택. 무시할 수 있는 ODP.',
+      notes_en: 'Direct R-123 replacement. Non-toxic (A1). Ultra-low GWP. Adopted by Trane and Carrier for new chillers. Negligible ODP.',
       hasLegacyData: false
     },
     {
@@ -441,7 +481,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '중압 원심/스크류 칠러 (R-134a 대체)',
+      use_en: 'Medium-pressure centrifugal/screw chillers (R-134a replacement)',
       notes_kr: '공비혼합물(글라이드 없음). R-134a 레트로핏 가능. GWP 56% 감소. Chemours Opteon XP10.',
+      notes_en: 'Azeotropic blend (no glide). Can retrofit R-134a systems. 56% GWP reduction. Chemours Opteon XP10.',
       hasLegacyData: false
     },
     {
@@ -459,7 +501,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0.2,
       use_kr: '저압 원심 칠러 (R-123 대체)',
+      use_en: 'Low-pressure centrifugal chillers (R-123 replacement)',
       notes_kr: '초저 GWP(2). R-123 직접 대체. 독성(B1). Chemours Opteon XP30. 유사한 압력/용량.',
+      notes_en: 'Ultra-low GWP (2). Direct R-123 replacement. Toxic (B1). Chemours Opteon XP30. Similar pressure/capacity.',
       hasLegacyData: false
     },
     {
@@ -477,7 +521,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0.1,
       use_kr: '중압 칠러, 히트펌프 (R-134a 대체)',
+      use_en: 'Medium-pressure chillers, heat pumps (R-134a replacement)',
       notes_kr: '공비혼합물. R-134a 대비 낮은 용량(약 80%). 비가연성(A1). 유럽 히트펌프 시장 확대.',
+      notes_en: 'Azeotropic blend. ~80% capacity vs R-134a. Non-flammable (A1). Growing in European heat pump market.',
       hasLegacyData: false
     },
 
@@ -499,7 +545,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '구형 차량 에어컨, 구형 냉장고 (1994년 이전)',
+      use_en: 'Legacy automotive AC, legacy refrigerators (pre-1994)',
       notes_kr: '1996년 생산 완전 금지(몬트리올 의정서). ODP 1.0 기준 물질. 역사적 참고용.',
+      notes_en: 'Production fully banned in 1996 (Montreal Protocol). ODP 1.0 reference substance. Historical reference only.',
       hasLegacyData: false
     },
     {
@@ -517,7 +565,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '구형 저온 상업 냉동 (1990년대 이전)',
+      use_en: 'Legacy low-temp commercial refrigeration (pre-1990s)',
       notes_kr: '1996년 생산 완전 금지. R-115(CFC) 포함. R-404A로 대체됨. 역사적 참고용.',
+      notes_en: 'Production fully banned in 1996. Contains R-115 (CFC). Replaced by R-404A. Historical reference only.',
       hasLegacyData: false
     },
     {
@@ -535,7 +585,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: true,
       glide_f: 1.0,
       use_kr: 'R-404A/R-507A 레트로핏 대체 (운송 냉동)',
+      use_en: 'R-404A/R-507A retrofit replacement (transport refrigeration)',
       notes_kr: '비가연성(A1). 운송/트레일러 냉동에 적합. R-404A 대비 유사 성능. 작은 글라이드(1°F).',
+      notes_en: 'Non-flammable (A1). Suitable for transport/trailer refrigeration. Similar performance to R-404A. Small glide (1°F).',
       hasLegacyData: false
     },
     {
@@ -553,7 +605,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '구형 저압 원심 칠러 (1990년대 이전)',
+      use_en: 'Legacy low-pressure centrifugal chillers (pre-1990s)',
       notes_kr: '1996년 생산 완전 금지. ODP 1.0 기준 물질. R-123 → R-1233zd(E)로 세대 교체.',
+      notes_en: 'Production fully banned in 1996. ODP 1.0 reference substance. Generational replacement: R-123 → R-1233zd(E).',
       hasLegacyData: false
     },
     {
@@ -571,7 +625,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '캐스케이드 초저온 시스템 (-80°C 이하)',
+      use_en: 'Cascade ultra-low temp systems (below -80°C)',
       notes_kr: '1996년 생산 금지. 초저온 캐스케이드 저단측 사용. R-23 또는 R-508B로 대체.',
+      notes_en: 'Production banned in 1996. Used in low stage of ultra-low temp cascade systems. Replaced by R-23 or R-508B.',
       hasLegacyData: false
     },
     {
@@ -589,7 +645,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0,
       use_kr: '캐스케이드 초저온 시스템 (-80°C 이하)',
+      use_en: 'Cascade ultra-low temp systems (below -80°C)',
       notes_kr: '극히 높은 GWP(14800). 초저온 냉동 전용(-80°C 달성). 대체 냉매 제한적. 규제 강화 중.',
+      notes_en: 'Extremely high GWP (14800). Ultra-low temp refrigeration only (reaches -80°C). Limited alternatives. Increasing regulatory pressure.',
       hasLegacyData: false
     },
     {
@@ -607,7 +665,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: false,
       glide_f: 0.1,
       use_kr: 'R-410A 대안 (일부 지역)',
+      use_en: 'R-410A alternative (some regions)',
       notes_kr: 'R-410A와 유사하나 R-125 비율 높음. 일부 아시아 제조사에서 사용. 사용 빈도 낮음.',
+      notes_en: 'Similar to R-410A but higher R-125 ratio. Used by some Asian manufacturers. Low adoption rate.',
       hasLegacyData: false
     },
 
@@ -629,7 +689,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: true,
       glide_f: 8.8,
       use_kr: 'R-22 드롭인 대체 (레트로핏)',
+      use_en: 'R-22 drop-in replacement (retrofit)',
       notes_kr: 'R-22 시스템에 오일 교체 없이 레트로핏 가능. POE/MO 오일 모두 호환. 큰 글라이드(8.8°F).',
+      notes_en: 'Can retrofit R-22 systems without oil change. Compatible with both POE and mineral oil. Large glide (8.8°F).',
       hasLegacyData: false
     },
     {
@@ -647,7 +709,9 @@ const RefrigerantCatalog = (() => {
       isZeotropic: true,
       glide_f: 6.5,
       use_kr: 'R-22 드롭인 대체 (에어컨 레트로핏)',
+      use_en: 'R-22 drop-in replacement (AC retrofit)',
       notes_kr: 'R-22 에어컨 시스템 레트로핏용. 미네랄 오일 호환. 약간의 효율 저하 가능.',
+      notes_en: 'For retrofitting R-22 AC systems. Compatible with mineral oil. Slight efficiency loss possible.',
       hasLegacyData: false
     }
   ];

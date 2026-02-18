@@ -23,19 +23,23 @@ const PTCalculator = (() => {
     if (typeof CoolPropEngine !== 'undefined' && CoolPropEngine.isReady()) {
       const coolpropName = getCoolPropName(refName);
       if (coolpropName) {
-        const bubble = CoolPropEngine.getSatPressureBubble(coolpropName, temp_f);
-        if (bubble !== null) {
-          const info = getRefInfo(refName);
-          if (info && info.isZeotropic) {
-            const dew = CoolPropEngine.getSatPressureDew(coolpropName, temp_f);
-            return { bubble, dew: dew !== null ? dew : bubble, source: 'CoolProp' };
+        try {
+          const bubble = CoolPropEngine.getSatPressureBubble(coolpropName, temp_f);
+          if (bubble !== null) {
+            const info = getRefInfo(refName);
+            if (info && info.isZeotropic) {
+              const dew = CoolPropEngine.getSatPressureDew(coolpropName, temp_f);
+              return { bubble, dew: dew !== null ? dew : bubble, source: 'CoolProp' };
+            }
+            return { pressure: bubble, source: 'CoolProp' };
           }
-          return { pressure: bubble, source: 'CoolProp' };
+        } catch (e) {
+          console.warn('CoolProp getPressure error:', refName, e);
         }
       }
     }
 
-    // Legacy fallback
+    // Legacy fallback — binary search for sorted P-T table
     if (typeof REFRIGERANT_DB === 'undefined') return null;
     const ref = REFRIGERANT_DB[refName];
     if (!ref) return null;
@@ -45,20 +49,23 @@ const PTCalculator = (() => {
     const maxT = data[data.length - 1].temp_f;
     const t = Math.max(minT, Math.min(maxT, temp_f));
 
-    for (let i = 0; i < data.length - 1; i++) {
-      if (t >= data[i].temp_f && t <= data[i + 1].temp_f) {
+    let lo = 0, hi = data.length - 2;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (t < data[mid].temp_f) hi = mid - 1;
+      else if (t > data[mid + 1].temp_f) lo = mid + 1;
+      else {
         if (ref.isZeotropic) {
           return {
-            bubble: lerp(t, data[i].temp_f, data[i + 1].temp_f, data[i].bubble_psig, data[i + 1].bubble_psig),
-            dew: lerp(t, data[i].temp_f, data[i + 1].temp_f, data[i].dew_psig, data[i + 1].dew_psig),
-            source: 'Legacy'
-          };
-        } else {
-          return {
-            pressure: lerp(t, data[i].temp_f, data[i + 1].temp_f, data[i].pressure_psig, data[i + 1].pressure_psig),
+            bubble: lerp(t, data[mid].temp_f, data[mid + 1].temp_f, data[mid].bubble_psig, data[mid + 1].bubble_psig),
+            dew: lerp(t, data[mid].temp_f, data[mid + 1].temp_f, data[mid].dew_psig, data[mid + 1].dew_psig),
             source: 'Legacy'
           };
         }
+        return {
+          pressure: lerp(t, data[mid].temp_f, data[mid + 1].temp_f, data[mid].pressure_psig, data[mid + 1].pressure_psig),
+          source: 'Legacy'
+        };
       }
     }
 
@@ -205,11 +212,13 @@ const PTCalculator = (() => {
       for (const [catKey, groupData] of Object.entries(grouped)) {
         const cat = groupData.category;
         const optgroup = document.createElement('optgroup');
-        optgroup.label = `${cat.icon} ${cat.name_kr}`;
+        const lang = typeof I18n !== 'undefined' ? I18n.getLang() : 'ko';
+        optgroup.label = `${cat.icon} ${(lang !== 'ko' && cat.name_en) ? cat.name_en : cat.name_kr}`;
         groupData.refrigerants.forEach(r => {
           const opt = document.createElement('option');
           opt.value = r.id;
-          opt.textContent = `${r.name_kr} (${r.safety})`;
+          const rName = (lang !== 'ko' && r.name_en) ? r.name_en : r.name_kr;
+          opt.textContent = `${rName} (${r.safety})`;
           // Indicate CoolProp vs Legacy
           if (!r.hasLegacyData && !(typeof CoolPropEngine !== 'undefined' && CoolPropEngine.isReady())) {
             opt.textContent += ' *';
@@ -248,7 +257,8 @@ const PTCalculator = (() => {
     const safety = info.safety || '';
     const gwp = info.gwp || '—';
     const type = info.type || '';
-    const name = info.name_kr || info.name || refId;
+    const lang = typeof I18n !== 'undefined' ? I18n.getLang() : 'ko';
+    const name = (lang !== 'ko' && info.name_en) ? info.name_en : (info.name_kr || info.name || refId);
     const isZeo = info.isZeotropic;
     const glide = info.glide_f || info.glide || 0;
 
@@ -256,7 +266,7 @@ const PTCalculator = (() => {
     html += ` <span style="font-size:var(--text-xs);color:var(--text-secondary)">${type} · GWP ${gwp} · ${safety}</span>`;
     html += ` <span class="engine-badge" style="font-size:var(--text-xs);padding:2px 6px;border-radius:4px;background:rgba(0,0,0,0.3);color:${sourceColor};border:1px solid ${sourceColor};margin-left:4px">${sourceLabel}</span>`;
     if (isZeo) {
-      html += ` <span class="zeotropic-indicator">비공비 (글라이드 ~${glide}°F)</span>`;
+      html += ` <span class="zeotropic-indicator">${t('pt.zeotropic.indicator', '비공비 (글라이드 ~°F)')} ~${glide}°F</span>`;
     }
     infoEl.innerHTML = html;
 
@@ -302,23 +312,23 @@ const PTCalculator = (() => {
         <div class="result-grid">
           <div class="result-box">
             <div class="result-value" style="color:var(--accent-orange)">${result.bubble.toFixed(1)}</div>
-            <div class="result-label">Bubble 압력 (psig)</div>
+            <div class="result-label">${t('pt.result.bubble', 'Bubble 압력 (psig)')}</div>
           </div>
           <div class="result-box">
             <div class="result-value" style="color:var(--accent-cyan)">${result.dew.toFixed(1)}</div>
-            <div class="result-label">Dew 압력 (psig)</div>
+            <div class="result-label">${t('pt.result.dew', 'Dew 압력 (psig)')}</div>
           </div>
         </div>
         <div class="alert-box alert-info" style="margin-top:12px">
           <span>ℹ️</span>
-          <span>${tempVal}°F (${tempC}°C) 에서의 포화압력. 과열도는 Dew, 과냉도는 Bubble 사용.${result.source ? ' [' + result.source + ']' : ''}</span>
+          <span>${t('pt.result.note', `${tempVal}°F (${tempC}°C) 에서의 포화압력. 과열도는 Dew, 과냉도는 Bubble 사용.`)}${result.source ? ' [' + result.source + ']' : ''}</span>
         </div>`;
     } else {
       const pVal = result.pressure !== undefined ? result.pressure : result.bubble;
       el.innerHTML = `
         <div class="result-box" style="text-align:center">
           <div class="result-value" style="color:var(--accent-blue)">${pVal.toFixed(1)}</div>
-          <div class="result-label">포화압력 (psig) @ ${tempVal}°F (${tempC}°C)${result.source ? ' [' + result.source + ']' : ''}</div>
+          <div class="result-label">${t('pt.result.pressure', '포화압력')} (psig) @ ${tempVal}°F (${tempC}°C)${result.source ? ' [' + result.source + ']' : ''}</div>
         </div>`;
     }
   }
@@ -338,34 +348,34 @@ const PTCalculator = (() => {
       const bubbleTemp = getTempFromPressure(refName, pressVal, 'bubble');
       const dewTemp = getTempFromPressure(refName, pressVal, 'dew');
       if (bubbleTemp === null || dewTemp === null) {
-        el.innerHTML = `<div class="alert-box alert-warning"><span>⚠️</span><span>이 냉매의 P-T 데이터가 없습니다.</span></div>`;
+        el.innerHTML = `<div class="alert-box alert-warning"><span>⚠️</span><span>${t('pt.no_data', '이 냉매의 P-T 데이터가 없습니다.')}</span></div>`;
         return;
       }
       el.innerHTML = `
         <div class="result-grid">
           <div class="result-box">
             <div class="result-value" style="color:var(--accent-orange)">${bubbleTemp.toFixed(1)}°F</div>
-            <div class="result-label">Bubble 온도 (${fToC(bubbleTemp).toFixed(1)}°C)</div>
+            <div class="result-label">${t('pt.result.bubble_temp', 'Bubble 온도')} (${fToC(bubbleTemp).toFixed(1)}°C)</div>
           </div>
           <div class="result-box">
             <div class="result-value" style="color:var(--accent-cyan)">${dewTemp.toFixed(1)}°F</div>
-            <div class="result-label">Dew 온도 (${fToC(dewTemp).toFixed(1)}°C)</div>
+            <div class="result-label">${t('pt.result.dew_temp', 'Dew 온도')} (${fToC(dewTemp).toFixed(1)}°C)</div>
           </div>
         </div>
         <div class="alert-box alert-info" style="margin-top:12px">
           <span>ℹ️</span>
-          <span>${pressVal} psig 에서의 포화온도. 비공비혼합물은 Bubble/Dew가 다릅니다.</span>
+          <span>${t('pt.result.zeotropic_note', `${pressVal} psig 에서의 포화온도. 비공비혼합물은 Bubble/Dew가 다릅니다.`)}</span>
         </div>`;
     } else {
       const satTemp = getTempFromPressure(refName, pressVal, 'pressure');
       if (satTemp === null) {
-        el.innerHTML = `<div class="alert-box alert-warning"><span>⚠️</span><span>이 냉매의 P-T 데이터가 없습니다.</span></div>`;
+        el.innerHTML = `<div class="alert-box alert-warning"><span>⚠️</span><span>${t('pt.no_data', '이 냉매의 P-T 데이터가 없습니다.')}</span></div>`;
         return;
       }
       el.innerHTML = `
         <div class="result-box" style="text-align:center">
           <div class="result-value" style="color:var(--accent-blue)">${satTemp.toFixed(1)}°F</div>
-          <div class="result-label">포화온도 @ ${pressVal} psig (${fToC(satTemp).toFixed(1)}°C)</div>
+          <div class="result-label">${t('pt.sat_temp', '포화온도')} @ ${pressVal} psig (${fToC(satTemp).toFixed(1)}°C)</div>
         </div>`;
     }
   }

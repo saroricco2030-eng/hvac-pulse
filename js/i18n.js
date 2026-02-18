@@ -100,38 +100,51 @@ const I18n = (() => {
   // =============================================
   function applyToStaticDOM() {
     if (currentLang === 'ko') {
-      // Restore Korean — reload page is the safest way
-      // But for now, re-render modules handles this
+      // Restore Korean text
       document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.dataset.i18n;
-        const koText = el.dataset.i18nKo; // Stored original Korean
+        const koText = el.dataset.i18nKo;
         if (koText) restoreElement(el, koText);
+      });
+      // Restore Korean placeholders
+      document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+        const koPh = el.dataset.i18nKoPh;
+        if (koPh) el.placeholder = koPh;
+      });
+      // Restore Korean help tooltips
+      document.querySelectorAll('[data-i18n-help]').forEach(el => {
+        const koHelp = el.dataset.i18nKoHelp;
+        if (koHelp) el.dataset.help = koHelp;
       });
       return;
     }
 
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.dataset.i18n;
-      const pack = packs[currentLang] || packs.en;
-      const translated = pack?.[key];
-      if (!translated) return;
+    const pack = packs[currentLang] || packs.en;
 
-      // Store original Korean text for restoration
-      if (!el.dataset.i18nKo) {
-        el.dataset.i18nKo = getTextOnly(el);
+    // Single query: all elements with any i18n attribute
+    document.querySelectorAll('[data-i18n],[data-i18n-ph],[data-i18n-help]').forEach(el => {
+      // Text content
+      if (el.dataset.i18n) {
+        const translated = pack?.[el.dataset.i18n];
+        if (translated) {
+          if (!el.dataset.i18nKo) el.dataset.i18nKo = getTextOnly(el);
+          setTextPreservingChildren(el, translated);
+        }
       }
-
-      setTextPreservingChildren(el, translated);
-    });
-
-    // Placeholders
-    document.querySelectorAll('[data-i18n-ph]').forEach(el => {
-      const key = el.dataset.i18nPh;
-      const pack = packs[currentLang] || packs.en;
-      const translated = pack?.[key];
-      if (translated) {
-        if (!el.dataset.i18nKoPh) el.dataset.i18nKoPh = el.placeholder;
-        el.placeholder = translated;
+      // Placeholder
+      if (el.dataset.i18nPh) {
+        const translated = pack?.[el.dataset.i18nPh];
+        if (translated) {
+          if (!el.dataset.i18nKoPh) el.dataset.i18nKoPh = el.placeholder;
+          el.placeholder = translated;
+        }
+      }
+      // Help tooltip
+      if (el.dataset.i18nHelp) {
+        const translated = pack?.[el.dataset.i18nHelp];
+        if (translated) {
+          if (!el.dataset.i18nKoHelp) el.dataset.i18nKoHelp = el.dataset.help;
+          el.dataset.help = translated;
+        }
       }
     });
   }
@@ -201,6 +214,15 @@ const I18n = (() => {
               const translated = pack?.[key];
               if (translated) el.placeholder = translated;
             });
+            node.querySelectorAll?.('[data-i18n-help]')?.forEach(el => {
+              const key = el.dataset.i18nHelp;
+              const pack = packs[currentLang] || packs.en;
+              const translated = pack?.[key];
+              if (translated) {
+                if (!el.dataset.i18nKoHelp) el.dataset.i18nKoHelp = el.dataset.help;
+                el.dataset.help = translated;
+              }
+            });
           }
         });
       });
@@ -222,13 +244,13 @@ const I18n = (() => {
     // Re-initialize modules that render Korean text dynamically
     // Each module's initUI() re-renders its content
 
-    // Tab labels
+    // Tab labels — store Korean fallback to prevent cascading bug
     document.querySelectorAll('.tab-item[data-tab]').forEach(tab => {
       const key = 'nav.' + tab.dataset.tab;
       const label = tab.querySelector('.tab-label');
       if (label) {
-        const translated = t(key, label.textContent);
-        label.textContent = translated;
+        if (!label.dataset.ko) label.dataset.ko = label.textContent;
+        label.textContent = t(key, label.dataset.ko);
       }
     });
 
@@ -239,13 +261,37 @@ const I18n = (() => {
     if (typeof TXVWizard !== 'undefined') TXVWizard.initUI?.();
     if (typeof ErrorCodeSearch !== 'undefined') ErrorCodeSearch.initUI?.();
     if (typeof CycleVisualization !== 'undefined') CycleVisualization.initUI?.();
+    if (typeof PHDiagram !== 'undefined') PHDiagram.initUI?.();
     if (typeof ServiceHistory !== 'undefined') ServiceHistory.renderList?.();
     if (typeof FieldNotes !== 'undefined') FieldNotes.renderList?.();
     if (typeof MaintenanceChecklist !== 'undefined') MaintenanceChecklist.initUI?.();
     if (typeof PartsCrossRef !== 'undefined') PartsCrossRef.initUI?.();
     if (typeof PipeCalculator !== 'undefined') PipeCalculator.initUI?.();
+    if (typeof RefrigerantCompare !== 'undefined') RefrigerantCompare.initUI?.();
+    if (typeof PHInteractive !== 'undefined') PHInteractive.initUI?.();
     if (typeof Settings !== 'undefined') Settings.initUI?.();
     if (typeof Auth !== 'undefined') Auth.renderSection?.();
+
+    // Sub-tab labels — only tools sub-tabs (not records, which use data-i18n)
+    document.querySelectorAll('#tools-sub-tabs .sub-tab-btn[data-sub]').forEach(btn => {
+      const sub = btn.dataset.sub;
+      const key = 'nav.' + sub;
+      // Use stored Korean text, or current text as initial value
+      if (!btn.dataset.ko) btn.dataset.ko = btn.textContent;
+      btn.textContent = t(key, btn.dataset.ko);
+    });
+
+    // Re-render refrigerant reference table
+    if (typeof window.renderRefTable === 'function') window.renderRefTable();
+
+    // Re-render CoolProp engine badge
+    const badge = document.getElementById('home-engine-status');
+    if (badge) {
+      const isReady = badge.style.color === 'var(--accent-green)';
+      badge.textContent = isReady
+        ? t('app.engine_ready', 'CoolProp NIST 엔진 활성')
+        : t('app.engine_legacy', '레거시 P-T 데이터 모드');
+    }
 
     // Re-apply static DOM translations after modules re-render
     setTimeout(() => {

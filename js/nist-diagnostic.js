@@ -337,14 +337,14 @@ const NISTDiagnostic = (() => {
 
       <!-- Copy / Export -->
       <div class="diag-actions-row">
-        <button class="diag-action-btn btn-copy" onclick="App.copyDiagText(this,'NIST 비침습 진단 결과','[${r.diagnosis.title}] 석션차이:${r.suctionDiff > 0 ? '+' : ''}${r.suctionDiff.toFixed(1)}°F 리퀴드차이:${r.liquidDiff > 0 ? '+' : ''}${r.liquidDiff.toFixed(1)}°F — ${r.diagnosis.detail.substring(0, 80)}')">
+        <button class="diag-action-btn btn-copy" onclick="App.copyDiagText(this,'${t('nist.title', 'NIST 비침습 진단').replace(/'/g,'&#39;')}','[${(r.diagnosis.i18nKey ? t(r.diagnosis.i18nKey + '.title', r.diagnosis.title) : r.diagnosis.title).replace(/'/g,'&#39;')}] ${t('nist.suction_diff','석션라인 차이')}:${r.suctionDiff > 0 ? '+' : ''}${r.suctionDiff.toFixed(1)}°F ${t('nist.liquid_diff','리퀴드라인 차이')}:${r.liquidDiff > 0 ? '+' : ''}${r.liquidDiff.toFixed(1)}°F')">
           <span class="diag-icon-svg">${App.SVG_ICONS.copy}</span> ${t('diag.copy_result', '결과 복사')}
         </button>
       </div>
 
       <div class="alert-box alert-info mt-12">
         <span class="diag-icon-svg icon-info" style="width:16px;height:16px;flex-shrink:0">${App.SVG_ICONS.alertCircle}</span>
-        <span>NIST 진단은 선별 검사입니다. 이상 발견 시 게이지 연결하여 정밀 진단하세요. 판정 기준: ±5°F 이내 정상, ±5~10°F 주의, ±10°F 초과 이상.</span>
+        <span>${t('nist.screening_note', 'NIST 진단은 선별 검사입니다. 이상 발견 시 게이지 연결하여 정밀 진단하세요. 판정 기준: ±5°F 이내 정상, ±5~10°F 주의, ±10°F 초과 이상.')}</span>
       </div>
 
       <div id="nist-advanced-info"></div>
@@ -402,13 +402,18 @@ const NISTDiagnostic = (() => {
   // Local fallback for diagKey mapping (when DataBridge not loaded yet)
   function _localMapDiagKey(r) {
     if (!r || !r.diagnosis) return null;
-    const title = r.diagnosis.title || '';
-    if (title.includes('정상')) return 'normal';
-    if (title.includes('냉매 부족')) return 'lowCharge';
-    if (title.includes('냉매 과충전')) return 'overcharge';
-    if (title.includes('에어플로우')) return 'lowAirflow';
-    if (title.includes('TXV') || title.includes('오버피딩')) return 'txvOverfeed';
-    if (title.includes('리퀴드라인')) return 'meteringRestriction';
+    // Use i18nKey directly if available
+    const keyMap = {
+      'nist.normal': 'normal',
+      'nist.lowcharge': 'lowCharge',
+      'nist.overcharge': 'overcharge',
+      'nist.airflow': 'lowAirflow',
+      'nist.txvoverfeed': 'txvOverfeed',
+      'nist.condenser': 'meteringRestriction',
+      'nist.liquid_low': 'meteringRestriction',
+      'nist.additional': null
+    };
+    if (r.diagnosis.i18nKey) return keyMap[r.diagnosis.i18nKey] || null;
     return null;
   }
 

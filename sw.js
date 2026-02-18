@@ -2,7 +2,7 @@
 // HVAC Pulse — Service Worker
 // ===================================================
 
-const CACHE_VERSION = 28;
+const CACHE_VERSION = 36;
 const CACHE_NAME = `hvac-pulse-v${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
@@ -12,6 +12,9 @@ const STATIC_ASSETS = [
   './manifest.json',
   './images/icon-192.png',
   './images/icon-512.png',
+  './images/icon-maskable-192.png',
+  './images/icon-maskable-512.png',
+  './images/icon-maskable.svg',
   './images/icon.svg',
   // Core data
   './js/refrigerant-data.js',
@@ -84,7 +87,11 @@ self.addEventListener('install', event => {
         // Try to cache WASM files but don't fail installation if unavailable
         return caches.open(CACHE_NAME).then(cache =>
           Promise.allSettled(WASM_ASSETS.map(url => cache.add(url)))
-        );
+        ).then(results => {
+          results.forEach((r, i) => {
+            if (r.status === 'rejected') console.warn('[SW] WASM cache failed:', WASM_ASSETS[i], r.reason);
+          });
+        });
       })
       .then(() => self.skipWaiting())
   );

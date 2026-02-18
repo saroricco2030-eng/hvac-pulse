@@ -41,7 +41,7 @@ const FieldNotes = (() => {
       </div>
 
       <div style="display:flex;gap:8px;margin-bottom:16px">
-        <input type="text" id="fn-search" class="form-input" placeholder="${t('notes.search_placeholder', '메모 검색...')}"
+        <input type="text" id="fn-search" class="form-input" aria-label="Note search" placeholder="${t('notes.search_placeholder', '메모 검색...')}"
           style="flex:1;min-height:40px;font-family:var(--font-sans);font-size:var(--text-sm)"
           oninput="FieldNotes.filterList()">
       </div>
@@ -53,8 +53,8 @@ const FieldNotes = (() => {
       <!-- Tag filter -->
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
         <button class="btn btn-sm btn-primary" onclick="FieldNotes.filterTag('')" id="fn-tag-all" style="width:auto;padding:4px 10px;font-size:var(--text-xs)">${t('common.all', '전체')}</button>
-        ${TAG_OPTIONS.map(t => `
-          <button class="btn btn-sm btn-secondary" onclick="FieldNotes.filterTag('${t.id}')" id="fn-tag-${t.id}" style="width:auto;padding:4px 10px;font-size:var(--text-xs)">${t.label}</button>
+        ${TAG_OPTIONS.map(tagOpt => `
+          <button class="btn btn-sm btn-secondary" onclick="FieldNotes.filterTag('${tagOpt.id}')" id="fn-tag-${tagOpt.id}" style="width:auto;padding:4px 10px;font-size:var(--text-xs)">${t('tag.' + tagOpt.id, tagOpt.label)}</button>
         `).join('')}
       </div>
 
@@ -72,7 +72,7 @@ const FieldNotes = (() => {
   function renderNoteCard(n) {
     const d = new Date(n.date);
     const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-    const tag = TAG_OPTIONS.find(t => t.id === n.tag) || TAG_OPTIONS[TAG_OPTIONS.length - 1];
+    const tag = TAG_OPTIONS.find(tOpt => tOpt.id === n.tag) || TAG_OPTIONS[TAG_OPTIONS.length - 1];
     const preview = (n.content || '').substring(0, 80) + ((n.content || '').length > 80 ? '...' : '');
 
     return `
@@ -86,7 +86,7 @@ const FieldNotes = (() => {
         </div>
         <div style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.5;margin-bottom:4px;margin-left:14px">${preview}</div>
         <div style="display:flex;gap:6px;align-items:center;margin-left:14px">
-          <span style="font-size:var(--text-xs);color:${tag.color};background:${tag.color}20;padding:2px 8px;border-radius:10px">${tag.label}</span>
+          <span style="font-size:var(--text-xs);color:${tag.color};background:${tag.color}20;padding:2px 8px;border-radius:10px">${t('tag.' + tag.id, tag.label)}</span>
           ${n.photos && n.photos.length > 0 ? `<span style="font-size:var(--text-xs);color:var(--text-muted)">📷 ${n.photos.length}</span>` : ''}
         </div>
       </div>`;
@@ -99,9 +99,9 @@ const FieldNotes = (() => {
     // Update button styles
     const allBtn = document.getElementById('fn-tag-all');
     if (allBtn) allBtn.className = `btn btn-sm ${tag === '' ? 'btn-primary' : 'btn-secondary'}`;
-    TAG_OPTIONS.forEach(t => {
-      const btn = document.getElementById(`fn-tag-${t.id}`);
-      if (btn) btn.className = `btn btn-sm ${tag === t.id ? 'btn-primary' : 'btn-secondary'}`;
+    TAG_OPTIONS.forEach(tagOpt => {
+      const btn = document.getElementById(`fn-tag-${tagOpt.id}`);
+      if (btn) btn.className = `btn btn-sm ${tag === tagOpt.id ? 'btn-primary' : 'btn-secondary'}`;
     });
     applyFilters();
   }
@@ -155,22 +155,22 @@ const FieldNotes = (() => {
 
       <div class="glass-card">
         <div class="form-group">
-          <label class="form-label">${t('notes.title_label', '제목')}</label>
+          <label class="form-label" for="fn-title">${t('notes.title_label', '제목')}</label>
           <input type="text" id="fn-title" class="form-input" placeholder="${t('notes.title_placeholder', '간단한 제목...')}" value="${existing?.title || ''}" style="font-family:var(--font-sans)">
         </div>
 
         <div class="form-group">
-          <label class="form-label">${t('notes.content_label', '내용')}</label>
+          <label class="form-label" for="fn-content">${t('notes.content_label', '내용')}</label>
           <textarea id="fn-content" class="form-input" rows="5" placeholder="${t('notes.content_placeholder', '현장 메모 내용...')}" style="font-family:var(--font-sans);resize:vertical;height:auto">${existing?.content || ''}</textarea>
         </div>
 
         <div class="form-group">
           <label class="form-label">${t('notes.tag', '태그')}</label>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
-            ${TAG_OPTIONS.map(t => `
-              <button type="button" onclick="FieldNotes.selectTag('${t.id}')" id="fn-form-tag-${t.id}"
-                class="btn btn-sm ${tag === t.id ? 'btn-primary' : 'btn-secondary'}"
-                style="width:auto;padding:6px 12px;font-size:var(--text-sm)">${t.label}</button>
+            ${TAG_OPTIONS.map(tagOpt => `
+              <button type="button" onclick="FieldNotes.selectTag('${tagOpt.id}')" id="fn-form-tag-${tagOpt.id}"
+                class="btn btn-sm ${tag === tagOpt.id ? 'btn-primary' : 'btn-secondary'}"
+                style="width:auto;padding:6px 12px;font-size:var(--text-sm)">${t('tag.' + tagOpt.id, tagOpt.label)}</button>
             `).join('')}
           </div>
         </div>
@@ -186,7 +186,7 @@ const FieldNotes = (() => {
             </div>
           `).join('')}
         </div>
-        <input type="file" id="fn-photo-input" accept="image/*" capture="environment" style="display:none" onchange="FieldNotes.handlePhoto(event)">
+        <input type="file" id="fn-photo-input" accept="image/*" capture="environment" style="display:none" aria-label="Photo upload" onchange="FieldNotes.handlePhoto(event)">
         <button class="btn btn-sm btn-secondary" onclick="document.getElementById('fn-photo-input').click()" style="width:auto">
           📷 ${t('service.add_photo', '사진 추가')}
         </button>
@@ -200,9 +200,9 @@ const FieldNotes = (() => {
 
   function selectTag(tagId) {
     selectedTag = tagId;
-    TAG_OPTIONS.forEach(t => {
-      const btn = document.getElementById(`fn-form-tag-${t.id}`);
-      if (btn) btn.className = `btn btn-sm ${tagId === t.id ? 'btn-primary' : 'btn-secondary'}`;
+    TAG_OPTIONS.forEach(tagOpt => {
+      const btn = document.getElementById(`fn-form-tag-${tagOpt.id}`);
+      if (btn) btn.className = `btn btn-sm ${tagId === tagOpt.id ? 'btn-primary' : 'btn-secondary'}`;
     });
   }
 
@@ -301,7 +301,7 @@ const FieldNotes = (() => {
 
     const d = new Date(n.date);
     const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-    const tag = TAG_OPTIONS.find(t => t.id === n.tag) || TAG_OPTIONS[TAG_OPTIONS.length - 1];
+    const tag = TAG_OPTIONS.find(tOpt => tOpt.id === n.tag) || TAG_OPTIONS[TAG_OPTIONS.length - 1];
 
     container.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-top:16px">
@@ -319,7 +319,7 @@ const FieldNotes = (() => {
         </div>
 
         <div style="margin-bottom:12px">
-          <span style="font-size:var(--text-xs);color:${tag.color};background:${tag.color}20;padding:3px 10px;border-radius:10px">${tag.label}</span>
+          <span style="font-size:var(--text-xs);color:${tag.color};background:${tag.color}20;padding:3px 10px;border-radius:10px">${t('tag.' + tag.id, tag.label)}</span>
         </div>
 
         <div style="font-size:var(--text-base);line-height:1.8;color:var(--text-primary);white-space:pre-line;margin-bottom:16px">${n.content || ''}</div>

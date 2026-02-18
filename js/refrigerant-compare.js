@@ -15,33 +15,33 @@ const RefrigerantCompare = (() => {
 
     container.innerHTML = `
       <div class="page-header">
-        <h1>⚖️ 냉매 비교 도구</h1>
-        <p class="subtitle">동일 조건에서 냉매 특성 비교</p>
+        <h1>${t('compare.title', '⚖️ 냉매 비교 도구')}</h1>
+        <p class="subtitle">${t('compare.subtitle', '동일 조건에서 냉매 특성 비교')}</p>
       </div>
 
       <div class="glass-card">
-        <div class="section-title">비교할 냉매 선택 (최대 ${MAX_COMPARE}종)</div>
+        <div class="section-title">${t('compare.select_ref', '비교할 냉매 선택 (최대 {n}종)').replace('{n}', MAX_COMPARE)}</div>
         <div id="compare-selectors"></div>
         <button class="btn" onclick="RefrigerantCompare.addSelector()" id="compare-add-btn"
           style="margin-top:8px;font-size:var(--text-sm);padding:8px 16px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary)">
-          + 냉매 추가
+          ${t('compare.add_ref', '+ 냉매 추가')}
         </button>
       </div>
 
       <div class="glass-card" id="compare-condition-card" style="display:none">
-        <div class="section-title">비교 조건</div>
+        <div class="section-title">${t('compare.condition', '비교 조건')}</div>
         <div class="input-row">
           <div class="form-group">
-            <label class="form-label">증발온도 (°F)</label>
+            <label class="form-label" for="compare-evap-t">${t('compare.evap_temp', '증발온도 (°F)')}</label>
             <input type="number" id="compare-evap-t" class="form-input" value="40" step="1">
           </div>
           <div class="form-group">
-            <label class="form-label">응축온도 (°F)</label>
+            <label class="form-label" for="compare-cond-t">${t('compare.cond_temp', '응축온도 (°F)')}</label>
             <input type="number" id="compare-cond-t" class="form-input" value="110" step="1">
           </div>
         </div>
         <button class="btn btn-primary" onclick="RefrigerantCompare.runCompare()" style="margin-top:8px">
-          비교 실행
+          ${t('compare.run', '비교 실행')}
         </button>
       </div>
 
@@ -60,7 +60,7 @@ const RefrigerantCompare = (() => {
 
     const count = container.querySelectorAll('.compare-selector').length;
     if (count >= MAX_COMPARE) {
-      App.showToast(`최대 ${MAX_COMPARE}종까지 비교 가능합니다.`, 'warning');
+      App.showToast(t('compare.max_reached', '최대 {n}종까지 비교 가능합니다.').replace('{n}', MAX_COMPARE), 'warning');
       return;
     }
 
@@ -74,7 +74,7 @@ const RefrigerantCompare = (() => {
     div.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
         <span style="width:12px;height:12px;border-radius:50%;background:${color};flex-shrink:0"></span>
-        <select class="form-select compare-ref-select" data-idx="${idx}" style="flex:1">
+        <select name="compare-ref-${idx}" class="form-select compare-ref-select" data-idx="${idx}" aria-label="Refrigerant ${idx}" style="flex:1">
           ${buildRefOptions(defaultValue)}
         </select>
         <button onclick="RefrigerantCompare.removeSelector(${idx})" style="background:none;border:none;color:var(--accent-red);font-size:var(--text-xl);cursor:pointer;padding:4px">×</button>
@@ -111,15 +111,18 @@ const RefrigerantCompare = (() => {
   }
 
   function buildRefOptions(selected) {
+    const lang = typeof I18n !== 'undefined' ? I18n.getLang() : 'ko';
     let html = '';
     if (typeof RefrigerantCatalog !== 'undefined') {
       const grouped = RefrigerantCatalog.getGroupedByCategory();
       for (const [catKey, groupData] of Object.entries(grouped)) {
         const cat = groupData.category;
-        html += `<optgroup label="${cat.icon} ${cat.name_kr}">`;
+        const catName = (lang !== 'ko' && cat.name_en) ? cat.name_en : cat.name_kr;
+        html += `<optgroup label="${cat.icon} ${catName}">`;
         groupData.refrigerants.forEach(r => {
           const sel = r.id === selected ? ' selected' : '';
-          html += `<option value="${r.id}"${sel}>${r.name_kr} (${r.safety})</option>`;
+          const rName = (lang !== 'ko' && r.name_en) ? r.name_en : r.name_kr;
+          html += `<option value="${r.id}"${sel}>${rName} (${r.safety})</option>`;
         });
         html += '</optgroup>';
       }
@@ -141,7 +144,7 @@ const RefrigerantCompare = (() => {
     });
 
     if (refs.length < 2) {
-      App.showToast('2개 이상의 냉매를 선택하세요.', 'warning');
+      App.showToast(t('compare.need_two', '2개 이상의 냉매를 선택하세요.'), 'warning');
       return;
     }
 
@@ -177,12 +180,20 @@ const RefrigerantCompare = (() => {
     }
 
     // Try CoolProp first
-    if (CoolPropEngine.isReady()) {
+    if (typeof CoolPropEngine !== 'undefined' && CoolPropEngine.isReady()) {
       const coolpropName = getCoolPropNameFor(refId);
       if (coolpropName) {
-        data.evapP = CoolPropEngine.getSatPressureBubble(coolpropName, evapT_f);
-        data.condP = CoolPropEngine.getSatPressureBubble(coolpropName, condT_f);
-        data.source = 'CoolProp';
+        try {
+          const ep = CoolPropEngine.getSatPressureBubble(coolpropName, evapT_f);
+          const cp = CoolPropEngine.getSatPressureBubble(coolpropName, condT_f);
+          if (ep != null && cp != null) {
+            data.evapP = ep;
+            data.condP = cp;
+            data.source = 'CoolProp';
+          }
+        } catch (e) {
+          console.warn('CoolProp error for', refId, e);
+        }
       }
     }
 
@@ -221,24 +232,24 @@ const RefrigerantCompare = (() => {
 
     let html = `
       <div class="glass-card">
-        <div class="section-title">비교 결과 (${evapT}°F 증발 / ${condT}°F 응축)</div>
+        <div class="section-title">${t('compare.result_title', '비교 결과 ({evap}°F 증발 / {cond}°F 응축)').replace('{evap}', evapT).replace('{cond}', condT)}</div>
 
         <!-- Comparison Table -->
         <div style="overflow-x:auto">
           <table class="compare-table">
             <thead>
               <tr>
-                <th>항목</th>
+                <th>${t('compare.col_item', '항목')}</th>
                 ${results.map(r => `<th style="color:${r.color}">${r.id}</th>`).join('')}
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>유형</td>
+                <td>${t('compare.type', '유형')}</td>
                 ${results.map(r => `<td>${r.type || '—'}</td>`).join('')}
               </tr>
               <tr>
-                <td>안전등급</td>
+                <td>${t('compare.safety', '안전등급')}</td>
                 ${results.map(r => {
                   const c = r.safety === 'A1' ? 'var(--accent-green)' : r.safety === 'A2L' ? 'var(--accent-orange)' : 'var(--accent-red)';
                   return `<td style="color:${c};font-weight:600">${r.safety || '—'}</td>`;
@@ -249,19 +260,19 @@ const RefrigerantCompare = (() => {
                 ${results.map(r => `<td class="mono">${r.gwp !== null ? r.gwp : '—'}</td>`).join('')}
               </tr>
               <tr>
-                <td>증발압력 (psig)</td>
+                <td>${t('compare.evap_p', '증발압력 (psig)')}</td>
                 ${results.map(r => `<td class="mono">${r.evapP !== null ? r.evapP.toFixed(1) : '—'}</td>`).join('')}
               </tr>
               <tr>
-                <td>응축압력 (psig)</td>
+                <td>${t('compare.cond_p', '응축압력 (psig)')}</td>
                 ${results.map(r => `<td class="mono">${r.condP !== null ? r.condP.toFixed(1) : '—'}</td>`).join('')}
               </tr>
               <tr>
-                <td>압축비</td>
+                <td>${t('compare.comp_ratio', '압축비')}</td>
                 ${results.map(r => `<td class="mono">${r.compressionRatio || '—'}</td>`).join('')}
               </tr>
               <tr>
-                <td>글라이드</td>
+                <td>${t('compare.glide', '글라이드')}</td>
                 ${results.map(r => `<td class="mono">${r.isZeotropic ? `~${r.glide_f}°F` : '—'}</td>`).join('')}
               </tr>
             </tbody>
@@ -271,13 +282,13 @@ const RefrigerantCompare = (() => {
 
       <!-- GWP Bar Chart -->
       <div class="glass-card">
-        <div class="section-title">GWP 비교</div>
+        <div class="section-title">${t('compare.gwp_compare', 'GWP 비교')}</div>
         ${renderGWPChart(results)}
       </div>
 
       <!-- Pressure Bar Chart -->
       <div class="glass-card">
-        <div class="section-title">운전 압력 비교</div>
+        <div class="section-title">${t('compare.pressure_compare', '운전 압력 비교')}</div>
         ${renderPressureChart(results)}
       </div>`;
 
@@ -318,13 +329,13 @@ const RefrigerantCompare = (() => {
               <div class="bar-track">
                 <div class="bar-fill" style="width:${evapPct}%;background:${r.color};opacity:0.6">${r.evapP !== null ? r.evapP.toFixed(0) : '—'}</div>
               </div>
-              <span class="pcc-bar-label">증발</span>
+              <span class="pcc-bar-label">${t('compare.evap', '증발')}</span>
             </div>
             <div class="pcc-bar">
               <div class="bar-track">
                 <div class="bar-fill" style="width:${condPct}%;background:${r.color}">${r.condP !== null ? r.condP.toFixed(0) : '—'}</div>
               </div>
-              <span class="pcc-bar-label">응축</span>
+              <span class="pcc-bar-label">${t('compare.condense', '응축')}</span>
             </div>
           </div>
         </div>`;

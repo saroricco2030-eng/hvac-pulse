@@ -6,9 +6,43 @@
 const ServiceHistory = (() => {
 
   const SYMPTOM_OPTIONS = [
-    '냉각불량', '이상소음', '기동불가', '결빙', '누설',
-    '에러코드', '고압경보', '저압경보', '진동과다', '기타'
+    { id: 'overcool', label: '냉각불량' },
+    { id: 'noise', label: '이상소음' },
+    { id: 'nostart', label: '기동불가' },
+    { id: 'freeze', label: '결빙' },
+    { id: 'leak', label: '누설' },
+    { id: 'error', label: '에러코드' },
+    { id: 'highpress', label: '고압경보' },
+    { id: 'lowpress', label: '저압경보' },
+    { id: 'vibration', label: '진동과다' },
+    { id: 'other', label: '기타' }
   ];
+
+  const EQUIP_TYPES = [
+    { id: 'refrigerator', label: '냉동기' },
+    { id: 'chiller', label: '칠러' },
+    { id: 'vrf', label: 'VRF' },
+    { id: 'package', label: '패키지/RTU' },
+    { id: 'showcase', label: '쇼케이스' },
+    { id: 'precision_ac', label: '항온항습기' },
+    { id: 'other', label: '기타' }
+  ];
+
+  // Translate symptom label: accepts stored Korean label or id
+  function tSymptom(val) {
+    if (!val) return '';
+    const opt = SYMPTOM_OPTIONS.find(s => s.label === val || s.id === val);
+    if (opt) return t('symptom.' + opt.id, opt.label);
+    return val;
+  }
+
+  // Translate equipment type label: accepts stored Korean label or id
+  function tEquip(val) {
+    if (!val) return '';
+    const opt = EQUIP_TYPES.find(e => e.label === val || e.id === val);
+    if (opt) return t('service.equip.' + opt.id, opt.label);
+    return val;
+  }
 
   let currentView = 'list'; // 'list' | 'form' | 'detail'
   let editingId = null;
@@ -35,7 +69,7 @@ const ServiceHistory = (() => {
       </div>
 
       <div style="display:flex;gap:8px;margin-bottom:16px">
-        <input type="text" id="sh-search" class="form-input" placeholder="${t('service.search_placeholder', '검색 (현장명, 모델명, 증상...)')}"
+        <input type="text" id="sh-search" class="form-input" aria-label="Service history search" placeholder="${t('service.search_placeholder', '검색 (현장명, 모델명, 증상...)')}"
           style="flex:1;min-height:40px;font-family:var(--font-sans);font-size:var(--text-sm)"
           oninput="ServiceHistory.filterList()">
       </div>
@@ -64,10 +98,10 @@ const ServiceHistory = (() => {
           <span style="font-size:var(--text-xs);color:var(--text-muted);font-family:var(--font-mono);white-space:nowrap">${dateStr}</span>
         </div>
         <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:4px">
-          ${r.manufacturer || ''} ${r.modelName || ''} ${r.equipType ? `(${r.equipType})` : ''}
+          ${r.manufacturer || ''} ${r.modelName || ''} ${r.equipType ? `(${tEquip(r.equipType)})` : ''}
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          ${r.symptom ? `<span class="badge badge-caution">${r.symptom}</span>` : ''}
+          ${r.symptom ? `<span class="badge badge-caution">${tSymptom(r.symptom)}</span>` : ''}
           ${r.errorCode ? `<span class="badge badge-danger">E: ${r.errorCode}</span>` : ''}
           ${r.photos && r.photos.length > 0 ? `<span class="badge badge-normal">📷 ${r.photos.length}</span>` : ''}
         </div>
@@ -124,16 +158,16 @@ const ServiceHistory = (() => {
         <div class="section-title">${t('service.basic_info', '기본 정보')}</div>
         <div class="input-row">
           <div class="form-group">
-            <label class="form-label">${t('service.date', '날짜')}</label>
+            <label class="form-label" for="sh-date">${t('service.date', '날짜')}</label>
             <input type="date" id="sh-date" class="form-input" value="${dateVal}" style="font-family:var(--font-sans)">
           </div>
           <div class="form-group">
-            <label class="form-label">${t('service.time', '시간')}</label>
+            <label class="form-label" for="sh-time">${t('service.time', '시간')}</label>
             <input type="time" id="sh-time" class="form-input" value="${timeVal}" style="font-family:var(--font-sans)">
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">${t('service.site_name', '현장명/위치')}</label>
+          <label class="form-label" for="sh-site">${t('service.site_name', '현장명/위치')}</label>
           <input type="text" id="sh-site" class="form-input" placeholder="${t('service.site_placeholder', '예: OO빌딩 B1 기계실')}" value="${existing?.siteName || ''}" style="font-family:var(--font-sans)">
         </div>
       </div>
@@ -142,25 +176,19 @@ const ServiceHistory = (() => {
         <div class="section-title">${t('service.equip_info', '장비 정보')}</div>
         <div class="input-row">
           <div class="form-group">
-            <label class="form-label">${t('service.manufacturer', '제조사')}</label>
+            <label class="form-label" for="sh-mfr">${t('service.manufacturer', '제조사')}</label>
             <input type="text" id="sh-mfr" class="form-input" placeholder="${t('service.mfr_placeholder', '예: Carrier')}" value="${existing?.manufacturer || ''}" style="font-family:var(--font-sans)">
           </div>
           <div class="form-group">
-            <label class="form-label">${t('service.model', '모델명')}</label>
+            <label class="form-label" for="sh-model">${t('service.model', '모델명')}</label>
             <input type="text" id="sh-model" class="form-input" placeholder="${t('service.model_placeholder', '예: 30RB-080')}" value="${existing?.modelName || ''}" style="font-family:var(--font-sans)">
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">${t('service.equip_type', '장비유형')}</label>
+          <label class="form-label" for="sh-equip-type">${t('service.equip_type', '장비유형')}</label>
           <select id="sh-equip-type" class="form-select" style="font-family:var(--font-sans)">
             <option value="">${t('common.select', '선택...')}</option>
-            <option value="냉동기" ${existing?.equipType === '냉동기' ? 'selected' : ''}>냉동기</option>
-            <option value="칠러" ${existing?.equipType === '칠러' ? 'selected' : ''}>칠러</option>
-            <option value="VRF" ${existing?.equipType === 'VRF' ? 'selected' : ''}>VRF</option>
-            <option value="패키지/RTU" ${existing?.equipType === '패키지/RTU' ? 'selected' : ''}>패키지/RTU</option>
-            <option value="쇼케이스" ${existing?.equipType === '쇼케이스' ? 'selected' : ''}>쇼케이스</option>
-            <option value="항온항습기" ${existing?.equipType === '항온항습기' ? 'selected' : ''}>항온항습기</option>
-            <option value="기타" ${existing?.equipType === '기타' ? 'selected' : ''}>기타</option>
+            ${EQUIP_TYPES.map(eq => `<option value="${eq.label}" ${existing?.equipType === eq.label ? 'selected' : ''}>${t('service.equip.' + eq.id, eq.label)}</option>`).join('')}
           </select>
         </div>
       </div>
@@ -168,14 +196,14 @@ const ServiceHistory = (() => {
       <div class="glass-card">
         <div class="section-title">${t('service.symptom_diag', '증상/진단')}</div>
         <div class="form-group">
-          <label class="form-label">${t('service.symptom', '증상')}</label>
+          <label class="form-label" for="sh-symptom">${t('service.symptom', '증상')}</label>
           <select id="sh-symptom" class="form-select" style="font-family:var(--font-sans)">
             <option value="">${t('common.select', '선택...')}</option>
-            ${SYMPTOM_OPTIONS.map(s => `<option value="${s}" ${existing?.symptom === s ? 'selected' : ''}>${s}</option>`).join('')}
+            ${SYMPTOM_OPTIONS.map(s => `<option value="${s.label}" ${existing?.symptom === s.label ? 'selected' : ''}>${t('symptom.' + s.id, s.label)}</option>`).join('')}
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">${t('service.error_code', '에러코드 (있으면)')}</label>
+          <label class="form-label" for="sh-error">${t('service.error_code', '에러코드 (있으면)')}</label>
           <input type="text" id="sh-error" class="form-input" placeholder="${t('service.error_placeholder', '예: E-03')}" value="${existing?.errorCode || ''}" style="font-family:var(--font-sans)">
         </div>
         ${pf.symptom ? `
@@ -184,7 +212,7 @@ const ServiceHistory = (() => {
           <div class="prefill-values">${pf.symptom}</div>
         </div>` : ''}
         <div class="form-group">
-          <label class="form-label">${t('service.diagnosis_result', '진단 결과')}</label>
+          <label class="form-label" for="sh-diagnosis">${t('service.diagnosis_result', '진단 결과')}</label>
           <textarea id="sh-diagnosis" class="form-input" rows="3" placeholder="${t('service.diagnosis_placeholder', '진단 내용...')}" style="font-family:var(--font-sans);resize:vertical;height:auto">${existing?.diagnosis || pf.diagnosis || ''}</textarea>
         </div>
       </div>
@@ -192,15 +220,15 @@ const ServiceHistory = (() => {
       <div class="glass-card">
         <div class="section-title">${t('service.repair_content', '수리 내용')}</div>
         <div class="form-group">
-          <label class="form-label">${t('service.repair_content', '수리 내용')}</label>
+          <label class="form-label" for="sh-repair">${t('service.repair_content', '수리 내용')}</label>
           <textarea id="sh-repair" class="form-input" rows="3" placeholder="${t('service.repair_placeholder', '수리/조치 내용...')}" style="font-family:var(--font-sans);resize:vertical;height:auto">${existing?.repairContent || ''}</textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">${t('service.replaced_parts', '교체 부품')}</label>
+          <label class="form-label" for="sh-parts">${t('service.replaced_parts', '교체 부품')}</label>
           <textarea id="sh-parts" class="form-input" rows="2" placeholder="${t('service.parts_placeholder', '부품명, 수량 (한 줄에 하나씩)')}" style="font-family:var(--font-sans);resize:vertical;height:auto">${existing?.replacedParts || ''}</textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">${t('service.tech_memo', '기술자 메모')}</label>
+          <label class="form-label" for="sh-memo">${t('service.tech_memo', '기술자 메모')}</label>
           <textarea id="sh-memo" class="form-input" rows="2" placeholder="${t('service.memo_placeholder', '추가 메모...')}" style="font-family:var(--font-sans);resize:vertical;height:auto">${existing?.techMemo || pf.techMemo || ''}</textarea>
         </div>
       </div>
@@ -215,7 +243,7 @@ const ServiceHistory = (() => {
             </div>
           `).join('')}
         </div>
-        <input type="file" id="sh-photo-input" accept="image/*" capture="environment" style="display:none" onchange="ServiceHistory.handlePhoto(event)">
+        <input type="file" id="sh-photo-input" accept="image/*" capture="environment" style="display:none" aria-label="Photo upload" onchange="ServiceHistory.handlePhoto(event)">
         <button class="btn btn-sm btn-secondary" onclick="document.getElementById('sh-photo-input').click()" style="width:auto">
           📷 ${t('service.add_photo', '사진 추가')}
         </button>
@@ -342,11 +370,11 @@ const ServiceHistory = (() => {
 
         ${r.manufacturer || r.modelName ? `
           <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:8px">
-            ${r.manufacturer || ''} ${r.modelName || ''} ${r.equipType ? `(${r.equipType})` : ''}
+            ${r.manufacturer || ''} ${r.modelName || ''} ${r.equipType ? `(${tEquip(r.equipType)})` : ''}
           </div>` : ''}
 
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
-          ${r.symptom ? `<span class="badge badge-caution">${r.symptom}</span>` : ''}
+          ${r.symptom ? `<span class="badge badge-caution">${tSymptom(r.symptom)}</span>` : ''}
           ${r.errorCode ? `<span class="badge badge-danger">E: ${r.errorCode}</span>` : ''}
         </div>
 

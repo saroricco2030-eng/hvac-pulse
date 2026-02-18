@@ -48,10 +48,10 @@ const PartsCrossRef = (() => {
   ];
 
   const CATEGORY_LABELS = {
-    compressor: '컴프레서',
-    filter_drier: '필터 드라이어',
-    txv: 'TXV (팽창밸브)',
-    solenoid: '솔레노이드 밸브'
+    get compressor() { return t('parts.cat_compressor', '컴프레서'); },
+    get filter_drier() { return t('parts.cat_filter_drier', '필터 드라이어'); },
+    get txv() { return t('parts.cat_txv', 'TXV (팽창밸브)'); },
+    get solenoid() { return t('parts.cat_solenoid', '솔레노이드 밸브'); }
   };
 
   function initUI() {
@@ -64,19 +64,19 @@ const PartsCrossRef = (() => {
 
     container.innerHTML = `
       <div class="page-header">
-        <h1>🔗 부품 호환 매칭</h1>
-        <p class="subtitle">크로스 레퍼런스 검색</p>
+        <h1>🔗 ${t('parts.title', '부품 호환 매칭')}</h1>
+        <p class="subtitle">${t('parts.subtitle', '크로스 레퍼런스 검색')}</p>
       </div>
 
       <div class="glass-card">
         <div class="form-group">
-          <label class="form-label">부품 모델명 검색</label>
-          <input type="text" id="parts-search" class="form-input" placeholder="예: ZR61K3, DML 083, TUAE..."
+          <label class="form-label">${t('parts.search_label', '부품 모델명 검색')}</label>
+          <input type="text" id="parts-search" class="form-input" placeholder="${t('parts.search_placeholder', '예: ZR61K3, DML 083, TUAE...')}"
             oninput="PartsCrossRef.search()" style="font-family:var(--font-sans)">
         </div>
 
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
-          <button class="btn btn-sm ${true ? 'btn-primary' : 'btn-secondary'}" onclick="PartsCrossRef.filterCategory('')" id="parts-cat-all" style="width:auto;padding:6px 12px;font-size:var(--text-sm)">전체</button>
+          <button class="btn btn-sm ${true ? 'btn-primary' : 'btn-secondary'}" onclick="PartsCrossRef.filterCategory('')" id="parts-cat-all" style="width:auto;padding:6px 12px;font-size:var(--text-sm)">${t('common.all', '전체')}</button>
           ${Object.entries(CATEGORY_LABELS).map(([k, v]) => `
             <button class="btn btn-sm btn-secondary" onclick="PartsCrossRef.filterCategory('${k}')" id="parts-cat-${k}" style="width:auto;padding:6px 12px;font-size:var(--text-sm)">${v}</button>
           `).join('')}
@@ -86,8 +86,8 @@ const PartsCrossRef = (() => {
       <div id="parts-result-area">
         <div class="glass-card" style="text-align:center;padding:40px 24px">
           <span style="font-size:var(--text-3xl)">🔍</span>
-          <p style="color:var(--text-secondary);margin-top:12px">부품 모델명을 입력하세요.</p>
-          <p style="color:var(--text-muted);font-size:var(--text-sm);margin-top:4px">예: ZR61, DML, C-083, TUAE</p>
+          <p style="color:var(--text-secondary);margin-top:12px">${t('parts.enter_model', '부품 모델명을 입력하세요.')}</p>
+          <p style="color:var(--text-muted);font-size:var(--text-sm);margin-top:4px">${t('parts.example_models', '예: ZR61, DML, C-083, TUAE')}</p>
         </div>
       </div>`;
   }
@@ -114,7 +114,7 @@ const PartsCrossRef = (() => {
       resultEl.innerHTML = `
         <div class="glass-card" style="text-align:center;padding:40px 24px">
           <span style="font-size:var(--text-3xl)">🔍</span>
-          <p style="color:var(--text-secondary);margin-top:12px">2글자 이상 입력하세요.</p>
+          <p style="color:var(--text-secondary);margin-top:12px">${t('parts.min_chars', '2글자 이상 입력하세요.')}</p>
         </div>`;
       return;
     }
@@ -130,13 +130,13 @@ const PartsCrossRef = (() => {
       resultEl.innerHTML = `
         <div class="glass-card" style="text-align:center;padding:32px 24px">
           <span style="font-size:var(--text-3xl)">😕</span>
-          <p style="color:var(--text-secondary);margin-top:12px">"${query}" 검색 결과 없음</p>
-          <p style="color:var(--text-muted);font-size:var(--text-sm);margin-top:4px">DB에 등록되지 않은 부품입니다.</p>
+          <p style="color:var(--text-secondary);margin-top:12px">"${query}" ${t('parts.no_results', '검색 결과 없음')}</p>
+          <p style="color:var(--text-muted);font-size:var(--text-sm);margin-top:4px">${t('parts.not_in_db', 'DB에 등록되지 않은 부품입니다.')}</p>
         </div>`;
       return;
     }
 
-    resultEl.innerHTML = `<div style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:8px">${matches.length}개 결과</div>` +
+    resultEl.innerHTML = `<div style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:8px">${matches.length} ${t('parts.results_count', '개 결과')}</div>` +
       matches.map(p => {
         const catLabel = CATEGORY_LABELS[p.category] || p.category;
         const compats = p.compatModels.map((m, i) => `<span style="color:var(--accent-cyan);font-family:var(--font-mono);font-weight:600">${m}</span> <span style="color:var(--text-muted);font-size:var(--text-xs)">(${p.compatMfrs[i] || ''})</span>`).join(', ');
@@ -151,10 +151,10 @@ const PartsCrossRef = (() => {
               <span class="badge badge-normal" style="font-size:var(--text-xs)">${catLabel}</span>
             </div>
             <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:8px">
-              ${p.capacity ? `용량: ${p.capacity} · ` : ''}냉매: ${p.refrigerant}
+              ${p.capacity ? `${t('parts.capacity', '용량')}: ${p.capacity} · ` : ''}${t('parts.refrigerant', '냉매')}: ${p.refrigerant}
             </div>
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-bottom:8px">
-              <div style="font-size:var(--text-xs);color:var(--text-muted);margin-bottom:4px">호환 부품:</div>
+              <div style="font-size:var(--text-xs);color:var(--text-muted);margin-bottom:4px">${t('parts.compatible', '호환 부품')}:</div>
               <div style="font-size:var(--text-sm);line-height:1.8">${compats}</div>
             </div>
             ${p.note ? `<div style="font-size:var(--text-sm);color:var(--text-muted)">${p.note}</div>` : ''}

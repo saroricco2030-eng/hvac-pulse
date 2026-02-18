@@ -30,9 +30,11 @@ const Settings = (() => {
 
   // --- Pressure conversion helpers ---
   function convertPressure(psig, toUnit) {
-    if (toUnit === 'bar') return (psig * 0.0689476 + 1.01325).toFixed(2);
-    if (toUnit === 'kPa') return ((psig + 14.696) * 6.89476).toFixed(1);
-    return psig; // psig
+    const v = parseFloat(psig);
+    if (isNaN(v)) return '--';
+    if (toUnit === 'bar') return (v * 0.0689476 + 1.01325).toFixed(2);
+    if (toUnit === 'kPa') return ((v + 14.696) * 6.89476).toFixed(1);
+    return v; // psig
   }
 
   function pressureLabel() {
@@ -167,10 +169,10 @@ const Settings = (() => {
       a.click();
       URL.revokeObjectURL(url);
 
-      App.showToast('데이터를 내보냈습니다.', 'success');
+      App.showToast(t('toast.export_success', '데이터를 내보냈습니다.'), 'success');
     } catch (e) {
       console.error('Export failed:', e);
-      App.showToast('내보내기 실패', 'error');
+      App.showToast(t('toast.export_fail', '내보내기 실패'), 'error');
     }
   }
 
@@ -179,12 +181,19 @@ const Settings = (() => {
     const file = event.target.files[0];
     if (!file) return;
 
+    const MAX_IMPORT_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_IMPORT_SIZE) {
+      App.showToast(t('toast.file_too_large', '파일이 너무 큽니다 (최대 10MB).'), 'error');
+      event.target.value = '';
+      return;
+    }
+
     try {
       const text = await file.text();
       const data = JSON.parse(text);
 
-      if (!data.appVersion) {
-        App.showToast('유효하지 않은 백업 파일입니다.', 'error');
+      if (!data.appVersion || typeof data !== 'object' || Array.isArray(data)) {
+        App.showToast(t('toast.invalid_backup', '유효하지 않은 백업 파일입니다.'), 'error');
         return;
       }
 
@@ -218,18 +227,18 @@ const Settings = (() => {
         if (data.settings.metering) set(KEYS.METERING, data.settings.metering);
       }
 
-      App.showToast(`${imported}건 데이터를 가져왔습니다.`, 'success');
+      App.showToast(t('toast.import_success', `${imported}건 데이터를 가져왔습니다.`), 'success');
       event.target.value = '';
     } catch (e) {
       console.error('Import failed:', e);
-      App.showToast('가져오기 실패 — 파일 형식을 확인하세요.', 'error');
+      App.showToast(t('toast.import_fail', '가져오기 실패 — 파일 형식을 확인하세요.'), 'error');
       event.target.value = '';
     }
   }
 
   function confirmDeleteAll() {
-    if (!confirm('모든 수리기록, 체크리스트, 현장메모가 삭제됩니다.\n삭제하시겠습니까?')) return;
-    if (!confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+    if (!confirm(t('settings.confirm_delete1', '모든 수리기록, 체크리스트, 현장메모가 삭제됩니다.\n삭제하시겠습니까?'))) return;
+    if (!confirm(t('settings.confirm_delete2', '정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.'))) return;
 
     deleteAllData();
   }
@@ -241,10 +250,10 @@ const Settings = (() => {
         DB.clear(DB.STORES.CHECKLISTS).catch(() => {}),
         DB.clear(DB.STORES.FIELD_NOTES).catch(() => {})
       ]);
-      App.showToast('모든 데이터가 삭제되었습니다.', 'success');
+      App.showToast(t('toast.delete_success', '모든 데이터가 삭제되었습니다.'), 'success');
     } catch (e) {
       console.error('Delete failed:', e);
-      App.showToast('삭제 실패', 'error');
+      App.showToast(t('toast.delete_fail', '삭제 실패'), 'error');
     }
   }
 

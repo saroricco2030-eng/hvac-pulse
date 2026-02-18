@@ -25,75 +25,82 @@ const PHDiagram = (() => {
 
     container.innerHTML = `
       <div class="page-header">
-        <h1>📈 P-H 선도 (몰리에르)</h1>
-        <p class="subtitle">압력-엔탈피 다이어그램 · 냉동사이클 시각화</p>
+        <h1>${t('ph.title', '📈 P-H 선도 (몰리에르)')}</h1>
+        <p class="subtitle">${t('ph.subtitle', '압력-엔탈피 다이어그램 · 냉동사이클 시각화')}</p>
       </div>
 
       <div class="glass-card">
         <div class="ph-engine-badge" id="ph-engine-badge">
           <span class="badge-dot"></span>
-          <span id="ph-engine-status">엔진 확인 중...</span>
+          <span id="ph-engine-status">${t('ph.engine_checking', '엔진 확인 중...')}</span>
         </div>
 
         <div class="form-group">
-          <label class="form-label">냉매 선택</label>
+          <label class="form-label" for="ph-ref-select">${t('ph.ref_select', '냉매 선택')}</label>
           <select id="ph-ref-select" class="form-select" onchange="PHDiagram.onRefChange()"></select>
         </div>
 
         <div id="ph-svg-container" class="ph-svg-container">
-          <div class="ph-placeholder">CoolProp 엔진이 필요합니다.<br>엔진 로딩 후 P-H 선도를 생성할 수 있습니다.</div>
+          <div class="ph-placeholder">${t('ph.engine_required', 'CoolProp 엔진이 필요합니다.')}<br>${t('ph.engine_required2', '엔진 로딩 후 P-H 선도를 생성할 수 있습니다.')}</div>
         </div>
       </div>
 
       <!-- Cycle Input -->
       <div class="glass-card" id="ph-cycle-card" style="display:none">
-        <div class="section-title">운전점 입력 (4점 사이클)</div>
+        <div class="section-title">${t('ph.cycle_input', '운전점 입력 (4점 사이클)')}</div>
         <div class="input-row">
           <div class="form-group">
-            <label class="form-label">흡입압력 (psig)</label>
-            <input type="number" id="ph-suction-p" class="form-input" placeholder="저압" step="0.1">
+            <label class="form-label" for="ph-suction-p">${t('ph.suction_p', '흡입압력 (psig)')}</label>
+            <input type="number" id="ph-suction-p" class="form-input" placeholder="${t('ph.low_side', '저압')}" step="0.1">
           </div>
           <div class="form-group">
-            <label class="form-label">토출압력 (psig)</label>
-            <input type="number" id="ph-discharge-p" class="form-input" placeholder="고압" step="0.1">
+            <label class="form-label" for="ph-discharge-p">${t('ph.discharge_p', '토출압력 (psig)')}</label>
+            <input type="number" id="ph-discharge-p" class="form-input" placeholder="${t('ph.high_side', '고압')}" step="0.1">
           </div>
         </div>
         <div class="input-row">
           <div class="form-group">
-            <label class="form-label">과열도 (°F)</label>
+            <label class="form-label" for="ph-superheat">${t('settings.matrix.col1', '과열도')} (°F)</label>
             <input type="number" id="ph-superheat" class="form-input" placeholder="10" step="0.1" value="10">
           </div>
           <div class="form-group">
-            <label class="form-label">과냉도 (°F)</label>
+            <label class="form-label" for="ph-subcooling">${t('settings.matrix.col2', '과냉도')} (°F)</label>
             <input type="number" id="ph-subcooling" class="form-input" placeholder="10" step="0.1" value="10">
           </div>
         </div>
         <button class="btn btn-primary" onclick="PHDiagram.drawCycle()" style="margin-top:8px">
-          사이클 그리기
+          ${t('ph.draw_cycle', '사이클 그리기')}
         </button>
         <div id="ph-cycle-info"></div>
       </div>
 
       <!-- Fault Simulation -->
       <div class="glass-card" id="ph-fault-card" style="display:none">
-        <div class="section-title">고장 시뮬레이션 (P-H 선도)</div>
+        <div class="section-title">${t('ph.fault_sim', '고장 시뮬레이션 (P-H 선도)')}</div>
         <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:12px">
-          고장을 선택하면 정상 사이클(실선) 위에 고장 사이클(점선)이 오버레이됩니다.
+          ${t('ph.fault_desc', '고장을 선택하면 정상 사이클(실선) 위에 고장 사이클(점선)이 오버레이됩니다.')}
         </p>
-        <select id="ph-fault-select" class="form-select" onchange="PHDiagram.drawFaultOverlay()">
-          <option value="">고장 유형 선택...</option>
-          <option value="refrigerant_low">냉매 부족</option>
-          <option value="refrigerant_high">냉매 과충전</option>
-          <option value="condenser_fouling">응축기 오염</option>
-          <option value="evaporator_fouling">증발기 기류 부족</option>
-          <option value="compressor_valve_leak">압축기 밸브 누설</option>
-          <option value="non_condensable">비응축가스 혼입</option>
+        <select id="ph-fault-select" class="form-select" aria-label="Fault simulation" onchange="PHDiagram.drawFaultOverlay()">
+          <option value="">${t('ph.fault_select', '고장 유형 선택...')}</option>
+          <option value="refrigerant_low">${t('ph.fault.low_charge', '냉매 부족')}</option>
+          <option value="refrigerant_high">${t('ph.fault.overcharge', '냉매 과충전')}</option>
+          <option value="condenser_fouling">${t('ph.fault.condenser', '응축기 오염')}</option>
+          <option value="evaporator_fouling">${t('ph.fault.evaporator', '증발기 기류 부족')}</option>
+          <option value="compressor_valve_leak">${t('ph.fault.compressor', '압축기 밸브 누설')}</option>
+          <option value="non_condensable">${t('ph.fault.ncg', '비응축가스 혼입')}</option>
         </select>
         <div id="ph-fault-info"></div>
       </div>`;
 
     populateRefSelect();
     updateEngineBadge();
+
+    // Restore previous state after re-render (language switch)
+    if (currentRefrigerant) {
+      const sel = document.getElementById('ph-ref-select');
+      if (sel) sel.value = currentRefrigerant;
+      if (CoolPropEngine.isReady()) drawSaturationCurve();
+    }
   }
 
   function populateRefSelect() {
@@ -101,16 +108,19 @@ const PHDiagram = (() => {
     if (!sel) return;
 
     sel.innerHTML = '';
+    const lang = typeof I18n !== 'undefined' ? I18n.getLang() : 'ko';
     if (typeof RefrigerantCatalog !== 'undefined') {
       const grouped = RefrigerantCatalog.getGroupedByCategory();
       for (const [catKey, groupData] of Object.entries(grouped)) {
         const cat = groupData.category;
         const group = document.createElement('optgroup');
-        group.label = `${cat.icon} ${cat.name_kr}`;
+        const catName = (lang !== 'ko' && cat.name_en) ? cat.name_en : cat.name_kr;
+        group.label = `${cat.icon} ${catName}`;
         groupData.refrigerants.forEach(r => {
           const opt = document.createElement('option');
           opt.value = r.id;
-          opt.textContent = `${r.name_kr} (${r.safety})`;
+          const rName = (lang !== 'ko' && r.name_en) ? r.name_en : r.name_kr;
+          opt.textContent = `${rName} (${r.safety})`;
           group.appendChild(opt);
         });
         sel.appendChild(group);
@@ -133,11 +143,11 @@ const PHDiagram = (() => {
 
     if (CoolPropEngine.isReady()) {
       badge.className = 'ph-engine-badge engine-ready';
-      status.textContent = '🔬 NIST급 정밀 계산 (CoolProp)';
+      status.textContent = t('ph.engine_ready', '🔬 NIST급 정밀 계산 (CoolProp)');
       document.getElementById('ph-cycle-card')?.style.setProperty('display', 'block');
     } else {
       badge.className = 'ph-engine-badge engine-fallback';
-      status.textContent = '⏳ CoolProp 미로딩 — P-H 선도 사용 불가';
+      status.textContent = t('ph.engine_unavailable', '⏳ CoolProp 미로딩 — P-H 선도 사용 불가');
     }
   }
 
@@ -164,7 +174,7 @@ const PHDiagram = (() => {
 
     currentCurve = CoolPropEngine.generatePHCurve(coolpropName, 80);
     if (!currentCurve) {
-      showPlaceholder('이 냉매의 P-H 데이터를 생성할 수 없습니다.');
+      showPlaceholder(t('ph.no_data', '이 냉매의 P-H 데이터를 생성할 수 없습니다.'));
       return;
     }
 
@@ -181,7 +191,7 @@ const PHDiagram = (() => {
     const sc = parseFloat(document.getElementById('ph-subcooling')?.value);
 
     if ([sP, dP, sh, sc].some(isNaN)) {
-      App.showToast('모든 값을 입력해주세요.', 'warning');
+      App.showToast(t('validation.required', '모든 값을 입력해주세요.'), 'warning');
       return;
     }
 
@@ -189,7 +199,7 @@ const PHDiagram = (() => {
     currentCycle = CoolPropEngine.calculateCyclePoints(coolpropName, sP, dP, sh, sc);
 
     if (!currentCycle) {
-      App.showToast('사이클 계산 실패 — 입력값을 확인하세요.', 'error');
+      App.showToast(t('ph.calc_fail', '사이클 계산 실패 — 입력값을 확인하세요.'), 'error');
       return;
     }
 
@@ -208,11 +218,11 @@ const PHDiagram = (() => {
           </div>
           <div class="computed-item">
             <div class="comp-value" style="color:var(--accent-cyan)">${currentCycle.refrigEffect}</div>
-            <div class="comp-label">냉동효과 (kJ/kg)</div>
+            <div class="comp-label">${t('ph.refrig_effect', '냉동효과')} (kJ/kg)</div>
           </div>
           <div class="computed-item">
             <div class="comp-value" style="color:var(--accent-orange)">${currentCycle.compWork}</div>
-            <div class="comp-label">압축일 (kJ/kg)</div>
+            <div class="comp-label">${t('ph.comp_work', '압축일')} (kJ/kg)</div>
           </div>
         </div>`;
     }
@@ -241,7 +251,7 @@ const PHDiagram = (() => {
           infoEl.innerHTML = `
             <div class="alert-box alert-warning" style="margin-top:12px">
               <span>📊</span>
-              <span><strong>${fault.name_kr}:</strong> ${fault.ph_effect.desc_kr}</span>
+              <span><strong>${(I18n.getLang() !== 'ko' && fault.name_en) ? fault.name_en : fault.name_kr}:</strong> ${(I18n.getLang() !== 'ko' && fault.ph_effect.desc_en) ? fault.ph_effect.desc_en : fault.ph_effect.desc_kr}</span>
             </div>`;
         }
       }
@@ -331,18 +341,18 @@ const PHDiagram = (() => {
     }
 
     // Axis labels
-    svg += `<text x="${WIDTH / 2}" y="${HEIGHT - 8}" text-anchor="middle" fill="var(--text-secondary)" font-size="12" font-family="system-ui">엔탈피 h (kJ/kg)</text>`;
-    svg += `<text x="14" y="${HEIGHT / 2}" text-anchor="middle" fill="var(--text-secondary)" font-size="12" font-family="system-ui" transform="rotate(-90,14,${HEIGHT / 2})">압력 P (kPa)</text>`;
+    svg += `<text x="${WIDTH / 2}" y="${HEIGHT - 8}" text-anchor="middle" fill="var(--text-secondary)" font-size="12" font-family="system-ui">${t('ph.axis_enthalpy', '엔탈피')} h (kJ/kg)</text>`;
+    svg += `<text x="14" y="${HEIGHT / 2}" text-anchor="middle" fill="var(--text-secondary)" font-size="12" font-family="system-ui" transform="rotate(-90,14,${HEIGHT / 2})">${t('ph.axis_pressure', '압력')} P (kPa)</text>`;
 
     // Title
-    svg += `<text x="${WIDTH / 2}" y="18" text-anchor="middle" fill="var(--text-primary)" font-size="13" font-weight="600" font-family="system-ui">${currentRefrigerant} P-H 선도</text>`;
+    svg += `<text x="${WIDTH / 2}" y="18" text-anchor="middle" fill="var(--text-primary)" font-size="13" font-weight="600" font-family="system-ui">${currentRefrigerant} ${t('ph.chart_title', 'P-H 선도')}</text>`;
 
     // Legend
     if (currentCycle && faultOverlay) {
       svg += `<line x1="${MARGIN.left + 10}" y1="14" x2="${MARGIN.left + 30}" y2="14" stroke="#3b82f6" stroke-width="2"/>`;
-      svg += `<text x="${MARGIN.left + 34}" y="18" fill="var(--text-secondary)" font-size="10">정상</text>`;
+      svg += `<text x="${MARGIN.left + 34}" y="18" fill="var(--text-secondary)" font-size="10">${t('ph.legend_normal', '정상')}</text>`;
       svg += `<line x1="${MARGIN.left + 60}" y1="14" x2="${MARGIN.left + 80}" y2="14" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3"/>`;
-      svg += `<text x="${MARGIN.left + 84}" y="18" fill="var(--text-secondary)" font-size="10">고장</text>`;
+      svg += `<text x="${MARGIN.left + 84}" y="18" fill="var(--text-secondary)" font-size="10">${t('ph.legend_fault', '고장')}</text>`;
     }
 
     svg += '</svg>';
@@ -403,12 +413,12 @@ const PHDiagram = (() => {
     if (currentCurve.saturatedLiquid.length > 5) {
       const midIdx = Math.floor(currentCurve.saturatedLiquid.length / 2);
       const pt = currentCurve.saturatedLiquid[midIdx];
-      g += `<text x="${scaleH(pt.h).toFixed(1)}" y="${scaleP(pt.p).toFixed(1) - 6}" fill="#f59e0b" font-size="9" text-anchor="end" opacity="0.8">포화액</text>`;
+      g += `<text x="${scaleH(pt.h).toFixed(1)}" y="${scaleP(pt.p).toFixed(1) - 6}" fill="#f59e0b" font-size="9" text-anchor="end" opacity="0.8">${t('ph.sat_liquid', '포화액')}</text>`;
     }
     if (currentCurve.saturatedVapor.length > 5) {
       const midIdx = Math.floor(currentCurve.saturatedVapor.length / 2);
       const pt = currentCurve.saturatedVapor[midIdx];
-      g += `<text x="${scaleH(pt.h).toFixed(1)}" y="${scaleP(pt.p).toFixed(1) - 6}" fill="#06b6d4" font-size="9" text-anchor="start" opacity="0.8">포화증기</text>`;
+      g += `<text x="${scaleH(pt.h).toFixed(1)}" y="${scaleP(pt.p).toFixed(1) - 6}" fill="#06b6d4" font-size="9" text-anchor="start" opacity="0.8">${t('ph.sat_vapor', '포화증기')}</text>`;
     }
 
     // Critical point
@@ -418,7 +428,7 @@ const PHDiagram = (() => {
       const pCrit = currentCurve.saturatedLiquid[currentCurve.saturatedLiquid.length - 1]?.p;
       if (hCrit && pCrit) {
         g += `<circle cx="${scaleH(hCrit).toFixed(1)}" cy="${scaleP(pCrit).toFixed(1)}" r="4" fill="#ef4444" stroke="#fff" stroke-width="1"/>`;
-        g += `<text x="${scaleH(hCrit).toFixed(1)}" y="${scaleP(pCrit).toFixed(1) - 8}" fill="#ef4444" font-size="9" text-anchor="middle">임계점</text>`;
+        g += `<text x="${scaleH(hCrit).toFixed(1)}" y="${scaleP(pCrit).toFixed(1) - 8}" fill="#ef4444" font-size="9" text-anchor="middle">${t('ph.critical_point', '임계점')}</text>`;
       }
     }
 

@@ -37,24 +37,28 @@ const DataBridge = (() => {
     const warnings = [];
     const replacements = RefrigerantCatalog.getReplacements(refId);
 
+    // Language-aware refrigerant name
+    const lang = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : 'ko';
+    const refName = (lang !== 'ko' && ref.name_en) ? ref.name_en : (ref.name_kr || ref.id);
+
     // Status warnings
     if (ref.status === 'banned') {
       warnings.push({
         type: 'danger',
         icon: '⛔',
-        text: `${ref.name_kr}은 생산 금지 냉매입니다. 사용/충전이 법적으로 불가합니다.`
+        text: t('bridge.warn_banned', `${ref.name_kr}은 생산 금지 냉매입니다. 사용/충전이 법적으로 불가합니다.`).replace('{name}', refName)
       });
     } else if (ref.status === 'phase-out') {
       warnings.push({
         type: 'warning',
         icon: '⚠️',
-        text: `${ref.name_kr}은 단계적 퇴출 중입니다. 서비스용 재생 냉매만 사용 가능합니다.`
+        text: t('bridge.warn_phaseout', `${ref.name_kr}은 단계적 퇴출 중입니다. 서비스용 재생 냉매만 사용 가능합니다.`).replace('{name}', refName)
       });
     } else if (ref.status === 'phase-down') {
       warnings.push({
         type: 'info',
         icon: 'ℹ️',
-        text: `${ref.name_kr}은 단계적 감축 대상입니다 (GWP ${ref.gwp}). 신규 설비 사용 제한 중.`
+        text: t('bridge.warn_phasedown', `${ref.name_kr}은 단계적 감축 대상입니다 (GWP ${ref.gwp}). 신규 설비 사용 제한 중.`).replace('{name}', refName).replace('{gwp}', ref.gwp)
       });
     }
 
@@ -63,19 +67,19 @@ const DataBridge = (() => {
       warnings.push({
         type: 'caution',
         icon: '🔥',
-        text: '미약 가연성 냉매 (A2L) — 점화원 관리 및 환기 필수. 누설 탐지기 준비.'
+        text: t('bridge.warn_a2l', '미약 가연성 냉매 (A2L) — 점화원 관리 및 환기 필수. 누설 탐지기 준비.')
       });
     } else if (ref.safety === 'A3') {
       warnings.push({
         type: 'danger',
         icon: '🔥',
-        text: '고가연성 냉매 (A3) — 충전량 제한 준수 필수. 점화원 절대 금지. 전용 장비 사용.'
+        text: t('bridge.warn_a3', '고가연성 냉매 (A3) — 충전량 제한 준수 필수. 점화원 절대 금지. 전용 장비 사용.')
       });
     } else if (ref.safety && ref.safety.startsWith('B')) {
       warnings.push({
         type: 'warning',
         icon: '☠️',
-        text: `독성 냉매 (${ref.safety}) — 환기 장치 필수. 가스 감지기 설치 확인. 개인보호장비 착용.`
+        text: t('bridge.warn_toxic', `독성 냉매 (${ref.safety}) — 환기 장치 필수. 가스 감지기 설치 확인. 개인보호장비 착용.`).replace('{safety}', ref.safety)
       });
     }
 
@@ -84,7 +88,7 @@ const DataBridge = (() => {
       warnings.push({
         type: 'info',
         icon: '🌍',
-        text: `높은 GWP (${ref.gwp}) — 누설 방지 철저히. EU F-Gas/AIM Act 규제 대상.`
+        text: t('bridge.warn_highgwp', `높은 GWP (${ref.gwp}) — 누설 방지 철저히. EU F-Gas/AIM Act 규제 대상.`).replace('{gwp}', ref.gwp)
       });
     }
 
@@ -93,16 +97,16 @@ const DataBridge = (() => {
       warnings.push({
         type: 'info',
         icon: '📐',
-        text: `큰 온도 글라이드 (${ref.glide_f}°F) — Bubble/Dew 구분 필수. 누설 시 전량 교체 필요.`
+        text: t('bridge.warn_glide', `큰 온도 글라이드 (${ref.glide_f}°F) — Bubble/Dew 구분 필수. 누설 시 전량 교체 필요.`).replace('{glide}', ref.glide_f)
       });
     }
 
     return {
       warnings,
       replacements,
-      notes: ref.notes_kr || null,
+      notes: (lang !== 'ko' && ref.notes_en) ? ref.notes_en : (ref.notes_kr || null),
       status: ref.status,
-      use: ref.use_kr || null
+      use: (lang !== 'ko' && ref.use_en) ? ref.use_en : (ref.use_kr || null)
     };
   }
 
@@ -112,6 +116,7 @@ const DataBridge = (() => {
   function renderRefrigerantWarnings(refId, containerEl) {
     if (!containerEl) return;
     const data = getRefrigerantWarnings(refId);
+    const lang = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : 'ko';
 
     if (data.warnings.length === 0 && !data.notes) {
       containerEl.innerHTML = '';
@@ -135,8 +140,9 @@ const DataBridge = (() => {
       html += `<div class="flex-wrap-gap-6">`;
       data.replacements.forEach(rep => {
         const safetyColor = rep.safety === 'A1' ? 'var(--accent-green)' : rep.safety === 'A2L' ? 'var(--accent-orange)' : 'var(--accent-red)';
+        const repName = (lang !== 'ko' && rep.name_en) ? rep.name_en : (rep.name_kr || rep.id);
         html += `<button class="ref-replace-btn" onclick="DataBridge.switchRefrigerant('${rep.id}')">
-          ${rep.name_kr} <span style="color:${safetyColor};font-size:var(--text-xs)">(${rep.safety}·GWP ${rep.gwp})</span>
+          ${repName} <span style="color:${safetyColor};font-size:var(--text-xs)">(${rep.safety}·GWP ${rep.gwp})</span>
         </button>`;
       });
       html += `</div></div>`;
@@ -262,7 +268,8 @@ const DataBridge = (() => {
    * Map diagKey to error code search keywords
    */
   function _getErrorSearchKeyword(diagKey) {
-    const map = {
+    const lang = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : 'ko';
+    const map_ko = {
       lowCharge: '냉매 부족',
       overcharge: '고압',
       meteringRestriction: '필터',
@@ -270,6 +277,15 @@ const DataBridge = (() => {
       txvOverfeed: 'TXV',
       lowAirflow: '에어플로우'
     };
+    const map_en = {
+      lowCharge: 'low charge',
+      overcharge: 'high pressure',
+      meteringRestriction: 'filter',
+      compressorWeak: 'compressor',
+      txvOverfeed: 'TXV',
+      lowAirflow: 'airflow'
+    };
+    const map = (lang === 'ko') ? map_ko : map_en;
     return map[diagKey] || null;
   }
 
@@ -368,13 +384,29 @@ const DataBridge = (() => {
   function mapNISTToDiagKey(nistResult) {
     if (!nistResult || !nistResult.diagnosis) return null;
 
+    // Prefer i18nKey-based mapping (language-independent)
+    if (nistResult.diagnosis.i18nKey) {
+      const keyMap = {
+        'nist.normal': 'normal',
+        'nist.lowcharge': 'lowCharge',
+        'nist.overcharge': 'overcharge',
+        'nist.airflow': 'lowAirflow',
+        'nist.txvoverfeed': 'txvOverfeed',
+        'nist.condenser': null,
+        'nist.liquid_low': 'meteringRestriction',
+        'nist.additional': null
+      };
+      return keyMap[nistResult.diagnosis.i18nKey] ?? null;
+    }
+
+    // Fallback: Korean title matching (legacy)
     const title = nistResult.diagnosis.title || '';
     if (title.includes('정상')) return 'normal';
     if (title.includes('냉매 부족')) return 'lowCharge';
     if (title.includes('냉매 과충전')) return 'overcharge';
     if (title.includes('에어플로우')) return 'lowAirflow';
     if (title.includes('TXV') || title.includes('오버피딩')) return 'txvOverfeed';
-    if (title.includes('응축기')) return null; // condenser_fouling — no direct diagKey
+    if (title.includes('응축기')) return null;
     if (title.includes('리퀴드라인')) return 'meteringRestriction';
 
     return null;
@@ -416,11 +448,11 @@ const DataBridge = (() => {
     if (diagResult.ctoa != null) parts.push(`CTOA: ${diagResult.ctoa.toFixed(1)}°F`);
     // NIST-specific temperature data
     if (diagResult.source === 'NIST') {
-      if (diagResult.returnAirTemp != null) parts.push(`리턴공기: ${diagResult.returnAirTemp}°F`);
-      if (diagResult.suctionLineTemp != null) parts.push(`석션라인: ${diagResult.suctionLineTemp}°F`);
-      if (diagResult.liquidLineTemp != null) parts.push(`리퀴드라인: ${diagResult.liquidLineTemp}°F`);
-      if (diagResult.suctionDiff != null) parts.push(`석션편차: ${diagResult.suctionDiff.toFixed(1)}°F`);
-      if (diagResult.liquidDiff != null) parts.push(`리퀴드편차: ${diagResult.liquidDiff.toFixed(1)}°F`);
+      if (diagResult.returnAirTemp != null) parts.push(`${t('bridge.rec_return', '리턴공기')}: ${diagResult.returnAirTemp}°F`);
+      if (diagResult.suctionLineTemp != null) parts.push(`${t('bridge.rec_suction', '석션라인')}: ${diagResult.suctionLineTemp}°F`);
+      if (diagResult.liquidLineTemp != null) parts.push(`${t('bridge.rec_liquid', '리퀴드라인')}: ${diagResult.liquidLineTemp}°F`);
+      if (diagResult.suctionDiff != null) parts.push(`${t('bridge.rec_suction_diff', '석션편차')}: ${diagResult.suctionDiff.toFixed(1)}°F`);
+      if (diagResult.liquidDiff != null) parts.push(`${t('bridge.rec_liquid_diff', '리퀴드편차')}: ${diagResult.liquidDiff.toFixed(1)}°F`);
     }
     prefill.symptom = parts.join(' · ');
 
@@ -428,7 +460,9 @@ const DataBridge = (() => {
     const memoLines = [];
     if (diagResult.severity) {
       const sl = diagResult.severity;
-      memoLines.push(`[심각도: ${sl.level}] ${sl.info?.desc_kr || ''}`);
+      const lang = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : 'ko';
+      const sevDesc = (lang !== 'ko' && sl.info?.desc_en) ? sl.info.desc_en : (sl.info?.desc_kr || '');
+      memoLines.push(`[${t('bridge.rec_severity', '심각도')}: ${sl.level}] ${sevDesc}`);
     }
     if (diagResult.diagnosis && diagResult.diagnosis.detail) {
       memoLines.push(diagResult.diagnosis.detail);
