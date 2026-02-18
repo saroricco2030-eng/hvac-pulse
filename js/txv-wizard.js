@@ -238,7 +238,7 @@ const TXVWizard = (() => {
         <button class="btn btn-sm btn-secondary" onclick="TXVWizard.goBack()" style="width:auto;padding:8px 12px">
           ← ${t('common.back', '뒤로')}
         </button>
-        <span style="font-size:0.8rem;color:var(--text-secondary)">${modeIcon} ${modeLabel}</span>
+        <span style="font-size:var(--text-sm);color:var(--text-secondary)">${modeIcon} ${modeLabel}</span>
       </div>
 
       ${progressHtml}
@@ -249,8 +249,8 @@ const TXVWizard = (() => {
         <div class="step-desc">${step.desc}</div>
 
         <div style="text-align:left;margin-bottom:16px">
-          <strong style="font-size:0.85rem;color:var(--text-primary)">${t('txv.check_items', '확인 사항')}:</strong>
-          <ul style="margin:8px 0 0 16px;font-size:0.85rem;color:var(--text-secondary);line-height:1.8">
+          <strong style="font-size:var(--text-sm);color:var(--text-primary)">${t('txv.check_items', '확인 사항')}:</strong>
+          <ul style="margin:8px 0 0 16px;font-size:var(--text-sm);color:var(--text-secondary);line-height:1.8">
             ${step.instructions.map(i => `<li>${i}</li>`).join('')}
           </ul>
         </div>
@@ -310,7 +310,7 @@ const TXVWizard = (() => {
           <p style="color:var(--text-secondary);margin-bottom:8px">
             <strong>${stepTitle}</strong> ${t('txv.solved_at_step', '단계에서 해결되었습니다.')}
           </p>
-          <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:24px">
+          <p style="color:var(--text-secondary);font-size:var(--text-sm);margin-bottom:24px">
             ${t('txv.recheck_hint', '시스템 안정화를 위해 15~30분 후 과열도/과냉도를 재확인하세요.')}
           </p>
           <button class="btn btn-primary" onclick="TXVWizard.initUI()">
@@ -322,7 +322,7 @@ const TXVWizard = (() => {
         <div class="glass-card" style="text-align:center">
           <div style="font-size:3rem;margin-bottom:16px">🔧</div>
           <h2 style="margin-bottom:12px;color:var(--accent-orange)">${t('txv.all_steps_done', '모든 단계 완료')}</h2>
-          <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:16px">
+          <p style="color:var(--text-secondary);font-size:var(--text-base);margin-bottom:16px">
             ${currentMode === 'starving' ? '7' : '5'} ${t('txv.checkpoints_checked', '체크포인트를 모두 확인했지만 문제가 해결되지 않았습니다.')}
           </p>
           <div class="alert-box alert-warning" style="text-align:left">

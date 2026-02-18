@@ -92,7 +92,7 @@ const CycleVisualization = (() => {
       </div>
 
       <div style="padding:0 4px">
-        <button class="btn btn-primary" id="cycle-diag-btn" style="width:100%;margin-top:12px;padding:14px;font-size:1rem" disabled>
+        <button class="btn btn-primary" id="cycle-diag-btn" style="width:100%;margin-top:12px;padding:14px;font-size:var(--text-base)" disabled>
           🔍 ${t('cycle.run_diag', '사이클 진단 실행')}
         </button>
       </div>
@@ -476,10 +476,10 @@ const CycleVisualization = (() => {
     const content = document.getElementById('cycle-panel-content');
     content.innerHTML = `
       <div style="margin-bottom:12px">
-        <div style="font-size:1.1rem;font-weight:700;color:var(--text-primary)">${data.name_kr}</div>
-        <div style="font-size:0.8rem;color:var(--text-secondary)">${data.name_en}</div>
+        <div style="font-size:var(--text-lg);font-weight:700;color:var(--text-primary)">${data.name_kr}</div>
+        <div style="font-size:var(--text-sm);color:var(--text-secondary)">${data.name_en}</div>
       </div>
-      <div style="font-size:0.85rem;color:var(--text-primary);margin-bottom:14px;line-height:1.6">${data.role}</div>
+      <div style="font-size:var(--text-sm);color:var(--text-primary);margin-bottom:14px;line-height:1.6">${data.role}</div>
 
       <div class="cycle-panel-section">
         <div class="cycle-panel-label">${t('cycle.normal_state', '정상 상태')}</div>
@@ -552,11 +552,11 @@ const CycleVisualization = (() => {
     }
 
     body.innerHTML = `
-      <div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:12px">${helpText}</div>
-      <div style="font-size:0.75rem;color:var(--accent-green);margin-bottom:12px">정상 범위: ${mp.normalRange}</div>
+      <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:12px">${helpText}</div>
+      <div style="font-size:var(--text-xs);color:var(--accent-green);margin-bottom:12px">정상 범위: ${mp.normalRange}</div>
       <div class="form-group">
         <label class="form-label">${inputLabel}</label>
-        <input type="number" id="cycle-input-val" class="form-input" style="font-size:1.2rem;text-align:center"
+        <input type="number" id="cycle-input-val" class="form-input" style="font-size:var(--text-xl);text-align:center"
                value="${currentVal != null ? currentVal : ''}" placeholder="값 입력" step="0.1" inputmode="decimal"
                onkeydown="if(event.key==='Enter')CycleVisualization.submitMeasure('${pointId}')">
       </div>
@@ -753,8 +753,8 @@ const CycleVisualization = (() => {
       const sc = STATUS_COLORS[status];
 
       let extra = '';
-      if (pid === 'Pd' && computed.condensingSatTemp != null) extra = `<div style="font-size:0.7rem;color:var(--text-secondary)">포화 ${computed.condensingSatTemp}°F</div>`;
-      if (pid === 'Ps' && computed.suctionSatTemp != null) extra = `<div style="font-size:0.7rem;color:var(--text-secondary)">포화 ${computed.suctionSatTemp}°F</div>`;
+      if (pid === 'Pd' && computed.condensingSatTemp != null) extra = `<div style="font-size:var(--text-xs);color:var(--text-secondary)">포화 ${computed.condensingSatTemp}°F</div>`;
+      if (pid === 'Ps' && computed.suctionSatTemp != null) extra = `<div style="font-size:var(--text-xs);color:var(--text-secondary)">포화 ${computed.suctionSatTemp}°F</div>`;
 
       html += `
         <div class="cycle-val-item">
@@ -883,8 +883,8 @@ const CycleVisualization = (() => {
       <div class="glass-card" style="margin-top:16px;border:1px solid ${diag.level === 'normal' ? 'rgba(16,185,129,0.3)' : diag.level === 'danger' ? 'rgba(239,68,68,0.3)' : 'rgba(245,158,11,0.3)'}">
         ${severityHtml}
         <div style="text-align:center;margin-bottom:12px">
-          <div style="font-size:2rem">${diag.icon}</div>
-          <div style="font-size:1.1rem;font-weight:700;color:var(--text-primary)">${diag.title}</div>
+          <div style="font-size:var(--text-3xl)">${diag.icon}</div>
+          <div style="font-size:var(--text-lg);font-weight:700;color:var(--text-primary)">${diag.title}</div>
         </div>
 
         ${signatureHtml}
@@ -901,9 +901,9 @@ const CycleVisualization = (() => {
         </div>
 
         ${affectedComps.length ? `
-        <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px">
+        <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:8px">
           <strong style="color:var(--accent-orange)">${t('cycle.check_target', '점검 대상')}:</strong> ${affectedNames}
-          <div style="font-size:0.75rem;margin-top:4px">↑ 다이어그램에서 깜빡이는 부품을 터치하면 상세 정보를 볼 수 있습니다.</div>
+          <div style="font-size:var(--text-xs);margin-top:4px">↑ 다이어그램에서 깜빡이는 부품을 터치하면 상세 정보를 볼 수 있습니다.</div>
         </div>` : ''}
 
         ${fieldTipsHtml}

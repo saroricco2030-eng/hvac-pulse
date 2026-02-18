@@ -528,7 +528,7 @@ const App = (() => {
         <div style="display:flex;align-items:center;gap:12px">
           ${iconHtml}
           <div>
-            <div class="fw-700" style="font-size:0.95rem">${result.title}</div>
+            <div class="fw-700" style="font-size:var(--text-base)">${result.title}</div>
             <div class="text-xs text-secondary mt-4">${result.summary}</div>
           </div>
         </div>

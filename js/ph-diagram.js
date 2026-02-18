@@ -77,7 +77,7 @@ const PHDiagram = (() => {
       <!-- Fault Simulation -->
       <div class="glass-card" id="ph-fault-card" style="display:none">
         <div class="section-title">고장 시뮬레이션 (P-H 선도)</div>
-        <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:12px">
+        <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:12px">
           고장을 선택하면 정상 사이클(실선) 위에 고장 사이클(점선)이 오버레이됩니다.
         </p>
         <select id="ph-fault-select" class="form-select" onchange="PHDiagram.drawFaultOverlay()">

@@ -72,7 +72,7 @@ const PipeCalculator = (() => {
       <!-- Charge Calculator -->
       <div class="glass-card">
         <div class="section-title">추가 냉매 충전량 계산</div>
-        <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:12px">
+        <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:12px">
           배관 연장 시 추가로 필요한 냉매량을 계산합니다. (리퀴드라인 기준)
         </p>
 
@@ -110,11 +110,11 @@ const PipeCalculator = (() => {
       <!-- Pipe Size Guide -->
       <div class="glass-card">
         <div class="section-title">배관 사이즈 가이드</div>
-        <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:12px">
+        <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:12px">
           냉동 능력별 추천 배관 사이즈 (R-410A 기준, 15m 이내)
         </p>
         <div style="overflow-x:auto">
-          <table style="width:100%;border-collapse:collapse;font-size:0.78rem">
+          <table style="width:100%;border-collapse:collapse;font-size:var(--text-sm)">
             <thead>
               <tr style="border-bottom:1px solid var(--border)">
                 <th style="text-align:left;padding:8px 4px;color:var(--text-secondary)">냉동 능력</th>
@@ -125,7 +125,7 @@ const PipeCalculator = (() => {
             <tbody>
               ${PIPE_GUIDE.map(g => `
                 <tr style="border-bottom:1px solid var(--border)">
-                  <td style="padding:8px 4px;font-size:0.75rem">${g.capacity}</td>
+                  <td style="padding:8px 4px;font-size:var(--text-xs)">${g.capacity}</td>
                   <td style="padding:8px 4px;text-align:center;font-family:var(--font-mono);color:var(--accent-orange)">${g.liquid}</td>
                   <td style="padding:8px 4px;text-align:center;font-family:var(--font-mono);color:var(--accent-cyan)">${g.suction}</td>
                 </tr>
@@ -177,7 +177,7 @@ const PipeCalculator = (() => {
         </div>
       </div>
       ${chargeLb >= 1 ? `
-        <div style="text-align:center;margin-top:8px;font-family:var(--font-mono);font-size:0.85rem;color:var(--text-secondary)">
+        <div style="text-align:center;margin-top:8px;font-family:var(--font-mono);font-size:var(--text-sm);color:var(--text-secondary)">
           = ${chargeLb.toFixed(2)} lb
         </div>` : ''}
       <div class="alert-box alert-info" style="margin-top:12px">

@@ -46,14 +46,14 @@ const InstallPrompt = (() => {
     if (type === 'ios') {
       body.innerHTML = `
         <div style="font-weight:600;margin-bottom:6px">${t('install.ios_title', '홈 화면에 추가하기')}</div>
-        <div style="font-size:0.8rem;color:var(--text-secondary)">
+        <div style="font-size:var(--text-sm);color:var(--text-secondary)">
           ${t('install.ios_desc', 'Safari 하단의 <strong style="color:var(--accent-blue)">공유 버튼 ↗</strong>을 누르고<br><strong style="color:var(--text-primary)">"홈 화면에 추가"</strong>를 선택하세요.')}
         </div>`;
       document.getElementById('install-btn')?.remove();
     } else {
       body.innerHTML = `
         <div style="font-weight:600;margin-bottom:4px">${t('install.android_title', '앱으로 설치하기')}</div>
-        <div style="font-size:0.8rem;color:var(--text-secondary)">${t('install.android_desc', '오프라인에서도 사용할 수 있습니다.')}</div>`;
+        <div style="font-size:var(--text-sm);color:var(--text-secondary)">${t('install.android_desc', '오프라인에서도 사용할 수 있습니다.')}</div>`;
     }
 
     banner.classList.add('show');

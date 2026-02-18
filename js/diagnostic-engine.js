@@ -375,11 +375,11 @@ const DiagnosticEngine = (() => {
 
       <div class="computed-row">
         <div class="computed-item">
-          <div class="comp-value" style="font-size:1.2rem;color:var(--text-primary)">${r.dtd.toFixed(1)}°F</div>
+          <div class="comp-value" style="font-size:var(--text-xl);color:var(--text-primary)">${r.dtd.toFixed(1)}°F</div>
           <div class="comp-label">DTD</div>
         </div>
         <div class="computed-item">
-          <div class="comp-value" style="font-size:1.2rem;color:var(--text-primary)">${r.ctoa.toFixed(1)}°F</div>
+          <div class="comp-value" style="font-size:var(--text-xl);color:var(--text-primary)">${r.ctoa.toFixed(1)}°F</div>
           <div class="comp-label">CTOA</div>
         </div>
       </div>

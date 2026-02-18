@@ -23,7 +23,7 @@ const RefrigerantCompare = (() => {
         <div class="section-title">비교할 냉매 선택 (최대 ${MAX_COMPARE}종)</div>
         <div id="compare-selectors"></div>
         <button class="btn" onclick="RefrigerantCompare.addSelector()" id="compare-add-btn"
-          style="margin-top:8px;font-size:0.8rem;padding:8px 16px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary)">
+          style="margin-top:8px;font-size:var(--text-sm);padding:8px 16px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary)">
           + 냉매 추가
         </button>
       </div>
@@ -77,7 +77,7 @@ const RefrigerantCompare = (() => {
         <select class="form-select compare-ref-select" data-idx="${idx}" style="flex:1">
           ${buildRefOptions(defaultValue)}
         </select>
-        <button onclick="RefrigerantCompare.removeSelector(${idx})" style="background:none;border:none;color:var(--accent-red);font-size:1.2rem;cursor:pointer;padding:4px">×</button>
+        <button onclick="RefrigerantCompare.removeSelector(${idx})" style="background:none;border:none;color:var(--accent-red);font-size:var(--text-xl);cursor:pointer;padding:4px">×</button>
       </div>`;
 
     container.appendChild(div);

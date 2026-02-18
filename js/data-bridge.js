@@ -136,7 +136,7 @@ const DataBridge = (() => {
       data.replacements.forEach(rep => {
         const safetyColor = rep.safety === 'A1' ? 'var(--accent-green)' : rep.safety === 'A2L' ? 'var(--accent-orange)' : 'var(--accent-red)';
         html += `<button class="ref-replace-btn" onclick="DataBridge.switchRefrigerant('${rep.id}')">
-          ${rep.name_kr} <span style="color:${safetyColor};font-size:0.65rem">(${rep.safety}·GWP ${rep.gwp})</span>
+          ${rep.name_kr} <span style="color:${safetyColor};font-size:var(--text-xs)">(${rep.safety}·GWP ${rep.gwp})</span>
         </button>`;
       });
       html += `</div></div>`;
@@ -145,7 +145,7 @@ const DataBridge = (() => {
     // Field notes
     if (data.notes) {
       html += `<div class="info-box-accent cyan">
-        <div class="section-label-sm cyan" style="font-size:0.7rem">${t('bridge.field_notes', '현장 노트')}</div>
+        <div class="section-label-sm cyan" style="font-size:var(--text-xs)">${t('bridge.field_notes', '현장 노트')}</div>
         <div class="field-notes-text">${data.notes}</div>
       </div>`;
     }

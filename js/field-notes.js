@@ -42,7 +42,7 @@ const FieldNotes = (() => {
 
       <div style="display:flex;gap:8px;margin-bottom:16px">
         <input type="text" id="fn-search" class="form-input" placeholder="${t('notes.search_placeholder', '메모 검색...')}"
-          style="flex:1;min-height:40px;font-family:var(--font-sans);font-size:0.85rem"
+          style="flex:1;min-height:40px;font-family:var(--font-sans);font-size:var(--text-sm)"
           oninput="FieldNotes.filterList()">
       </div>
 
@@ -52,18 +52,18 @@ const FieldNotes = (() => {
 
       <!-- Tag filter -->
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
-        <button class="btn btn-sm btn-primary" onclick="FieldNotes.filterTag('')" id="fn-tag-all" style="width:auto;padding:4px 10px;font-size:0.72rem">${t('common.all', '전체')}</button>
+        <button class="btn btn-sm btn-primary" onclick="FieldNotes.filterTag('')" id="fn-tag-all" style="width:auto;padding:4px 10px;font-size:var(--text-xs)">${t('common.all', '전체')}</button>
         ${TAG_OPTIONS.map(t => `
-          <button class="btn btn-sm btn-secondary" onclick="FieldNotes.filterTag('${t.id}')" id="fn-tag-${t.id}" style="width:auto;padding:4px 10px;font-size:0.72rem">${t.label}</button>
+          <button class="btn btn-sm btn-secondary" onclick="FieldNotes.filterTag('${t.id}')" id="fn-tag-${t.id}" style="width:auto;padding:4px 10px;font-size:var(--text-xs)">${t.label}</button>
         `).join('')}
       </div>
 
       <div id="fn-list-area">
         ${notes.length === 0 ? `
           <div class="glass-card" style="text-align:center;padding:40px 24px">
-            <span style="font-size:2rem">📒</span>
+            <span style="font-size:var(--text-3xl)">📒</span>
             <p style="color:var(--text-secondary);margin-top:12px">${t('notes.no_notes', '메모가 없습니다.')}</p>
-            <p style="color:var(--text-muted);font-size:0.8rem">${t('notes.quick_record', '현장에서 빠르게 기록하세요.')}</p>
+            <p style="color:var(--text-muted);font-size:var(--text-sm)">${t('notes.quick_record', '현장에서 빠르게 기록하세요.')}</p>
           </div>
         ` : notes.map(n => renderNoteCard(n)).join('')}
       </div>`;
@@ -80,14 +80,14 @@ const FieldNotes = (() => {
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
           <div style="display:flex;align-items:center;gap:6px;flex:1">
             <span style="width:8px;height:8px;border-radius:50%;background:${tag.color};flex-shrink:0"></span>
-            <span style="font-size:0.9rem;font-weight:600;line-height:1.3">${n.title || t('notes.no_title', '(제목 없음)')}</span>
+            <span style="font-size:var(--text-base);font-weight:600;line-height:1.3">${n.title || t('notes.no_title', '(제목 없음)')}</span>
           </div>
-          <span style="font-size:0.7rem;color:var(--text-muted);font-family:var(--font-mono);white-space:nowrap;margin-left:8px">${dateStr}</span>
+          <span style="font-size:var(--text-xs);color:var(--text-muted);font-family:var(--font-mono);white-space:nowrap;margin-left:8px">${dateStr}</span>
         </div>
-        <div style="font-size:0.8rem;color:var(--text-secondary);line-height:1.5;margin-bottom:4px;margin-left:14px">${preview}</div>
+        <div style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.5;margin-bottom:4px;margin-left:14px">${preview}</div>
         <div style="display:flex;gap:6px;align-items:center;margin-left:14px">
-          <span style="font-size:0.7rem;color:${tag.color};background:${tag.color}20;padding:2px 8px;border-radius:10px">${tag.label}</span>
-          ${n.photos && n.photos.length > 0 ? `<span style="font-size:0.7rem;color:var(--text-muted)">📷 ${n.photos.length}</span>` : ''}
+          <span style="font-size:var(--text-xs);color:${tag.color};background:${tag.color}20;padding:2px 8px;border-radius:10px">${tag.label}</span>
+          ${n.photos && n.photos.length > 0 ? `<span style="font-size:var(--text-xs);color:var(--text-muted)">📷 ${n.photos.length}</span>` : ''}
         </div>
       </div>`;
   }
@@ -150,7 +150,7 @@ const FieldNotes = (() => {
     container.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-top:16px">
         <button class="btn btn-sm btn-secondary" onclick="FieldNotes.renderList()" style="width:auto;padding:8px 12px">← ${t('common.list', '목록')}</button>
-        <h2 style="font-size:1.1rem;font-weight:700">${existing ? t('notes.edit_memo', '메모 수정') : t('notes.new_memo', '새 현장 메모')}</h2>
+        <h2 style="font-size:var(--text-lg);font-weight:700">${existing ? t('notes.edit_memo', '메모 수정') : t('notes.new_memo', '새 현장 메모')}</h2>
       </div>
 
       <div class="glass-card">
@@ -170,7 +170,7 @@ const FieldNotes = (() => {
             ${TAG_OPTIONS.map(t => `
               <button type="button" onclick="FieldNotes.selectTag('${t.id}')" id="fn-form-tag-${t.id}"
                 class="btn btn-sm ${tag === t.id ? 'btn-primary' : 'btn-secondary'}"
-                style="width:auto;padding:6px 12px;font-size:0.78rem">${t.label}</button>
+                style="width:auto;padding:6px 12px;font-size:var(--text-sm)">${t.label}</button>
             `).join('')}
           </div>
         </div>
@@ -182,7 +182,7 @@ const FieldNotes = (() => {
           ${photosArray.map((p, i) => `
             <div style="position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
               <img src="${p}" style="width:100%;height:100%;object-fit:cover">
-              <button onclick="FieldNotes.removePhoto(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.7);border:none;color:#fff;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:0.7rem">×</button>
+              <button onclick="FieldNotes.removePhoto(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.7);border:none;color:#fff;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:var(--text-xs)">×</button>
             </div>
           `).join('')}
         </div>
@@ -245,7 +245,7 @@ const FieldNotes = (() => {
     el.innerHTML = photosArray.map((p, i) => `
       <div style="position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
         <img src="${p}" style="width:100%;height:100%;object-fit:cover">
-        <button onclick="FieldNotes.removePhoto(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.7);border:none;color:#fff;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:0.7rem">×</button>
+        <button onclick="FieldNotes.removePhoto(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.7);border:none;color:#fff;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:var(--text-xs)">×</button>
       </div>
     `).join('');
   }
@@ -306,23 +306,23 @@ const FieldNotes = (() => {
     container.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-top:16px">
         <button class="btn btn-sm btn-secondary" onclick="FieldNotes.renderList()" style="width:auto;padding:8px 12px">← ${t('common.list', '목록')}</button>
-        <h2 style="font-size:1.1rem;font-weight:700">${t('notes.detail_title', '메모 상세')}</h2>
+        <h2 style="font-size:var(--text-lg);font-weight:700">${t('notes.detail_title', '메모 상세')}</h2>
       </div>
 
       <div class="glass-card">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
           <div style="display:flex;align-items:center;gap:8px">
             <span style="width:10px;height:10px;border-radius:50%;background:${tag.color}"></span>
-            <span style="font-size:1.05rem;font-weight:700">${n.title || t('notes.no_title', '(제목 없음)')}</span>
+            <span style="font-size:var(--text-base);font-weight:700">${n.title || t('notes.no_title', '(제목 없음)')}</span>
           </div>
-          <span style="font-size:0.75rem;color:var(--text-muted);font-family:var(--font-mono)">${dateStr}</span>
+          <span style="font-size:var(--text-xs);color:var(--text-muted);font-family:var(--font-mono)">${dateStr}</span>
         </div>
 
         <div style="margin-bottom:12px">
-          <span style="font-size:0.72rem;color:${tag.color};background:${tag.color}20;padding:3px 10px;border-radius:10px">${tag.label}</span>
+          <span style="font-size:var(--text-xs);color:${tag.color};background:${tag.color}20;padding:3px 10px;border-radius:10px">${tag.label}</span>
         </div>
 
-        <div style="font-size:0.9rem;line-height:1.8;color:var(--text-primary);white-space:pre-line;margin-bottom:16px">${n.content || ''}</div>
+        <div style="font-size:var(--text-base);line-height:1.8;color:var(--text-primary);white-space:pre-line;margin-bottom:16px">${n.content || ''}</div>
 
         ${n.photos && n.photos.length > 0 ? `
           <div class="form-label">${t('service.photos', '사진')} (${n.photos.length})</div>

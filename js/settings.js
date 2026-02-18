@@ -128,15 +128,15 @@ const Settings = (() => {
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
-        <button class="btn btn-primary" onclick="Settings.exportData()" style="font-size:0.8rem;padding:10px">
+        <button class="btn btn-primary" onclick="Settings.exportData()" style="font-size:var(--text-sm);padding:10px">
           📤 ${t('settings.export', '데이터 내보내기')}
         </button>
-        <button class="btn" onclick="document.getElementById('import-file-input').click()" style="font-size:0.8rem;padding:10px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary)">
+        <button class="btn" onclick="document.getElementById('import-file-input').click()" style="font-size:var(--text-sm);padding:10px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary)">
           📥 ${t('settings.import', '데이터 가져오기')}
         </button>
       </div>
       <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="Settings.importData(event)">
-      <button class="btn" onclick="Settings.confirmDeleteAll()" style="width:100%;margin-top:8px;font-size:0.8rem;padding:10px;background:transparent;border:1px solid rgba(239,68,68,0.3);color:var(--accent-red)">
+      <button class="btn" onclick="Settings.confirmDeleteAll()" style="width:100%;margin-top:8px;font-size:var(--text-sm);padding:10px;background:transparent;border:1px solid rgba(239,68,68,0.3);color:var(--accent-red)">
         🗑️ ${t('settings.delete_all', '전체 데이터 삭제')}
       </button>
     `;

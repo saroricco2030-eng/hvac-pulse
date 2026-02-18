@@ -36,7 +36,7 @@ const ServiceHistory = (() => {
 
       <div style="display:flex;gap:8px;margin-bottom:16px">
         <input type="text" id="sh-search" class="form-input" placeholder="${t('service.search_placeholder', '검색 (현장명, 모델명, 증상...)')}"
-          style="flex:1;min-height:40px;font-family:var(--font-sans);font-size:0.85rem"
+          style="flex:1;min-height:40px;font-family:var(--font-sans);font-size:var(--text-sm)"
           oninput="ServiceHistory.filterList()">
       </div>
 
@@ -47,7 +47,7 @@ const ServiceHistory = (() => {
       <div id="sh-list-area">
         ${records.length === 0 ? `
           <div class="glass-card" style="text-align:center;padding:40px 24px">
-            <span style="font-size:2rem">📝</span>
+            <span style="font-size:var(--text-3xl)">📝</span>
             <p style="color:var(--text-secondary);margin-top:12px">${t('service.no_records', '수리 기록이 없습니다.')}</p>
           </div>
         ` : records.map(r => renderRecordCard(r)).join('')}
@@ -60,10 +60,10 @@ const ServiceHistory = (() => {
     return `
       <div class="glass-card" style="padding:16px;cursor:pointer" onclick="ServiceHistory.showDetail(${r.id})" data-search="${(r.siteName || '') + ' ' + (r.modelName || '') + ' ' + (r.symptom || '')}">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-          <div style="font-size:0.9rem;font-weight:600">${r.siteName || t('service.no_site', '(현장명 없음)')}</div>
-          <span style="font-size:0.72rem;color:var(--text-muted);font-family:var(--font-mono);white-space:nowrap">${dateStr}</span>
+          <div style="font-size:var(--text-base);font-weight:600">${r.siteName || t('service.no_site', '(현장명 없음)')}</div>
+          <span style="font-size:var(--text-xs);color:var(--text-muted);font-family:var(--font-mono);white-space:nowrap">${dateStr}</span>
         </div>
-        <div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px">
+        <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:4px">
           ${r.manufacturer || ''} ${r.modelName || ''} ${r.equipType ? `(${r.equipType})` : ''}
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -117,7 +117,7 @@ const ServiceHistory = (() => {
     container.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-top:16px">
         <button class="btn btn-sm btn-secondary" onclick="ServiceHistory.renderList()" style="width:auto;padding:8px 12px">← ${t('common.list', '목록')}</button>
-        <h2 style="font-size:1.1rem;font-weight:700">${existing ? t('service.edit_record', '기록 수정') : t('service.new_record', '새 수리 기록')}</h2>
+        <h2 style="font-size:var(--text-lg);font-weight:700">${existing ? t('service.edit_record', '기록 수정') : t('service.new_record', '새 수리 기록')}</h2>
       </div>
 
       <div class="glass-card">
@@ -211,7 +211,7 @@ const ServiceHistory = (() => {
           ${photosArray.map((p, i) => `
             <div style="position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
               <img src="${p}" style="width:100%;height:100%;object-fit:cover">
-              <button onclick="ServiceHistory.removePhoto(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.7);border:none;color:#fff;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:0.7rem">×</button>
+              <button onclick="ServiceHistory.removePhoto(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.7);border:none;color:#fff;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:var(--text-xs)">×</button>
             </div>
           `).join('')}
         </div>
@@ -267,7 +267,7 @@ const ServiceHistory = (() => {
     el.innerHTML = photosArray.map((p, i) => `
       <div style="position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
         <img src="${p}" style="width:100%;height:100%;object-fit:cover">
-        <button onclick="ServiceHistory.removePhoto(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.7);border:none;color:#fff;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:0.7rem">×</button>
+        <button onclick="ServiceHistory.removePhoto(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.7);border:none;color:#fff;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:var(--text-xs)">×</button>
       </div>
     `).join('');
   }
@@ -331,17 +331,17 @@ const ServiceHistory = (() => {
     container.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-top:16px">
         <button class="btn btn-sm btn-secondary" onclick="ServiceHistory.renderList()" style="width:auto;padding:8px 12px">← ${t('common.list', '목록')}</button>
-        <h2 style="font-size:1.1rem;font-weight:700">${t('service.detail_title', '수리 기록 상세')}</h2>
+        <h2 style="font-size:var(--text-lg);font-weight:700">${t('service.detail_title', '수리 기록 상세')}</h2>
       </div>
 
       <div class="glass-card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <span style="font-size:1rem;font-weight:700">${r.siteName || t('service.no_site', '(현장명 없음)')}</span>
-          <span style="font-size:0.75rem;color:var(--text-muted);font-family:var(--font-mono)">${dateStr}</span>
+          <span style="font-size:var(--text-base);font-weight:700">${r.siteName || t('service.no_site', '(현장명 없음)')}</span>
+          <span style="font-size:var(--text-xs);color:var(--text-muted);font-family:var(--font-mono)">${dateStr}</span>
         </div>
 
         ${r.manufacturer || r.modelName ? `
-          <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px">
+          <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:8px">
             ${r.manufacturer || ''} ${r.modelName || ''} ${r.equipType ? `(${r.equipType})` : ''}
           </div>` : ''}
 
@@ -350,10 +350,10 @@ const ServiceHistory = (() => {
           ${r.errorCode ? `<span class="badge badge-danger">E: ${r.errorCode}</span>` : ''}
         </div>
 
-        ${r.diagnosis ? `<div style="margin-bottom:12px"><div class="form-label">${t('service.diagnosis_result', '진단 결과')}</div><div style="font-size:0.85rem;line-height:1.7;color:var(--text-primary)">${r.diagnosis}</div></div>` : ''}
-        ${r.repairContent ? `<div style="margin-bottom:12px"><div class="form-label">${t('service.repair_content', '수리 내용')}</div><div style="font-size:0.85rem;line-height:1.7;color:var(--text-primary)">${r.repairContent}</div></div>` : ''}
-        ${r.replacedParts ? `<div style="margin-bottom:12px"><div class="form-label">${t('service.replaced_parts', '교체 부품')}</div><div style="font-size:0.85rem;line-height:1.7;color:var(--text-primary);white-space:pre-line">${r.replacedParts}</div></div>` : ''}
-        ${r.techMemo ? `<div style="margin-bottom:12px"><div class="form-label">${t('service.tech_memo', '기술자 메모')}</div><div style="font-size:0.85rem;line-height:1.7;color:var(--accent-cyan)">${r.techMemo}</div></div>` : ''}
+        ${r.diagnosis ? `<div style="margin-bottom:12px"><div class="form-label">${t('service.diagnosis_result', '진단 결과')}</div><div style="font-size:var(--text-sm);line-height:1.7;color:var(--text-primary)">${r.diagnosis}</div></div>` : ''}
+        ${r.repairContent ? `<div style="margin-bottom:12px"><div class="form-label">${t('service.repair_content', '수리 내용')}</div><div style="font-size:var(--text-sm);line-height:1.7;color:var(--text-primary)">${r.repairContent}</div></div>` : ''}
+        ${r.replacedParts ? `<div style="margin-bottom:12px"><div class="form-label">${t('service.replaced_parts', '교체 부품')}</div><div style="font-size:var(--text-sm);line-height:1.7;color:var(--text-primary);white-space:pre-line">${r.replacedParts}</div></div>` : ''}
+        ${r.techMemo ? `<div style="margin-bottom:12px"><div class="form-label">${t('service.tech_memo', '기술자 메모')}</div><div style="font-size:var(--text-sm);line-height:1.7;color:var(--accent-cyan)">${r.techMemo}</div></div>` : ''}
 
         ${r.photos && r.photos.length > 0 ? `
           <div class="form-label">${t('service.photos', '사진')} (${r.photos.length})</div>

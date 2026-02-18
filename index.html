@@ -99,7 +99,7 @@
       <div class="onboarding-desc">
         홈 화면의 <strong>빠른 진단</strong>으로 즉시 시작하거나,<br>
         <strong>도구</strong> 탭에서 원하는 기능을 선택하세요.<br><br>
-        용어가 어려우면 <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(59,130,246,0.15);color:#3b82f6;font-size:0.65rem;font-weight:700;border:1px solid rgba(59,130,246,0.3)">?</span> 아이콘을 터치하세요.
+        용어가 어려우면 <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(59,130,246,0.15);color:#3b82f6;font-size:var(--text-xs);font-weight:700;border:1px solid rgba(59,130,246,0.3)">?</span> 아이콘을 터치하세요.
       </div>
     </div>
     <!-- Dots & Actions -->
@@ -386,7 +386,7 @@
               <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             <div class="accordion-body">
-              <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:10px">
+              <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:10px">
                 과열도 = 석션라인 실측온도 − 포화온도(Dew Point)
               </p>
               <div class="input-row">
@@ -414,7 +414,7 @@
               <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             <div class="accordion-body">
-              <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:10px">
+              <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:10px">
                 과냉도 = 포화온도(Bubble Point) − 리퀴드라인 실측온도
               </p>
               <div class="input-row">
@@ -751,7 +751,7 @@
     <!-- About -->
     <div class="glass-card">
       <div class="section-title" data-i18n="settings.about.title">앱 정보</div>
-      <div style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8">
+      <div style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.8">
         <strong style="color:var(--text-primary)">HVAC Pulse — 현장 진단 도구</strong><br>
         <span id="about-version">Version 1.0.0</span><br><br>
         <strong>데이터 소스:</strong><br>
@@ -929,8 +929,8 @@ window.dispatchEvent(new Event('coolprop-factory-ready'));
 <div id="install-banner" class="install-banner">
   <div id="install-banner-body" style="flex:1"></div>
   <div style="display:flex;gap:8px;align-items:center">
-    <button id="install-btn" class="btn btn-primary" onclick="InstallPrompt.install()" style="font-size:0.8rem;padding:8px 16px;white-space:nowrap" data-i18n="install.button">설치</button>
-    <button class="btn" onclick="InstallPrompt.dismiss()" style="font-size:0.8rem;padding:8px 12px;background:transparent;border:1px solid var(--border);color:var(--text-secondary)" data-i18n="install.close">닫기</button>
+    <button id="install-btn" class="btn btn-primary" onclick="InstallPrompt.install()" style="font-size:var(--text-sm);padding:8px 16px;white-space:nowrap" data-i18n="install.button">설치</button>
+    <button class="btn" onclick="InstallPrompt.dismiss()" style="font-size:var(--text-sm);padding:8px 12px;background:transparent;border:1px solid var(--border);color:var(--text-secondary)" data-i18n="install.close">닫기</button>
   </div>
 </div>
 

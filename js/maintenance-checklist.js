@@ -388,7 +388,7 @@ const MaintenanceChecklist = (() => {
           <div style="display:grid;gap:8px">
             ${EQUIP_TYPES.map(e => `
               <button class="choice-btn" onclick="MaintenanceChecklist.selectEquip('${e.id}')"
-                style="flex-direction:row;justify-content:flex-start;min-height:48px;padding:12px 16px;gap:12px;font-size:0.9rem;border:1px solid var(--border)">
+                style="flex-direction:row;justify-content:flex-start;min-height:48px;padding:12px 16px;gap:12px;font-size:var(--text-base);border:1px solid var(--border)">
                 <span>${e.icon}</span><span>${e.label}</span>
               </button>
             `).join('')}
@@ -421,7 +421,7 @@ const MaintenanceChecklist = (() => {
         <div style="display:grid;gap:8px">
           ${EQUIP_TYPES.map(e => `
             <button class="choice-btn" onclick="MaintenanceChecklist.selectEquip('${e.id}')"
-              style="flex-direction:row;justify-content:flex-start;min-height:48px;padding:12px 16px;gap:12px;font-size:0.9rem;border:1px solid var(--border)">
+              style="flex-direction:row;justify-content:flex-start;min-height:48px;padding:12px 16px;gap:12px;font-size:var(--text-base);border:1px solid var(--border)">
               <span>${e.icon}</span><span>${e.label}</span>
             </button>
           `).join('')}
@@ -447,7 +447,7 @@ const MaintenanceChecklist = (() => {
         <div style="display:grid;gap:8px">
           ${periods.map(p => `
             <button class="choice-btn" onclick="MaintenanceChecklist.selectPeriod('${p.id}')"
-              style="flex-direction:row;justify-content:flex-start;min-height:48px;padding:12px 16px;gap:12px;font-size:0.9rem;border:1px solid var(--border)">
+              style="flex-direction:row;justify-content:flex-start;min-height:48px;padding:12px 16px;gap:12px;font-size:var(--text-base);border:1px solid var(--border)">
               <span>${p.icon}</span><span>${p.label}</span>
             </button>
           `).join('')}
@@ -476,12 +476,12 @@ const MaintenanceChecklist = (() => {
       <div class="glass-card">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
           <button class="btn btn-sm btn-secondary" onclick="MaintenanceChecklist.selectEquip('${currentEquip}')" style="width:auto;padding:8px 12px">← ${t('common.back', '뒤로')}</button>
-          <span style="font-size:0.85rem;color:var(--text-secondary)">${equip?.icon} ${equip?.label} · ${period?.label}</span>
+          <span style="font-size:var(--text-sm);color:var(--text-secondary)">${equip?.icon} ${equip?.label} · ${period?.label}</span>
         </div>
 
         <!-- Progress -->
         <div style="margin-bottom:16px">
-          <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:6px">
+          <div style="display:flex;justify-content:space-between;font-size:var(--text-sm);margin-bottom:6px">
             <span style="color:var(--text-secondary)">${t('checklist.progress', '진행률')}</span>
             <span style="font-family:var(--font-mono);color:${pct === 100 ? 'var(--accent-green)' : 'var(--text-primary)'}">${checkedCount}/${total} (${pct}%)</span>
           </div>
@@ -495,14 +495,14 @@ const MaintenanceChecklist = (() => {
           ${checkStates.map((item, i) => `
             <div style="background:var(--bg-card);border:1px solid ${item.checked ? 'rgba(16,185,129,0.3)' : 'var(--border)'};border-radius:var(--radius-md);padding:12px;transition:all 0.2s ease">
               <div style="display:flex;align-items:flex-start;gap:10px;cursor:pointer" onclick="MaintenanceChecklist.toggleCheck(${i})">
-                <span style="font-size:1.2rem;flex-shrink:0;margin-top:2px">${item.checked ? '✅' : '⬜'}</span>
-                <span style="font-size:0.85rem;line-height:1.5;${item.checked ? 'color:var(--text-muted);text-decoration:line-through' : 'color:var(--text-primary)'}">${item.text}</span>
+                <span style="font-size:var(--text-xl);flex-shrink:0;margin-top:2px">${item.checked ? '✅' : '⬜'}</span>
+                <span style="font-size:var(--text-sm);line-height:1.5;${item.checked ? 'color:var(--text-muted);text-decoration:line-through' : 'color:var(--text-primary)'}">${item.text}</span>
               </div>
-              ${item.memo ? `<div style="margin-top:6px;margin-left:32px;font-size:0.78rem;color:var(--accent-cyan);background:rgba(6,182,212,0.08);padding:4px 8px;border-radius:4px">${item.memo}</div>` : ''}
+              ${item.memo ? `<div style="margin-top:6px;margin-left:32px;font-size:var(--text-sm);color:var(--accent-cyan);background:rgba(6,182,212,0.08);padding:4px 8px;border-radius:4px">${item.memo}</div>` : ''}
               <div style="margin-top:6px;margin-left:32px">
                 <input type="text" placeholder="${t('checklist.add_memo', '메모 추가...')}" value="${item.memo || ''}"
                   onchange="MaintenanceChecklist.setMemo(${i}, this.value)"
-                  style="width:100%;padding:6px 8px;background:var(--bg-deep);border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);font-size:0.78rem;font-family:var(--font-sans);outline:none">
+                  style="width:100%;padding:6px 8px;background:var(--bg-deep);border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);font-size:var(--text-sm);font-family:var(--font-sans);outline:none">
               </div>
             </div>
           `).join('')}
@@ -558,7 +558,7 @@ const MaintenanceChecklist = (() => {
       if (records.length === 0) {
         area.innerHTML = `
           <div class="glass-card" style="text-align:center;padding:40px 24px">
-            <span style="font-size:2rem">📋</span>
+            <span style="font-size:var(--text-3xl)">📋</span>
             <p style="color:var(--text-secondary);margin-top:12px">${t('checklist.no_history', '저장된 체크리스트가 없습니다.')}</p>
           </div>`;
         return;
@@ -574,16 +574,16 @@ const MaintenanceChecklist = (() => {
         return `
           <div class="glass-card" style="padding:16px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <span style="font-size:0.85rem;font-weight:600">${equip?.icon || ''} ${equip?.label || r.equipType}</span>
-              <span style="font-size:0.75rem;color:var(--text-muted);font-family:var(--font-mono)">${dateStr}</span>
+              <span style="font-size:var(--text-sm);font-weight:600">${equip?.icon || ''} ${equip?.label || r.equipType}</span>
+              <span style="font-size:var(--text-xs);color:var(--text-muted);font-family:var(--font-mono)">${dateStr}</span>
             </div>
-            <div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:8px">${period?.label || r.period}</div>
+            <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:8px">${period?.label || r.period}</div>
             <div style="display:flex;align-items:center;gap:8px">
               <div style="flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden">
                 <div style="height:100%;width:${pct}%;background:${pct === 100 ? 'var(--accent-green)' : 'var(--accent-blue)'};border-radius:2px"></div>
               </div>
-              <span style="font-size:0.75rem;font-family:var(--font-mono);color:${pct === 100 ? 'var(--accent-green)' : 'var(--text-secondary)'}">${r.checkedCount}/${r.totalCount}</span>
-              <button onclick="MaintenanceChecklist.deleteRecord(${r.id})" style="background:none;border:none;color:var(--accent-red);cursor:pointer;font-size:0.8rem;padding:4px">${t('common.delete', '삭제')}</button>
+              <span style="font-size:var(--text-xs);font-family:var(--font-mono);color:${pct === 100 ? 'var(--accent-green)' : 'var(--text-secondary)'}">${r.checkedCount}/${r.totalCount}</span>
+              <button onclick="MaintenanceChecklist.deleteRecord(${r.id})" style="background:none;border:none;color:var(--accent-red);cursor:pointer;font-size:var(--text-sm);padding:4px">${t('common.delete', '삭제')}</button>
             </div>
           </div>`;
       }).join('');

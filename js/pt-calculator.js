@@ -253,8 +253,8 @@ const PTCalculator = (() => {
     const glide = info.glide_f || info.glide || 0;
 
     let html = `<span class="ref-badge"><span class="safety-dot ${safety.toLowerCase()}"></span>${name}</span>`;
-    html += ` <span style="font-size:0.75rem;color:var(--text-secondary)">${type} · GWP ${gwp} · ${safety}</span>`;
-    html += ` <span class="engine-badge" style="font-size:0.65rem;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,0.3);color:${sourceColor};border:1px solid ${sourceColor};margin-left:4px">${sourceLabel}</span>`;
+    html += ` <span style="font-size:var(--text-xs);color:var(--text-secondary)">${type} · GWP ${gwp} · ${safety}</span>`;
+    html += ` <span class="engine-badge" style="font-size:var(--text-xs);padding:2px 6px;border-radius:4px;background:rgba(0,0,0,0.3);color:${sourceColor};border:1px solid ${sourceColor};margin-left:4px">${sourceLabel}</span>`;
     if (isZeo) {
       html += ` <span class="zeotropic-indicator">비공비 (글라이드 ~${glide}°F)</span>`;
     }
@@ -391,7 +391,7 @@ const PTCalculator = (() => {
       <div class="result-box" style="text-align:center">
         <div class="result-value ${status}">${result.superheat.toFixed(1)}°F</div>
         <div class="result-label">${t('pt.superheat', '과열도')} (Superheat) ${statusIcon} ${statusText}</div>
-        <div style="font-size:0.8rem;color:var(--text-secondary);margin-top:8px">
+        <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:8px">
           ${t('pt.sat_temp', '포화온도')} (Dew): ${result.satTemp}°F (${fToC(result.satTemp).toFixed(1)}°C)<br>
           ${t('pt.suction_actual', '석션라인 실측')}: ${suctionT}°F
         </div>
@@ -423,7 +423,7 @@ const PTCalculator = (() => {
       <div class="result-box" style="text-align:center">
         <div class="result-value ${status}">${result.subcooling.toFixed(1)}°F</div>
         <div class="result-label">${t('pt.subcooling', '과냉도')} (Subcooling) ${statusIcon} ${statusText}</div>
-        <div style="font-size:0.8rem;color:var(--text-secondary);margin-top:8px">
+        <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:8px">
           ${t('pt.sat_temp', '포화온도')} (Bubble): ${result.satTemp}°F (${fToC(result.satTemp).toFixed(1)}°C)<br>
           ${t('pt.liquid_actual', '리퀴드라인 실측')}: ${liquidT}°F
         </div>

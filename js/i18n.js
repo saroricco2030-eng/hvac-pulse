@@ -85,6 +85,9 @@ const I18n = (() => {
     applyToStaticDOM();
     reRenderModules();
 
+    // Update language selector active state
+    renderSelector('lang-section');
+
     if (typeof App !== 'undefined') {
       App.showToast(t('settings.langChanged', '언어가 변경되었습니다.'), 'success');
     }
@@ -245,7 +248,10 @@ const I18n = (() => {
     if (typeof Auth !== 'undefined') Auth.renderSection?.();
 
     // Re-apply static DOM translations after modules re-render
-    setTimeout(() => applyToStaticDOM(), 100);
+    setTimeout(() => {
+      applyToStaticDOM();
+      renderSelector('lang-section');
+    }, 100);
   }
 
   // =============================================
@@ -254,6 +260,13 @@ const I18n = (() => {
   function renderSelector(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
+
+    // If already rendered, just update active state (no DOM rebuild = no animation flicker)
+    const existing = container.querySelector('.lang-grid');
+    if (existing) {
+      updateSelectorActive(container);
+      return;
+    }
 
     container.innerHTML = `
       <div class="glass-card">
@@ -264,16 +277,37 @@ const I18n = (() => {
           </div>
         </div>
         <div class="lang-grid">
-          ${LANGUAGES.map(lang => `
-            <button class="lang-btn ${lang.code === currentLang ? 'active' : ''}"
+          ${LANGUAGES.map(lang => {
+            const isActive = lang.code === currentLang;
+            return `
+            <button class="lang-btn ${isActive ? 'active' : ''}" data-lang="${lang.code}"
               onclick="I18n.setLanguage('${lang.code}')"
               ${lang.code !== 'ko' && !packs[lang.code] ? 'disabled title="Coming soon"' : ''}>
               <span class="lang-flag">${lang.flag}</span>
               <span class="lang-name">${lang.name}</span>
-            </button>
-          `).join('')}
+              ${isActive ? '<span class="lang-check">✓</span>' : ''}
+            </button>`;
+          }).join('')}
         </div>
       </div>`;
+  }
+
+  // Update active state without replacing DOM (prevents transition flicker)
+  function updateSelectorActive(container) {
+    container.querySelectorAll('.lang-btn[data-lang]').forEach(btn => {
+      const isActive = btn.dataset.lang === currentLang;
+      btn.classList.toggle('active', isActive);
+      // Add or remove checkmark
+      const check = btn.querySelector('.lang-check');
+      if (isActive && !check) {
+        const span = document.createElement('span');
+        span.className = 'lang-check';
+        span.textContent = '✓';
+        btn.appendChild(span);
+      } else if (!isActive && check) {
+        check.remove();
+      }
+    });
   }
 
   // =============================================
