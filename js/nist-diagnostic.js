@@ -248,6 +248,25 @@ const NISTDiagnostic = (() => {
     const outdoorTemp = parseFloat(document.getElementById('nist-outdoor-t').value);
     const seerClass = document.getElementById('nist-seer')?.value || 'high';
 
+    // NaN safety check (validateField covers most cases, but guard against edge scenarios)
+    if ([returnAirTemp, suctionLineTemp, liquidLineTemp, outdoorTemp].some(isNaN)) return;
+
+    // Physical range validation: -50°F ~ 200°F for standard HVAC
+    const tempRange = { min: -50, max: 200 };
+    const temps = [
+      { val: returnAirTemp, id: 'nist-return-t' },
+      { val: suctionLineTemp, id: 'nist-suction-t' },
+      { val: liquidLineTemp, id: 'nist-liquid-t' },
+      { val: outdoorTemp, id: 'nist-outdoor-t' }
+    ];
+    for (const tp of temps) {
+      if (tp.val < tempRange.min || tp.val > tempRange.max) {
+        const el = document.getElementById(tp.id);
+        if (el) App.validateField(el, t('validation.temp_range', '온도 범위를 확인하세요 (-50~200°F)'));
+        return;
+      }
+    }
+
     const result = calculate({ returnAirTemp, suctionLineTemp, liquidLineTemp, outdoorTemp, seerClass });
     renderResult(result, resultEl);
   }

@@ -120,7 +120,8 @@ const DiagnosticEngine = (() => {
     const condensingSatTemp = scResult.satTemp;
     const ctoa = condensingSatTemp - outdoorTemp;
 
-    const compressionRatio = (dischargePressure + 14.7) / (suctionPressure + 14.7);
+    const suctionAbsolute = suctionPressure + 14.7;
+    const compressionRatio = suctionAbsolute > 0 ? (dischargePressure + 14.7) / suctionAbsolute : 99;
     const dlt = condensingSatTemp + superheat + (compressionRatio * 8);
 
     // --- Classify ---
@@ -243,8 +244,20 @@ const DiagnosticEngine = (() => {
     const dischargePressure = parseFloat(document.getElementById('diag-discharge-p')?.value);
     const suctionLineTemp = parseFloat(document.getElementById('diag-suction-t')?.value);
     const liquidLineTemp = parseFloat(document.getElementById('diag-liquid-t')?.value);
-    const outdoorTemp = parseFloat(document.getElementById('diag-outdoor-t')?.value || '95');
-    const returnAirTemp = parseFloat(document.getElementById('diag-return-t')?.value || '75');
+    const outdoorRaw = parseFloat(document.getElementById('diag-outdoor-t')?.value);
+    const returnRaw = parseFloat(document.getElementById('diag-return-t')?.value);
+    const outdoorTemp = isNaN(outdoorRaw) ? 95 : outdoorRaw;
+    const returnAirTemp = isNaN(returnRaw) ? 75 : returnRaw;
+
+    // Safety: prevent NaN propagation from required fields
+    if ([suctionPressure, dischargePressure, suctionLineTemp, liquidLineTemp].some(isNaN)) return;
+
+    // Range validation: physically reasonable HVAC values
+    if (suctionPressure < -14.6 || suctionPressure > 800) {
+      const el = document.getElementById('diag-suction-p');
+      if (el) App.validateField(el, t('validation.pressure_range', '압력 범위를 확인하세요 (0~800 psig)'));
+      return;
+    }
 
     // Cross-validate: discharge must be higher than suction
     if (dischargePressure <= suctionPressure) {
