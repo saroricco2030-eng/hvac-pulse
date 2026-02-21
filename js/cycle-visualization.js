@@ -21,6 +21,20 @@ const CycleVisualization = (() => {
     compressionRatio: null
   };
 
+  // --- Convert normalRange text to current unit ---
+  function convertNormalRange(text, pointId) {
+    if (!text || typeof Settings === 'undefined' || !Settings.isMetric()) return text;
+    const isDelta = ['SH', 'SC', 'DT'].includes(pointId);
+    return text.replace(/(\d+(?:\.\d+)?)~(\d+(?:\.\d+)?)°F/g, (_, lo, hi) => {
+      const loC = isDelta ? (parseFloat(lo) * 5 / 9).toFixed(0) : ((parseFloat(lo) - 32) * 5 / 9).toFixed(0);
+      const hiC = isDelta ? (parseFloat(hi) * 5 / 9).toFixed(0) : ((parseFloat(hi) - 32) * 5 / 9).toFixed(0);
+      return `${loC}~${hiC}°C`;
+    }).replace(/(\d+(?:\.\d+)?)°F/g, (_, v) => {
+      const cVal = isDelta ? (parseFloat(v) * 5 / 9).toFixed(0) : ((parseFloat(v) - 32) * 5 / 9).toFixed(0);
+      return `${cVal}°C`;
+    });
+  }
+
   // --- Status colors ---
   const STATUS_COLORS = {
     normal:  { fill: '#10b981', stroke: '#059669', get label() { return t('status.normal', '정상'); } },
@@ -550,7 +564,7 @@ const CycleVisualization = (() => {
 
     body.innerHTML = `
       <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:12px">${helpText}</div>
-      <div style="font-size:var(--text-xs);color:var(--accent-green);margin-bottom:12px">${t('cycle.normal_range', '정상 범위')}: ${mp.normalRange}</div>
+      <div style="font-size:var(--text-xs);color:var(--accent-green);margin-bottom:12px">${t('cycle.normal_range', '정상 범위')}: ${convertNormalRange(mp.normalRange, pointId)}</div>
       <div class="form-group">
         <label class="form-label">${inputLabel}</label>
         <input type="number" id="cycle-input-val" class="form-input" style="font-size:var(--text-xl);text-align:center"
