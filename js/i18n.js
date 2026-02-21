@@ -46,7 +46,7 @@ const I18n = (() => {
     } else {
       // Auto-detect from browser language
       const browserLang = (navigator.language || '').slice(0, 2).toLowerCase();
-      if (browserLang === 'ko' || (browserLang && packs[browserLang])) {
+      if (browserLang && packs[browserLang]) {
         currentLang = browserLang;
       }
     }

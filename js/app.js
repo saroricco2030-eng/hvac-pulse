@@ -161,12 +161,12 @@ const App = (() => {
       });
     });
 
-    // One-time migration: reset old defaults (v2)
-    if (!localStorage.getItem('hvac-migrated-v2')) {
+    // One-time migration: reset old defaults (v3)
+    if (!localStorage.getItem('hvac-migrated-v3')) {
       localStorage.removeItem('hvac-unit');
       localStorage.removeItem('hvac-pressure-unit');
       localStorage.removeItem('hvac-lang');
-      localStorage.setItem('hvac-migrated-v2', '1');
+      localStorage.setItem('hvac-migrated-v3', '1');
     }
 
     // i18n — initialize BEFORE modules so t() returns correct language from first render
