@@ -59,12 +59,29 @@ const I18n = (() => {
   }
 
   // =============================================
+  // Unit placeholder resolver
+  // Replaces {tempUnit} / {pressUnit} and existing unit text
+  // =============================================
+  function resolveUnits(str) {
+    if (!str || typeof str !== 'string') return str;
+    if (str.indexOf('{') === -1 && str.indexOf('°') === -1 &&
+        str.indexOf('psig') === -1 && str.indexOf('bar(') === -1 && str.indexOf('kPa(') === -1) return str;
+    const tl = typeof Settings !== 'undefined' ? Settings.tempLabel() : '°F';
+    const pl = typeof Settings !== 'undefined' ? Settings.pressureLabel() : 'psig';
+    return str
+      .replace(/\{tempUnit\}/g, tl)
+      .replace(/\{pressUnit\}/g, pl)
+      .replace(/\(°[FC]\)/g, '(' + tl + ')')
+      .replace(/\((psig|bar\(a\)|kPa\(a\))\)/g, '(' + pl + ')');
+  }
+
+  // =============================================
   // Core translate function
   // Korean text is always the fallback
   // =============================================
   function t(key, koreanFallback) {
-    if (currentLang === 'ko') return koreanFallback;
-    return packs[currentLang]?.[key] || packs.en?.[key] || koreanFallback;
+    if (currentLang === 'ko') return resolveUnits(koreanFallback);
+    return resolveUnits(packs[currentLang]?.[key] || packs.en?.[key] || koreanFallback);
   }
 
   // =============================================
@@ -100,10 +117,10 @@ const I18n = (() => {
   // =============================================
   function applyToStaticDOM() {
     if (currentLang === 'ko') {
-      // Restore Korean text
+      // Restore Korean text (with current unit labels)
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const koText = el.dataset.i18nKo;
-        if (koText) restoreElement(el, koText);
+        if (koText) restoreElement(el, resolveUnits(koText));
       });
       // Restore Korean placeholders
       document.querySelectorAll('[data-i18n-ph]').forEach(el => {
@@ -129,10 +146,10 @@ const I18n = (() => {
     document.querySelectorAll('[data-i18n],[data-i18n-ph],[data-i18n-help],[data-i18n-aria]').forEach(el => {
       // Text content
       if (el.dataset.i18n) {
-        const translated = pack?.[el.dataset.i18n];
-        if (translated) {
+        const raw = pack?.[el.dataset.i18n];
+        if (raw) {
           if (!el.dataset.i18nKo) el.dataset.i18nKo = getTextOnly(el);
-          setTextPreservingChildren(el, translated);
+          setTextPreservingChildren(el, resolveUnits(raw));
         }
       }
       // Placeholder
@@ -215,10 +232,10 @@ const I18n = (() => {
             node.querySelectorAll?.('[data-i18n]')?.forEach(el => {
               const key = el.dataset.i18n;
               const pack = packs[currentLang] || packs.en;
-              const translated = pack?.[key];
-              if (translated) {
+              const raw = pack?.[key];
+              if (raw) {
                 if (!el.dataset.i18nKo) el.dataset.i18nKo = getTextOnly(el);
-                setTextPreservingChildren(el, translated);
+                setTextPreservingChildren(el, resolveUnits(raw));
               }
             });
             node.querySelectorAll?.('[data-i18n-ph]')?.forEach(el => {

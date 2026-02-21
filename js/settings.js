@@ -145,6 +145,7 @@ const Settings = (() => {
   function setPressUnit(unit) {
     set(KEYS.UNIT_PRESS, unit);
     renderAdditionalSettings();
+    I18n.applyToStaticDOM();
   }
 
   function setDefaultRef(ref) {

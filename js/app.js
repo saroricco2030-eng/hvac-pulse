@@ -25,18 +25,18 @@ const App = (() => {
 
   // Category → sub-tab mapping
   const CATEGORY_MAP = {
-    'diag':   { label: '진단',     subs: ['cross', 'nist', 'txv', 'errorcode'] },
-    'calc':   { label: '계산',     subs: ['pt', 'compare', 'pipe'] },
-    'visual': { label: '시각화',   subs: ['cycle', 'ph', 'phlearn'] },
-    'maint':  { label: '정비관리', subs: ['checklist', 'parts'] }
+    'diag':   { label: 'Diagnostics',    subs: ['cross', 'nist', 'txv', 'errorcode'] },
+    'calc':   { label: 'Calculation',    subs: ['pt', 'compare', 'pipe'] },
+    'visual': { label: 'Visualization',  subs: ['cycle', 'ph', 'phlearn'] },
+    'maint':  { label: 'Maintenance',    subs: ['checklist', 'parts'] }
   };
 
-  // Sub-tab display labels
+  // Sub-tab display labels (English fallbacks matching en.js nav.* keys)
   const SUB_LABELS = {
-    'cross': '교차진단', 'nist': 'NIST', 'txv': 'TXV', 'errorcode': '에러코드',
-    'pt': 'P-T 계산', 'compare': '냉매비교', 'pipe': '배관계산',
-    'cycle': '사이클', 'ph': 'P-H 선도', 'phlearn': 'P-H 학습',
-    'checklist': '체크리스트', 'parts': '부품호환'
+    'cross': 'Cross-Diag', 'nist': 'NIST', 'txv': 'TXV', 'errorcode': 'Error Codes',
+    'pt': 'P-T Calc', 'compare': 'Ref Compare', 'pipe': 'Pipe Calc',
+    'cycle': 'Cycle', 'ph': 'P-H Diagram', 'phlearn': 'P-H Learning',
+    'checklist': 'Checklist', 'parts': 'Parts Ref'
   };
 
   // Sub-tab defaults
@@ -829,7 +829,7 @@ const App = (() => {
   // Settings (Temperature Unit Toggle)
   // =============================================
   function initSettings() {
-    const unitPref = localStorage.getItem('hvac-unit') || 'F';
+    const unitPref = Settings.get(Settings.KEYS.UNIT_TEMP);
     const unitToggleF = document.getElementById('setting-unit-f');
     const unitToggleC = document.getElementById('setting-unit-c');
 
@@ -846,12 +846,14 @@ const App = (() => {
         localStorage.setItem('hvac-unit', 'F');
         unitToggleF.classList.add('active');
         unitToggleC.classList.remove('active');
+        I18n.applyToStaticDOM();
       });
 
       unitToggleC.addEventListener('click', () => {
         localStorage.setItem('hvac-unit', 'C');
         unitToggleC.classList.add('active');
         unitToggleF.classList.remove('active');
+        I18n.applyToStaticDOM();
       });
     }
   }
