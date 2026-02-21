@@ -13,8 +13,8 @@ const Settings = (() => {
   };
 
   const DEFAULTS = {
-    [KEYS.UNIT_TEMP]:   'F',
-    [KEYS.UNIT_PRESS]:  'psig',
+    [KEYS.UNIT_TEMP]:   'C',
+    [KEYS.UNIT_PRESS]:  'kPa',
     [KEYS.DEFAULT_REF]: 'R-410A',
     [KEYS.METERING]:    'txv'
   };

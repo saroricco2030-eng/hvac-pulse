@@ -20,7 +20,7 @@ const I18n = (() => {
     { code: 'hi', name: 'हिन्दी',      flag: '🇮🇳' }
   ];
 
-  let currentLang = 'ko';
+  let currentLang = 'en';
   let packs = {}; // { en: { key: 'translation', ... }, ja: {...}, ... }
   let observer = null;
 
@@ -46,7 +46,7 @@ const I18n = (() => {
     } else {
       // Auto-detect from browser language
       const browserLang = (navigator.language || '').slice(0, 2).toLowerCase();
-      if (browserLang && packs[browserLang]) {
+      if (browserLang === 'ko' || (browserLang && packs[browserLang])) {
         currentLang = browserLang;
       }
     }
