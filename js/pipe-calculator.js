@@ -134,7 +134,7 @@ const PipeCalculator = (() => {
           </table>
         </div>
         <div class="alert-box alert-info" style="margin-top:12px">
-          <span>ℹ️</span>
+          ${App.statusSvg('info')}
           <span>${t('pipe.guide_note', '이 값은 일반 참고용입니다. 정확한 사이즈는 제조사 사양을 따르세요. 배관 길이 15m 초과 시 한 사이즈 업 고려.')}</span>
         </div>
       </div>`;
@@ -155,7 +155,7 @@ const PipeCalculator = (() => {
 
     const chargePerM = CHARGE_PER_METER[ref]?.[size];
     if (!chargePerM) {
-      resultEl.innerHTML = `<div class="alert-box alert-warning"><span>⚠️</span><span>${t('pipe.no_data', '해당 조합의 데이터가 없습니다.')}</span></div>`;
+      resultEl.innerHTML = `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>${t('pipe.no_data', '해당 냉매·배관 조합의 데이터가 없습니다. 다른 냉매나 배관 사이즈를 선택해보세요.')}</span></div>`;
       return;
     }
 
@@ -181,7 +181,7 @@ const PipeCalculator = (() => {
           = ${chargeLb.toFixed(2)} lb
         </div>` : ''}
       <div class="alert-box alert-info" style="margin-top:12px">
-        <span>ℹ️</span>
+        ${App.statusSvg('info')}
         <span>${t('pipe.result_note', '리퀴드라인 기준 값입니다. 석션라인은 가스 밀도가 낮아 충전량이 훨씬 적습니다.')} (${ref}@${size}" = ${chargePerM}g/m)</span>
       </div>`;
   }

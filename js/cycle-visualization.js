@@ -10,7 +10,6 @@ const CycleVisualization = (() => {
   // --- State ---
   let measurements = {};
   let selectedRefrigerant = 'R-410A';
-  let activeComponent = null;
 
   // Computed values from measurements
   let computed = {
@@ -79,10 +78,10 @@ const CycleVisualization = (() => {
           ${generateSVG()}
         </div>
         <div class="cycle-legend">
-          <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>${t('cycle.high_gas', '고압가스')}</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span>${t('cycle.high_liquid', '고압액체')}</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span>${t('cycle.mixed', '혼합')}</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span>${t('cycle.low_gas', '저압가스')}</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--high-pressure)"></span>${t('cycle.high_gas', '고압가스')}</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--liquid-line)"></span>${t('cycle.high_liquid', '고압액체')}</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--accent-purple)"></span>${t('cycle.mixed', '혼합')}</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--low-pressure)"></span>${t('cycle.low_gas', '저압가스')}</span>
         </div>
       </div>
 
@@ -466,8 +465,6 @@ const CycleVisualization = (() => {
     const data = CYCLE_COMPONENTS[compId];
     if (!data) return;
 
-    activeComponent = compId;
-
     // Highlight component on SVG
     clearHighlights();
     const el = document.getElementById(`comp-${compId}`);
@@ -516,7 +513,6 @@ const CycleVisualization = (() => {
     document.getElementById('cycle-overlay').classList.remove('show');
     document.getElementById('cycle-info-panel').classList.remove('show');
     clearHighlights();
-    activeComponent = null;
   }
 
   // ============================================================
@@ -821,31 +817,31 @@ const CycleVisualization = (() => {
 
     // Build result
     const resultEl = document.getElementById('cycle-diag-result');
-    const shIcon = shClass === 'normal' ? '✅' : shClass === 'high' ? '🔺' : '🔻';
-    const scIcon = scClass === 'normal' ? '✅' : scClass === 'high' ? '🔺' : '🔻';
+    const shIcon = shClass === 'normal' ? App.statusSvg('normal') : App.statusSvg(shClass);
+    const scIcon = scClass === 'normal' ? App.statusSvg('normal') : App.statusSvg(scClass);
 
     // Extra warnings
     let warnings = '';
     if (measurements.DLT != null && measurements.DLT > 275) {
-      warnings += `<div class="alert-box alert-danger"><span>🚨</span><span>DLT ${measurements.DLT}°F (>275°F) — ${t('cycle.warn_oil_breakdown', '오일 파괴 위험!')}</span></div>`;
+      warnings += `<div class="alert-box alert-danger">${App.statusSvg('siren')}<span>DLT ${measurements.DLT}°F (>275°F) — ${t('cycle.warn_oil_breakdown', '오일 파괴 위험!')}</span></div>`;
     }
     if (computed.compressionRatio != null && computed.compressionRatio > 12) {
-      warnings += `<div class="alert-box alert-danger"><span>🔴</span><span>${t('cycle.compression_ratio', '압축비')} ${computed.compressionRatio}:1 (>12:1) — ${t('cycle.warn_compressor_overload', '컴프레서 과부하!')}</span></div>`;
+      warnings += `<div class="alert-box alert-danger">${App.statusSvg('danger')}<span>${t('cycle.compression_ratio', '압축비')} ${computed.compressionRatio}:1 (>12:1) — ${t('cycle.warn_compressor_overload', '컴프레서 과부하!')}</span></div>`;
     }
     if (measurements.DT != null && (measurements.DT < 10 || measurements.DT > 28)) {
       const dtStatus = measurements.DT < 10 ? t('cycle.warn_dt_low', '과소 (결빙?)') : t('cycle.warn_dt_high', '과대 (에어플로우?)');
-      warnings += `<div class="alert-box alert-warning"><span>⚠️</span><span>ΔT ${measurements.DT}°F — ${dtStatus}</span></div>`;
+      warnings += `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>ΔT ${measurements.DT}°F — ${dtStatus}</span></div>`;
     }
 
     // Diagnosis icon/title from diagnostic engine mapping
     const DIAG_DISPLAY = {
-      normal:              { icon: '✅', title: t('diag.normal.title', '시스템 정상'), level: 'normal' },
-      lowCharge:           { icon: '🔴', title: t('diag.lowcharge.title', '냉매 부족 (누설 의심)'), level: 'danger' },
-      meteringRestriction: { icon: '🟠', title: t('diag.metering.title', '계량장치 제한 (TXV/필터)'), level: 'caution' },
-      overcharge:          { icon: '🔴', title: t('diag.overcharge.title', '냉매 과충전'), level: 'danger' },
-      compressorWeak:      { icon: '🔴', title: t('diag.compressor.title', '컴프레서 불량'), level: 'danger' },
-      txvOverfeed:         { icon: '🟡', title: t('diag.txvoverfeed.title', 'TXV 오버피딩'), level: 'caution' },
-      lowAirflow:          { icon: '🟠', title: t('diag.lowairflow.title', '에어플로우 부족'), level: 'caution' }
+      normal:              { level: 'normal',  title: t('diag.normal.title', '시스템 정상') },
+      lowCharge:           { level: 'danger',  title: t('diag.lowcharge.title', '냉매 부족 (누설 의심)') },
+      meteringRestriction: { level: 'caution', title: t('diag.metering.title', '계량장치 제한 (TXV/필터)') },
+      overcharge:          { level: 'danger',  title: t('diag.overcharge.title', '냉매 과충전') },
+      compressorWeak:      { level: 'danger',  title: t('diag.compressor.title', '컴프레서 불량') },
+      txvOverfeed:         { level: 'caution', title: t('diag.txvoverfeed.title', 'TXV 오버피딩') },
+      lowAirflow:          { level: 'caution', title: t('diag.lowairflow.title', '에어플로우 부족') }
     };
 
     const diag = DIAG_DISPLAY[diagKey];
@@ -884,10 +880,10 @@ const CycleVisualization = (() => {
     }
 
     resultEl.innerHTML = `
-      <div class="glass-card" style="margin-top:16px;border:1px solid ${diag.level === 'normal' ? 'rgba(16,185,129,0.3)' : diag.level === 'danger' ? 'rgba(239,68,68,0.3)' : 'rgba(245,158,11,0.3)'}">
+      <div class="glass-card diag-result-${diag.level}" style="margin-top:16px">
         ${severityHtml}
         <div style="text-align:center;margin-bottom:12px">
-          <div style="font-size:var(--text-3xl)">${diag.icon}</div>
+          ${App.diagIcon(diag.level)}
           <div style="font-size:var(--text-lg);font-weight:700;color:var(--text-primary)">${diag.title}</div>
         </div>
 

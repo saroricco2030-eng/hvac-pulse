@@ -102,6 +102,15 @@ const DiagnosticEngine = (() => {
     }
   };
 
+  // --- Engineering Constants ---
+  const ATM_PSI = 14.7;          // atmospheric pressure in psi
+  const SH_HIGH = 20;            // superheat high threshold (°F)
+  const SH_LOW = 5;              // superheat low threshold (°F)
+  const SC_HIGH = 18;            // subcooling high threshold (°F)
+  const SC_LOW = 5;              // subcooling low threshold (°F)
+  const DLT_CR_FACTOR = 8;       // compression ratio multiplier for DLT estimate
+  const CR_FALLBACK = 99;        // fallback when suction is zero
+
   // --- Main Diagnosis ---
   function diagnose(params) {
     const { refName, suctionPressure, dischargePressure, suctionLineTemp, liquidLineTemp, outdoorTemp, returnAirTemp } = params;
@@ -120,13 +129,13 @@ const DiagnosticEngine = (() => {
     const condensingSatTemp = scResult.satTemp;
     const ctoa = condensingSatTemp - outdoorTemp;
 
-    const suctionAbsolute = suctionPressure + 14.7;
-    const compressionRatio = suctionAbsolute > 0 ? (dischargePressure + 14.7) / suctionAbsolute : 99;
-    const dlt = condensingSatTemp + superheat + (compressionRatio * 8);
+    const suctionAbsolute = suctionPressure + ATM_PSI;
+    const compressionRatio = suctionAbsolute > 0 ? (dischargePressure + ATM_PSI) / suctionAbsolute : CR_FALLBACK;
+    const dlt = condensingSatTemp + superheat + (compressionRatio * DLT_CR_FACTOR);
 
     // --- Classify ---
-    const shClass = superheat > 20 ? 'high' : superheat < 5 ? 'low' : 'normal';
-    const scClass = subcooling > 18 ? 'high' : subcooling < 5 ? 'low' : 'normal';
+    const shClass = superheat > SH_HIGH ? 'high' : superheat < SH_LOW ? 'low' : 'normal';
+    const scClass = subcooling > SC_HIGH ? 'high' : subcooling < SC_LOW ? 'low' : 'normal';
 
     // --- Diagnosis matrix ---
     let diagKey = 'normal';
@@ -212,6 +221,11 @@ const DiagnosticEngine = (() => {
     }
   }
 
+  // Unit-aware input helper: convert user temperature input to °F
+  function inputTempToF(val) {
+    return (typeof Settings !== 'undefined' && Settings.isMetric()) ? val * 9 / 5 + 32 : val;
+  }
+
   function runDiagnostic() {
     const refName = document.getElementById('diag-ref-select')?.value;
 
@@ -242,12 +256,14 @@ const DiagnosticEngine = (() => {
 
     const suctionPressure = parseFloat(document.getElementById('diag-suction-p')?.value);
     const dischargePressure = parseFloat(document.getElementById('diag-discharge-p')?.value);
-    const suctionLineTemp = parseFloat(document.getElementById('diag-suction-t')?.value);
-    const liquidLineTemp = parseFloat(document.getElementById('diag-liquid-t')?.value);
+    // Convert temperature inputs from user unit to °F for internal calculation
+    const suctionLineTemp = inputTempToF(parseFloat(document.getElementById('diag-suction-t')?.value));
+    const liquidLineTemp = inputTempToF(parseFloat(document.getElementById('diag-liquid-t')?.value));
     const outdoorRaw = parseFloat(document.getElementById('diag-outdoor-t')?.value);
     const returnRaw = parseFloat(document.getElementById('diag-return-t')?.value);
-    const outdoorTemp = isNaN(outdoorRaw) ? 95 : outdoorRaw;
-    const returnAirTemp = isNaN(returnRaw) ? 75 : returnRaw;
+    const metric = typeof Settings !== 'undefined' && Settings.isMetric();
+    const outdoorTemp = isNaN(outdoorRaw) ? (metric ? 35 : 95) : inputTempToF(outdoorRaw);
+    const returnAirTemp = isNaN(returnRaw) ? (metric ? 24 : 75) : inputTempToF(returnRaw);
 
     // Safety: prevent NaN propagation from required fields
     if ([suctionPressure, dischargePressure, suctionLineTemp, liquidLineTemp].some(isNaN)) return;
@@ -275,7 +291,7 @@ const DiagnosticEngine = (() => {
     });
 
     if (!result) {
-      resultEl.innerHTML = `<div class="alert-box alert-danger"><span class="diag-icon-svg icon-danger">${App.SVG_ICONS.xCircle}</span><span>${t('error.calc_error', '계산 오류가 발생했습니다.')}</span></div>`;
+      resultEl.innerHTML = `<div class="alert-box alert-danger"><span class="diag-icon-svg icon-danger">${App.SVG_ICONS.xCircle}</span><span>${t('error.calc_error', '계산 오류 — 입력값과 냉매 선택을 확인하세요. 압력·온도 값이 비어있거나 범위를 벗어났을 수 있습니다.')}</span></div>`;
       return;
     }
 
@@ -318,6 +334,9 @@ const DiagnosticEngine = (() => {
   function renderResult(r, el) {
     const shStatus = PTCalculator.getSuperheatStatus(r.superheat);
     const scStatus = PTCalculator.getSubcoolingStatus(r.subcooling);
+    // Display helpers: internal values are °F, convert for display
+    const dT = (typeof Settings !== 'undefined') ? Settings.displayDelta : (v => v.toFixed(1) + '°F');
+    const dA = (typeof Settings !== 'undefined') ? Settings.displayTemp : (v => v.toFixed(1) + '°F');
 
     // --- Advanced Diagnostic enrichment ---
     let severityHtml = '';
@@ -360,11 +379,11 @@ const DiagnosticEngine = (() => {
       <!-- Computed Values -->
       <div class="computed-row" style="grid-template-columns:repeat(3,1fr)">
         <div class="computed-item">
-          <div class="comp-value ${shStatus}">${r.superheat.toFixed(1)}°F</div>
+          <div class="comp-value ${shStatus}">${dT(r.superheat)}</div>
           <div class="comp-label">${t('settings.matrix.col1', '과열도')}</div>
         </div>
         <div class="computed-item">
-          <div class="comp-value ${scStatus}">${r.subcooling.toFixed(1)}°F</div>
+          <div class="comp-value ${scStatus}">${dT(r.subcooling)}</div>
           <div class="comp-label">${t('settings.matrix.col2', '과냉도')}</div>
         </div>
         <div class="computed-item">
@@ -375,11 +394,11 @@ const DiagnosticEngine = (() => {
 
       <div class="computed-row">
         <div class="computed-item">
-          <div class="comp-value" style="font-size:var(--text-xl);color:var(--text-primary)">${r.dtd.toFixed(1)}°F</div>
+          <div class="comp-value" style="font-size:var(--text-xl);color:var(--text-primary)">${dT(r.dtd)}</div>
           <div class="comp-label">DTD</div>
         </div>
         <div class="computed-item">
-          <div class="comp-value" style="font-size:var(--text-xl);color:var(--text-primary)">${r.ctoa.toFixed(1)}°F</div>
+          <div class="comp-value" style="font-size:var(--text-xl);color:var(--text-primary)">${dT(r.ctoa)}</div>
           <div class="comp-label">CTOA</div>
         </div>
       </div>
@@ -416,7 +435,7 @@ const DiagnosticEngine = (() => {
     }
 
     // Copy / Export button row
-    const diagText = `[${diagTitle}] ${t('settings.matrix.col1', '과열도')}:${r.superheat.toFixed(1)}°F ${t('settings.matrix.col2', '과냉도')}:${r.subcooling.toFixed(1)}°F ${t('warn.cr_label', '압축비')}:${r.compressionRatio.toFixed(1)} DTD:${r.dtd.toFixed(1)}°F CTOA:${r.ctoa.toFixed(1)}°F — ${diagCause}`;
+    const diagText = `[${diagTitle}] ${t('settings.matrix.col1', '과열도')}:${dT(r.superheat)} ${t('settings.matrix.col2', '과냉도')}:${dT(r.subcooling)} ${t('warn.cr_label', '압축비')}:${r.compressionRatio.toFixed(1)} DTD:${dT(r.dtd)} CTOA:${dT(r.ctoa)} — ${diagCause}`;
     const copyLabel = t('copy.cross_diag', '교차 진단 결과').replace(/'/g, '&#39;');
     const safeDiagText = diagText.replace(/`/g, "'").replace(/'/g, '&#39;');
     html += `
@@ -442,8 +461,11 @@ const DiagnosticEngine = (() => {
 
   // --- Quick diagnose (SH/SC only, for home screen) ---
   function quickDiagnose(sh, sc) {
-    const shClass = sh > 20 ? 'high' : sh < 5 ? 'low' : 'normal';
-    const scClass = sc > 18 ? 'high' : sc < 5 ? 'low' : 'normal';
+    // Convert delta from user unit to °F for threshold comparison
+    const shF = (typeof Settings !== 'undefined' && Settings.isMetric()) ? sh * 9 / 5 : sh;
+    const scF = (typeof Settings !== 'undefined' && Settings.isMetric()) ? sc * 9 / 5 : sc;
+    const shClass = shF > 20 ? 'high' : shF < 5 ? 'low' : 'normal';
+    const scClass = scF > 18 ? 'high' : scF < 5 ? 'low' : 'normal';
 
     let diagKey = 'normal';
     if (shClass === 'normal' && scClass === 'normal') diagKey = 'normal';
@@ -463,7 +485,7 @@ const DiagnosticEngine = (() => {
       title: translatedTitle,
       summary: diagKey === 'normal'
         ? t('quick.normal_summary', '측정값이 정상 범위입니다')
-        : `${t('settings.matrix.col1', '과열도')} ${sh}°F (${shClass === 'high' ? '↑' : shClass === 'low' ? '↓' : '→'}) · ${t('settings.matrix.col2', '과냉도')} ${sc}°F (${scClass === 'high' ? '↑' : scClass === 'low' ? '↓' : '→'})`,
+        : `${t('settings.matrix.col1', '과열도')} ${sh}${(typeof Settings !== 'undefined') ? Settings.tempLabel() : '°F'} (${shClass === 'high' ? '↑' : shClass === 'low' ? '↓' : '→'}) · ${t('settings.matrix.col2', '과냉도')} ${sc}${(typeof Settings !== 'undefined') ? Settings.tempLabel() : '°F'} (${scClass === 'high' ? '↑' : scClass === 'low' ? '↓' : '→'})`,
       level: d.level,
       diagKey
     };

@@ -44,7 +44,6 @@ const App = (() => {
     'records': 'service'
   };
 
-  let currentTab = 'home';
   let currentCategory = null;
 
   // =============================================
@@ -58,7 +57,10 @@ const App = (() => {
     copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>',
     save: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>',
     arrowRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
-    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+    arrowUp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>',
+    arrowDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+    siren: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="M5.5 5.5l2.8 2.8"/><path d="M18.5 5.5l-2.8 2.8"/><circle cx="12" cy="14" r="6"/><line x1="12" y1="11" x2="12" y2="14"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
   };
 
   function diagIcon(level) {
@@ -70,6 +72,21 @@ const App = (() => {
     };
     const i = iconMap[level] || iconMap.info;
     return `<div class="diag-icon-svg ${i.cls}">${i.svg}</div>`;
+  }
+
+  // Inline status SVG icon (replaces emoji ✅/⚠️/🔴 for cross-platform consistency)
+  function statusSvg(status) {
+    const map = {
+      normal: `<span class="svg-icon svg-icon--sm icon-normal">${SVG_ICONS.checkCircle}</span>`,
+      caution: `<span class="svg-icon svg-icon--sm icon-caution">${SVG_ICONS.alertTriangle}</span>`,
+      danger: `<span class="svg-icon svg-icon--sm icon-danger">${SVG_ICONS.xCircle}</span>`,
+      warning: `<span class="svg-icon svg-icon--sm icon-caution">${SVG_ICONS.alertTriangle}</span>`,
+      info: `<span class="svg-icon svg-icon--sm icon-info">${SVG_ICONS.alertCircle}</span>`,
+      high: `<span class="svg-icon svg-icon--sm icon-danger">${SVG_ICONS.arrowUp}</span>`,
+      low: `<span class="svg-icon svg-icon--sm icon-danger">${SVG_ICONS.arrowDown}</span>`,
+      siren: `<span class="svg-icon svg-icon--sm icon-danger">${SVG_ICONS.siren}</span>`
+    };
+    return map[status] || map.info;
   }
 
   // =============================================
@@ -226,6 +243,21 @@ const App = (() => {
     initSearch();
     initBackButton();
     initSessionStorage();
+    initSubTabScrollHints();
+  }
+
+  // Sub-tab scroll fade hint
+  function initSubTabScrollHints() {
+    document.querySelectorAll('.sub-tab-bar').forEach(bar => {
+      const wrap = bar.closest('.sub-tab-bar-wrap');
+      if (!wrap) return;
+      const check = () => {
+        const atEnd = bar.scrollLeft + bar.clientWidth >= bar.scrollWidth - 8;
+        wrap.classList.toggle('scrolled-end', atEnd);
+      };
+      bar.addEventListener('scroll', check, { passive: true });
+      check();
+    });
   }
 
   // =============================================
@@ -570,21 +602,25 @@ const App = (() => {
     const SH = t('pt.superheat', '과열도');
     const SC = t('pt.subcooling', '과냉도');
     const NRM = t('status.normal', '정상');
-    if (sh >= 5 && sh <= 15 && sc >= 8 && sc <= 14)
+    const u = (typeof Settings !== 'undefined') ? Settings.tempLabel() : '°F';
+    // Convert user deltas to °F for threshold comparison
+    const shF = (typeof Settings !== 'undefined' && Settings.isMetric()) ? sh * 9 / 5 : sh;
+    const scF = (typeof Settings !== 'undefined' && Settings.isMetric()) ? sc * 9 / 5 : sc;
+    if (shF >= 5 && shF <= 15 && scF >= 8 && scF <= 14)
       return { title: t('diag.normal.title', '정상'), summary: t('quick.normal_summary', '측정값이 정상 범위입니다'), level: 'normal' };
-    if (sh > 15 && sc < 8)
-      return { title: t('diag.lowcharge.title', '냉매 부족 (누설 의심)'), summary: `${SH} ${sh}°F↑ · ${SC} ${sc}°F↓`, level: 'danger' };
-    if (sh > 15 && sc > 14)
-      return { title: t('diag.metering.title', '계량장치 제한'), summary: `${SH} ${sh}°F↑ · ${SC} ${sc}°F↑`, level: 'danger' };
-    if (sh < 5 && sc > 14)
-      return { title: t('diag.overcharge.title', '냉매 과충전'), summary: `${SH} ${sh}°F↓ · ${SC} ${sc}°F↑`, level: 'danger' };
-    if (sh < 5 && sc < 8)
-      return { title: t('diag.compressor.title', '컴프레서 불량'), summary: `${SH} ${sh}°F↓ · ${SC} ${sc}°F↓`, level: 'danger' };
-    if (sh < 5 && sc >= 8 && sc <= 14)
-      return { title: t('diag.txvoverfeed.title', 'TXV 오버피딩'), summary: `${SH} ${sh}°F↓ · ${SC} ${NRM}`, level: 'caution' };
-    if (sh > 15 && sc >= 8 && sc <= 14)
-      return { title: t('diag.lowairflow.title', '에어플로우 부족'), summary: `${SH} ${sh}°F↑ · ${SC} ${NRM}`, level: 'caution' };
-    return { title: t('diag.atypical.title', '비정형 조합'), summary: `${SH} ${sh}°F · ${SC} ${sc}°F — ${t('diag.atypical.hint', '상세 진단 필요')}`, level: 'caution' };
+    if (shF > 15 && scF < 8)
+      return { title: t('diag.lowcharge.title', '냉매 부족 (누설 의심)'), summary: `${SH} ${sh}${u}↑ · ${SC} ${sc}${u}↓`, level: 'danger' };
+    if (shF > 15 && scF > 14)
+      return { title: t('diag.metering.title', '계량장치 제한'), summary: `${SH} ${sh}${u}↑ · ${SC} ${sc}${u}↑`, level: 'danger' };
+    if (shF < 5 && scF > 14)
+      return { title: t('diag.overcharge.title', '냉매 과충전'), summary: `${SH} ${sh}${u}↓ · ${SC} ${sc}${u}↑`, level: 'danger' };
+    if (shF < 5 && scF < 8)
+      return { title: t('diag.compressor.title', '컴프레서 불량'), summary: `${SH} ${sh}${u}↓ · ${SC} ${sc}${u}↓`, level: 'danger' };
+    if (shF < 5 && scF >= 8 && scF <= 14)
+      return { title: t('diag.txvoverfeed.title', 'TXV 오버피딩'), summary: `${SH} ${sh}${u}↓ · ${SC} ${NRM}`, level: 'caution' };
+    if (shF > 15 && scF >= 8 && scF <= 14)
+      return { title: t('diag.lowairflow.title', '에어플로우 부족'), summary: `${SH} ${sh}${u}↑ · ${SC} ${NRM}`, level: 'caution' };
+    return { title: t('diag.atypical.title', '비정형 조합'), summary: `${SH} ${sh}${u} · ${SC} ${sc}${u} — ${t('diag.atypical.hint', '상세 진단 필요')}`, level: 'caution' };
   }
 
   // =============================================
@@ -646,7 +682,6 @@ const App = (() => {
   // =============================================
   function switchTab(tabName, fromPopstate) {
     if (!TAB_MAP[tabName]) return;
-    currentTab = tabName;
 
     // Hide all pages
     document.querySelectorAll('.page-section').forEach(p => {
@@ -943,7 +978,7 @@ const App = (() => {
   // =============================================
   return {
     init, switchTab, showSub, showCategory, backToHub, showToast,
-    copyDiagText, diagIcon, SVG_ICONS,
+    copyDiagText, diagIcon, statusSvg, SVG_ICONS,
     validateField, clearValidation
   };
 })();

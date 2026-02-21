@@ -44,7 +44,8 @@ const NISTDiagnostic = (() => {
     const expectedLiquidLine = expectedCondensingTemp - NORMAL_SUBCOOLING;
 
     // Delta T (supply air temp difference)
-    const expectedSupplyAir = returnAirTemp - 20; // Rough estimate
+    const SUPPLY_AIR_DELTA = 20; // Rough cooling delta for supply air estimate (°F)
+    const expectedSupplyAir = returnAirTemp - SUPPLY_AIR_DELTA;
 
     // Differences
     const suctionDiff = suctionLineTemp - expectedSuctionLine;

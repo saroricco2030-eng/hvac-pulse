@@ -44,6 +44,45 @@ const Settings = (() => {
     return 'psig';
   }
 
+  // --- Temperature conversion helpers ---
+  // Returns current unit: 'F' or 'C'
+  function tempUnit() {
+    return get(KEYS.UNIT_TEMP) || 'F';
+  }
+
+  function isMetric() {
+    return tempUnit() === 'C';
+  }
+
+  // Convert user input (absolute temp) to internal °F
+  function userTempToF(val) {
+    if (isMetric()) return val * 9 / 5 + 32;
+    return val;
+  }
+
+  // Convert user input (delta temp, e.g. SH/SC) to internal °F delta
+  function userDeltaToF(val) {
+    if (isMetric()) return val * 9 / 5;
+    return val;
+  }
+
+  // Format internal °F value for display in user's unit
+  function displayTemp(val_f) {
+    if (isMetric()) return ((val_f - 32) * 5 / 9).toFixed(1) + '°C';
+    return val_f.toFixed(1) + '°F';
+  }
+
+  // Format internal °F delta for display in user's unit
+  function displayDelta(val_f) {
+    if (isMetric()) return (val_f * 5 / 9).toFixed(1) + '°C';
+    return val_f.toFixed(1) + '°F';
+  }
+
+  // Get unit label: '°F' or '°C'
+  function tempLabel() {
+    return isMetric() ? '°C' : '°F';
+  }
+
   // --- Initialize UI ---
   function initUI() {
     renderAdditionalSettings();
@@ -138,7 +177,7 @@ const Settings = (() => {
         </button>
       </div>
       <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="Settings.importData(event)">
-      <button class="btn" onclick="Settings.confirmDeleteAll()" style="width:100%;margin-top:8px;font-size:var(--text-sm);padding:10px;background:transparent;border:1px solid rgba(239,68,68,0.3);color:var(--accent-red)">
+      <button class="btn btn-danger-outline" onclick="Settings.confirmDeleteAll()">
         🗑️ ${t('settings.delete_all', '전체 데이터 삭제')}
       </button>
     `;
@@ -261,6 +300,8 @@ const Settings = (() => {
   return {
     get, set, KEYS,
     convertPressure, pressureLabel,
+    tempUnit, isMetric, userTempToF, userDeltaToF,
+    displayTemp, displayDelta, tempLabel,
     initUI,
     setPressUnit, setDefaultRef, setMetering,
     exportData, importData, confirmDeleteAll

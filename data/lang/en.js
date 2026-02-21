@@ -640,7 +640,7 @@ const LANG_EN = {
   'validation.return_t': 'Enter return air temperature',
   'validation.outdoor_t': 'Enter outdoor temperature',
   'validation.pressure_compare': 'Discharge pressure must be higher than suction pressure',
-  'error.calc_error': 'Calculation error occurred.',
+  'error.calc_error': 'Calculation error — Verify your inputs and refrigerant selection. Pressure or temperature values may be missing or out of range.',
 
   // =============================================
   // Search Database (app.js)
@@ -652,6 +652,7 @@ const LANG_EN = {
   'tool.subcooling': 'Subcooling Calculation',
   'tool.subcooling.desc': 'Liquid line subcooling',
   'tool.cross': 'Cross Diagnosis',
+  'tool.cross_diag': 'Cross Diagnosis',
   'tool.cross.desc': 'Superheat × Subcooling auto-diagnosis',
   'tool.nist': 'NIST Non-Invasive',
   'tool.nist.desc': 'Temperature only, no gauges',
@@ -771,6 +772,14 @@ const LANG_EN = {
   'common.no': 'No',
   'common.ok': 'OK',
 
+  // Aria labels (accessibility)
+  'aria.main_nav': 'Main navigation',
+  'aria.search': 'Search',
+  'aria.tab_home': 'Home',
+  'aria.tab_tools': 'Tools',
+  'aria.tab_records': 'Records',
+  'aria.tab_settings': 'Settings',
+
   // =============================================
   // Missing Keys — JS t() calls (added for full coverage)
   // =============================================
@@ -858,8 +867,8 @@ const LANG_EN = {
   // P-T Calculator
   'pt.superheat': 'Superheat',
   'pt.subcooling': 'Subcooling',
-  'pt.no_data': 'No P-T data for this refrigerant. CoolProp engine required.',
-  'pt.calc_fail': 'Calculation failed — Check refrigerant data.',
+  'pt.no_data': 'No P-T data for this refrigerant. If CoolProp is still loading, try again shortly, or select a common refrigerant (R-410A, etc.).',
+  'pt.calc_fail': 'Calculation failed — Make sure all pressure and temperature fields are filled in. You can also try selecting a different refrigerant.',
   'pt.sat_temp': 'Saturation Temp',
   'pt.suction_actual': 'Suction Line Measured',
   'pt.liquid_actual': 'Liquid Line Measured',
@@ -1080,10 +1089,15 @@ const LANG_EN = {
   'pipe.col_liquid': 'Liquid',
   'pipe.col_suction': 'Suction',
   'pipe.guide_note': 'These values are general references. Follow manufacturer specifications for exact sizing. Consider upsizing for pipe runs over 15m.',
-  'pipe.no_data': 'No data available for this combination.',
+  'pipe.no_data': 'No data for this refrigerant/pipe combination. Try selecting a different refrigerant or pipe size.',
   'pipe.grams': 'Grams',
   'pipe.ounces': 'Ounces',
   'pipe.result_note': 'Values are based on liquid line. Suction line charge is much less due to lower gas density.',
+
+  // =============================================
+  // Diagnostic Report
+  // =============================================
+  'report.print': 'PDF / Print',
 
   // =============================================
   // Refrigerant Compare

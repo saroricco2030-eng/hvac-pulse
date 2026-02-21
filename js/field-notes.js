@@ -180,9 +180,9 @@ const FieldNotes = (() => {
         <div class="section-title">${t('service.photos', '사진 첨부')}</div>
         <div id="fn-photo-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
           ${photosArray.map((p, i) => `
-            <div style="position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
-              <img src="${p}" style="width:100%;height:100%;object-fit:cover">
-              <button onclick="FieldNotes.removePhoto(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.7);border:none;color:#fff;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:var(--text-xs)">×</button>
+            <div class="photo-thumb">
+              <img src="${p}" alt="">
+              <button class="photo-remove-btn" onclick="FieldNotes.removePhoto(${i})">×</button>
             </div>
           `).join('')}
         </div>
@@ -243,9 +243,9 @@ const FieldNotes = (() => {
     const el = document.getElementById('fn-photo-preview');
     if (!el) return;
     el.innerHTML = photosArray.map((p, i) => `
-      <div style="position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
-        <img src="${p}" style="width:100%;height:100%;object-fit:cover">
-        <button onclick="FieldNotes.removePhoto(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.7);border:none;color:#fff;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:var(--text-xs)">×</button>
+      <div class="photo-thumb">
+        <img src="${p}" alt="">
+        <button class="photo-remove-btn" onclick="FieldNotes.removePhoto(${i})">×</button>
       </div>
     `).join('');
   }

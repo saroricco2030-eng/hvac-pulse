@@ -178,6 +178,19 @@ const DiagnosticReport = (() => {
 
 
   // ============================================================
+  // HVAC Normal Range Constants (°F-based)
+  // ============================================================
+  const NORMAL_RANGES = {
+    SH:   { type: 'range', lo: 8, hi: 14, display: '8~14°F' },
+    SC:   { type: 'range', lo: 8, hi: 14, display: '8~14°F' },
+    DLT:  { type: 'max', val: 225, display: '<225°F' },
+    DT:   { type: 'range', lo: 15, hi: 22, display: '15~22°F' },
+    DTD:  { type: 'range', lo: 30, hi: 40, display: '30~40°F' },
+    CTOA: { type: 'range', lo: 15, hi: 30, display: '15~30°F' },
+    CR:   { type: 'max', val: 12, display: '<12:1' }
+  };
+
+  // ============================================================
   // MEASUREMENT TABLE BUILDER
   // ============================================================
   function buildMeasurementTable(diagResult, measurements) {
@@ -209,15 +222,15 @@ const DiagnosticReport = (() => {
 
     // Superheat
     const sh = d.superheat ?? m.SH ?? null;
-    addRow('과열도 (SH)', sh, '°F', { type: 'range', lo: 8, hi: 14, display: '8~14°F' }, 'SH');
+    addRow('과열도 (SH)', sh, '°F', NORMAL_RANGES.SH, 'SH');
 
     // Subcooling
     const sc = d.subcooling ?? m.SC ?? null;
-    addRow('과냉도 (SC)', sc, '°F', { type: 'range', lo: 8, hi: 14, display: '8~14°F' }, 'SC');
+    addRow('과냉도 (SC)', sc, '°F', NORMAL_RANGES.SC, 'SC');
 
     // DLT
     const dlt = m.DLT ?? d.dlt ?? d.dischargeTemp ?? null;
-    addRow('토출온도 (DLT)', dlt, '°F', { type: 'max', val: 225, display: '<225°F' }, 'DLT');
+    addRow('토출온도 (DLT)', dlt, '°F', NORMAL_RANGES.DLT, 'DLT');
 
     // Suction line temp
     const slt = m.suctionLineTemp ?? d.suctionLineTemp ?? null;
@@ -241,16 +254,16 @@ const DiagnosticReport = (() => {
 
     // Delta T
     const dt = m.DT ?? (tret != null && tsup != null ? tret - tsup : null);
-    addRow('ΔT (공기온도차)', dt, '°F', { type: 'range', lo: 15, hi: 22, display: '15~22°F' }, 'DT');
+    addRow('ΔT (공기온도차)', dt, '°F', NORMAL_RANGES.DT, 'DT');
 
     // DTD
-    if (d.dtd != null) addRow('DTD', d.dtd, '°F', { type: 'range', lo: 30, hi: 40, display: '30~40°F' }, 'DTD');
+    if (d.dtd != null) addRow('DTD', d.dtd, '°F', NORMAL_RANGES.DTD, 'DTD');
 
     // CTOA
-    if (d.ctoa != null) addRow('CTOA', d.ctoa, '°F', { type: 'range', lo: 15, hi: 30, display: '15~30°F' }, 'CTOA');
+    if (d.ctoa != null) addRow('CTOA', d.ctoa, '°F', NORMAL_RANGES.CTOA, 'CTOA');
 
     // Compression ratio
-    if (d.compressionRatio != null) addRow('압축비', d.compressionRatio, ':1', { type: 'max', val: 12, display: '<12:1' }, 'CR');
+    if (d.compressionRatio != null) addRow('압축비', d.compressionRatio, ':1', NORMAL_RANGES.CR, 'CR');
 
     return rows.filter(r => r.value != null);
   }
@@ -305,13 +318,13 @@ const DiagnosticReport = (() => {
 
     // Diagnosis display
     const DIAG_NAMES = {
-      normal:              { title: '시스템 정상', icon: '✅', level: 'normal' },
-      lowCharge:           { title: '냉매 부족 (누설 의심)', icon: '🔴', level: 'danger' },
-      overcharge:          { title: '냉매 과충전', icon: '🔴', level: 'danger' },
-      meteringRestriction: { title: '계량장치 제한 (TXV/필터)', icon: '🟠', level: 'caution' },
-      compressorWeak:      { title: '컴프레서 불량 (효율 저하)', icon: '🔴', level: 'danger' },
-      txvOverfeed:         { title: 'TXV 오버피딩', icon: '🟡', level: 'caution' },
-      lowAirflow:          { title: '에어플로우 부족', icon: '🟠', level: 'caution' }
+      normal:              { title: '시스템 정상', level: 'normal' },
+      lowCharge:           { title: '냉매 부족 (누설 의심)', level: 'danger' },
+      overcharge:          { title: '냉매 과충전', level: 'danger' },
+      meteringRestriction: { title: '계량장치 제한 (TXV/필터)', level: 'caution' },
+      compressorWeak:      { title: '컴프레서 불량 (효율 저하)', level: 'danger' },
+      txvOverfeed:         { title: 'TXV 오버피딩', level: 'caution' },
+      lowAirflow:          { title: '에어플로우 부족', level: 'caution' }
     };
 
     const diagDisplay = DIAG_NAMES[diagKey] || DIAG_NAMES.normal;
@@ -319,7 +332,6 @@ const DiagnosticReport = (() => {
     return {
       diagKey,
       title: diagDisplay.title,
-      icon: diagDisplay.icon,
       level: diagDisplay.level,
       severity,
       confidence,
@@ -602,7 +614,7 @@ const DiagnosticReport = (() => {
         ${severityDisplay}
 
         <div class="dr-diagnosis-main">
-          <div class="dr-diag-icon">${report.primary.icon}</div>
+          <div class="dr-diag-icon">${App.diagIcon(report.primary.level)}</div>
           <div class="dr-diag-body">
             <div class="dr-diag-label">1차 소견</div>
             <div class="dr-diag-title">${report.primary.title}</div>
@@ -644,7 +656,7 @@ const DiagnosticReport = (() => {
           ${report.prescription.map((step, i) => `
             <label class="dr-check-item ${step.checked ? 'checked' : ''}">
               <input type="checkbox" name="dr-step-${i}" ${step.checked ? 'checked' : ''} data-step="${i}" onchange="DiagnosticReport.toggleCheck('${report.diagKey}', ${i}, this.checked)">
-              <span class="dr-check-box">${step.checked ? '✅' : '☐'}</span>
+              <span class="dr-check-box">${step.checked ? App.statusSvg('normal') : '☐'}</span>
               <span class="dr-check-text">${i + 1}. ${step.text}</span>
             </label>
           `).join('')}
@@ -691,7 +703,7 @@ const DiagnosticReport = (() => {
           <span>📤</span><span>공유</span>
         </button>
         <button class="dr-action-btn" onclick="DiagnosticReport.printReport()">
-          <span>🖨️</span><span>인쇄</span>
+          <span>🖨️</span><span>${t('report.print', 'PDF / 인쇄')}</span>
         </button>
         <button class="dr-action-btn" onclick="DiagnosticReport.saveToHistory()">
           <span>💾</span><span>기록 저장</span>
@@ -707,7 +719,7 @@ const DiagnosticReport = (() => {
 
   function renderStatus(status) {
     if (!status) return '<span class="dr-status-none">─</span>';
-    if (status === 'normal') return '<span class="dr-status-normal">✅ 정상</span>';
+    if (status === 'normal') return `<span class="dr-status-normal">${App.statusSvg('normal')} 정상</span>`;
     if (status === 'high') return '<span class="dr-status-high">⬆ 비정상 ↑</span>';
     if (status === 'low') return '<span class="dr-status-low">⬇ 비정상 ↓</span>';
     return '<span class="dr-status-none">─</span>';
@@ -718,18 +730,18 @@ const DiagnosticReport = (() => {
 
     const levels = (typeof FaultSignatures !== 'undefined') ?
       FaultSignatures.SEVERITY_LEVELS : {
-        SL1: { icon: '🟡', label_kr: '경미', color: '#FFD700' },
-        SL2: { icon: '🟠', label_kr: '주의', color: '#FFA500' },
-        SL3: { icon: '🔴', label_kr: '심각', color: '#FF4500' },
-        SL4: { icon: '⛔', label_kr: '위험', color: '#FF0000' }
+        SL1: { label_kr: '경미', color: '#FFD700', svgStatus: 'caution' },
+        SL2: { label_kr: '주의', color: '#FFA500', svgStatus: 'warning' },
+        SL3: { label_kr: '심각', color: '#FF4500', svgStatus: 'danger' },
+        SL4: { label_kr: '위험', color: '#FF0000', svgStatus: 'danger' }
       };
 
     const sl = levels[severity.level];
     if (!sl) return '';
 
     return `
-      <div class="dr-severity" style="border-left-color: ${sl.color}">
-        <span class="dr-severity-icon">${sl.icon}</span>
+      <div class="dr-severity dr-severity-${severity.level.toLowerCase()}">
+        <span class="dr-severity-icon">${App.statusSvg(sl.svgStatus || (severity.level === 'SL1' ? 'caution' : severity.level === 'SL2' ? 'warning' : 'danger'))}</span>
         <span class="dr-severity-level">${severity.level} — ${sl.label_kr}</span>
         ${severity.info?.desc_kr ? `<span class="dr-severity-desc">${(I18n.getLang() !== 'ko' && severity.info.desc_en) ? severity.info.desc_en : severity.info.desc_kr}</span>` : ''}
       </div>`;
@@ -794,7 +806,7 @@ const DiagnosticReport = (() => {
       const box = label.querySelector('.dr-check-box');
       if (checked) {
         label.classList.add('checked');
-        box.textContent = '✅';
+        box.innerHTML = App.statusSvg('normal');
       } else {
         label.classList.remove('checked');
         box.textContent = '☐';
@@ -807,7 +819,7 @@ const DiagnosticReport = (() => {
     const statusEl = document.querySelector('[id^="dr-check-status"]');
     if (statusEl) {
       if (allChecked && steps.length > 0) {
-        statusEl.innerHTML = '<div class="dr-check-complete">✅ 수리 완료 — 측정값을 다시 확인하세요</div>';
+        statusEl.innerHTML = `<div class="dr-check-complete">${App.statusSvg('normal')} 수리 완료 — 측정값을 다시 확인하세요</div>`;
       } else {
         statusEl.innerHTML = '';
       }
@@ -850,12 +862,13 @@ const DiagnosticReport = (() => {
     text += `━━━ 측정결과 ━━━\n`;
     report.measureRows.forEach(r => {
       const val = typeof r.value === 'number' ? r.value.toFixed(1) : r.value;
-      const status = r.status === 'high' ? '⬆' : r.status === 'low' ? '⬇' : r.status === 'normal' ? '✅' : '─';
+      const status = r.status === 'high' ? '▲' : r.status === 'low' ? '▼' : r.status === 'normal' ? '✓' : '─';
       text += `${r.label}: ${val}${r.unit} ${status}\n`;
     });
 
     text += `\n━━━ 진단소견 ━━━\n`;
-    text += `${report.primary.icon} ${report.primary.title}\n`;
+    const levelMark = report.primary.level === 'normal' ? '✓' : report.primary.level === 'danger' ? '✗' : '△';
+    text += `${levelMark} ${report.primary.title}\n`;
     text += `신뢰도: ${report.primary.confidence}%\n`;
 
     if (report.primary.severity) {

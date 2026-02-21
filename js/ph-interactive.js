@@ -1000,7 +1000,7 @@ const PHInteractive = (() => {
       if (fe[pointKey]) {
         faultNote = `
           <div class="phi-pop-fault">
-            <div class="phi-pop-fault-title">⚠️ ${t('phi.fault_when', '{name} 시').replace('{name}', fe.name)}</div>
+            <div class="phi-pop-fault-title">${App.statusSvg('warning')} ${t('phi.fault_when', '{name} 시').replace('{name}', fe.name)}</div>
             <div class="phi-pop-fault-text">${fe[pointKey]}</div>
           </div>`;
       }
@@ -1015,7 +1015,7 @@ const PHInteractive = (() => {
       }
     }
     if (content.normalRange) {
-      valueHtml += `<div class="phi-pop-normal">✅ ${content.normalRange}</div>`;
+      valueHtml += `<div class="phi-pop-normal">${App.statusSvg('normal')} ${content.normalRange}</div>`;
     }
 
     popover.innerHTML = `

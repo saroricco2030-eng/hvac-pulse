@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="HVAC Pulse — 과열도/과냉도 계산, 교차 진단, NIST 비침습 진단, TXV 트러블슈팅, 정비 관리">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://www.gstatic.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; font-src 'self' https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; frame-src 'self' https://*.firebaseapp.com">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://www.gstatic.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; font-src 'self' https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; frame-src 'self' https://*.firebaseapp.com; base-uri 'self'; form-action 'self'">
   <meta name="author" content="HVAC Pulse">
   <meta name="copyright" content="Copyright (c) 2024-2026 HVAC Pulse. All rights reserved.">
   <meta name="robots" content="noindex, nofollow">
@@ -19,6 +19,14 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="./images/icon-192.png">
   <link rel="apple-touch-icon" href="./images/icon-192.png">
+
+  <!-- Resource hints -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com">
+
+  <!-- Google Fonts (moved from CSS @import for faster LCP) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap">
 
   <!-- Styles -->
   <link rel="stylesheet" href="./css/style.css">
@@ -190,6 +198,12 @@
     <div class="glass-card">
       <div class="section-title" data-i18n="home.tools.title">자주 쓰는 도구</div>
       <div class="quick-tools">
+        <button class="quick-tool-btn" data-nav="tools" data-category="diag" data-sub="cross">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
+          <span data-i18n="tool.cross_diag">교차진단</span>
+        </button>
         <button class="quick-tool-btn" data-nav="tools" data-category="calc" data-sub="pt">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
@@ -250,7 +264,7 @@
           <h1 data-i18n="tools.title">도구</h1>
           <p class="subtitle" data-i18n="tools.subtitle">진단 · 계산 · 시각화 · 정비</p>
         </div>
-        <button class="search-trigger-btn" id="search-trigger" aria-label="검색">
+        <button class="search-trigger-btn" id="search-trigger" aria-label="검색" data-i18n-aria="aria.search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </button>
       </div>
@@ -340,7 +354,9 @@
       </button>
 
       <!-- Dynamic sub-tabs -->
-      <div class="sub-tab-bar" id="tools-sub-tabs"></div>
+      <div class="sub-tab-bar-wrap">
+        <div class="sub-tab-bar" id="tools-sub-tabs"></div>
+      </div>
 
       <!-- ======= ALL SUB-PAGES (tools-sub-*) ======= -->
 
@@ -624,9 +640,11 @@
   <!-- ===================================== -->
   <section id="page-records" class="page-section" role="tabpanel" aria-labelledby="tab-records">
     <!-- Sub-tabs -->
-    <div class="sub-tab-bar" id="records-sub-tabs">
-      <button class="sub-tab-btn active" data-sub="service" onclick="App.showSub('records','service')" data-i18n="tab.service">📝 수리이력</button>
-      <button class="sub-tab-btn" data-sub="notes" onclick="App.showSub('records','notes')" data-i18n="tab.notes">📒 현장메모</button>
+    <div class="sub-tab-bar-wrap">
+      <div class="sub-tab-bar" id="records-sub-tabs">
+        <button class="sub-tab-btn active" data-sub="service" onclick="App.showSub('records','service')" data-i18n="tab.service">📝 수리이력</button>
+        <button class="sub-tab-btn" data-sub="notes" onclick="App.showSub('records','notes')" data-i18n="tab.notes">📒 현장메모</button>
+      </div>
     </div>
 
     <!-- Sub: Service History -->
@@ -786,9 +804,9 @@
 <!-- ===================================== -->
 <!-- BOTTOM TAB BAR -->
 <!-- ===================================== -->
-<nav class="tab-bar" aria-label="메인 내비게이션">
+<nav class="tab-bar" aria-label="메인 내비게이션" data-i18n-aria="aria.main_nav">
   <div class="tab-bar-inner" role="tablist">
-    <button id="tab-home" class="tab-item active" data-tab="home" role="tab" aria-selected="true" aria-controls="page-home" aria-label="홈">
+    <button id="tab-home" class="tab-item active" data-tab="home" role="tab" aria-selected="true" aria-controls="page-home" aria-label="홈" data-i18n-aria="aria.tab_home">
       <span class="tab-icon">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
@@ -797,7 +815,7 @@
       </span>
       <span class="tab-label" data-i18n="nav.home">홈</span>
     </button>
-    <button id="tab-tools" class="tab-item" data-tab="tools" role="tab" aria-selected="false" aria-controls="page-tools" aria-label="도구">
+    <button id="tab-tools" class="tab-item" data-tab="tools" role="tab" aria-selected="false" aria-controls="page-tools" aria-label="도구" data-i18n-aria="aria.tab_tools">
       <span class="tab-icon">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
@@ -805,7 +823,7 @@
       </span>
       <span class="tab-label" data-i18n="nav.tools">도구</span>
     </button>
-    <button id="tab-records" class="tab-item" data-tab="records" role="tab" aria-selected="false" aria-controls="page-records" aria-label="기록">
+    <button id="tab-records" class="tab-item" data-tab="records" role="tab" aria-selected="false" aria-controls="page-records" aria-label="기록" data-i18n-aria="aria.tab_records">
       <span class="tab-icon">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>
@@ -817,7 +835,7 @@
       </span>
       <span class="tab-label" data-i18n="nav.records">기록</span>
     </button>
-    <button id="tab-settings" class="tab-item" data-tab="settings" role="tab" aria-selected="false" aria-controls="page-settings" aria-label="설정">
+    <button id="tab-settings" class="tab-item" data-tab="settings" role="tab" aria-selected="false" aria-controls="page-settings" aria-label="설정" data-i18n-aria="aria.tab_settings">
       <span class="tab-icon">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>

@@ -7,7 +7,6 @@
 const Auth = (() => {
 
   let currentUser = null;
-  let initialized = false;
 
   // =============================================
   // Initialize
@@ -22,7 +21,6 @@ const Auth = (() => {
     try {
       if (typeof firebase === 'undefined' || typeof firebase.auth !== 'function') {
         console.warn('Auth: Firebase SDK partially loaded — local-only mode');
-        initialized = true;
         renderSection();
         return;
       }
@@ -37,7 +35,6 @@ const Auth = (() => {
       // Listen for auth state changes
       firebase.auth().onAuthStateChanged(user => {
         currentUser = user;
-        initialized = true;
         renderSection();
 
         if (user && typeof CloudSync !== 'undefined') {
@@ -46,7 +43,6 @@ const Auth = (() => {
       });
     } catch (e) {
       console.warn('Auth: Firebase init failed', e);
-      initialized = true;
       renderSection();
     }
   }

@@ -130,7 +130,7 @@ const DataBridge = (() => {
       const alertClass = w.type === 'danger' ? 'alert-danger' :
                          w.type === 'warning' ? 'alert-warning' :
                          w.type === 'caution' ? 'alert-warning' : 'alert-info';
-      html += `<div class="alert-box ${alertClass}" style="margin-top:8px"><span>${w.icon}</span><span>${w.text}</span></div>`;
+      html += `<div class="alert-box ${alertClass}" style="margin-top:8px">${App.statusSvg(w.type === 'danger' ? 'danger' : w.type === 'caution' ? 'caution' : w.type === 'warning' ? 'warning' : 'info')}<span>${w.text}</span></div>`;
     });
 
     // Replacement recommendations

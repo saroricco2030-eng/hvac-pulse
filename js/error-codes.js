@@ -8,9 +8,9 @@ const ErrorCodeSearch = (() => {
 
   function getSeverityMap() {
     return {
-      critical: { label: t('severity.critical', '심각'), color: 'var(--accent-red)', bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)' },
-      warning:  { label: t('severity.warning', '주의'), color: 'var(--accent-orange)', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.3)' },
-      info:     { label: t('severity.info', '정보'), color: 'var(--accent-blue)', bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.3)' }
+      critical: { label: t('severity.critical', '심각'), cls: 'ec-severity-critical' },
+      warning:  { label: t('severity.warning', '주의'), cls: 'ec-severity-warning' },
+      info:     { label: t('severity.info', '정보'), cls: 'ec-severity-info' }
     };
   }
 
@@ -86,7 +86,7 @@ const ErrorCodeSearch = (() => {
 
     container.innerHTML = `
       <div class="page-header">
-        <h1>🚨 ${t('errorcode.title', '에러코드 검색')}</h1>
+        <h1>${App.statusSvg('siren')} ${t('errorcode.title', '에러코드 검색')}</h1>
         <p class="subtitle">${t('errorcode.subtitle', '10개 제조사 · 150+ 에러코드 · 즉시 검색')}</p>
       </div>
 
@@ -243,19 +243,19 @@ const ErrorCodeSearch = (() => {
       <div id="ec-brand-results">
         ${critical.length > 0 ? `
           <div style="margin-bottom:8px">
-            <div style="font-size:var(--text-xs);font-weight:600;color:var(--accent-red);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">🔴 ${t('severity.critical', '심각')} (${critical.length})</div>
+            <div style="font-size:var(--text-xs);font-weight:600;color:var(--accent-red);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">${App.statusSvg('danger')} ${t('severity.critical', '심각')} (${critical.length})</div>
             ${critical.map(e => renderCodeCard(e, false)).join('')}
           </div>
         ` : ''}
         ${warning.length > 0 ? `
           <div style="margin-bottom:8px">
-            <div style="font-size:var(--text-xs);font-weight:600;color:var(--accent-orange);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">🟠 ${t('severity.warning', '주의')} (${warning.length})</div>
+            <div style="font-size:var(--text-xs);font-weight:600;color:var(--accent-orange);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">${App.statusSvg('warning')} ${t('severity.warning', '주의')} (${warning.length})</div>
             ${warning.map(e => renderCodeCard(e, false)).join('')}
           </div>
         ` : ''}
         ${info.length > 0 ? `
           <div style="margin-bottom:8px">
-            <div style="font-size:var(--text-xs);font-weight:600;color:var(--accent-blue);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">🔵 ${t('severity.info', '정보')} (${info.length})</div>
+            <div style="font-size:var(--text-xs);font-weight:600;color:var(--accent-blue);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">${App.statusSvg('info')} ${t('severity.info', '정보')} (${info.length})</div>
             ${info.map(e => renderCodeCard(e, false)).join('')}
           </div>
         ` : ''}
@@ -279,13 +279,13 @@ const ErrorCodeSearch = (() => {
     const isExpanded = expandedCards.has(cardId);
 
     return `
-      <div class="glass-card ec-card" style="padding:14px;margin-bottom:8px;border-left:3px solid ${sev.color}"
+      <div class="glass-card ec-card ${sev.cls}"
         data-search="${e.code} ${e.description_kr} ${e.description_en} ${e.causes.join(' ')} ${e.manufacturer}" data-card-id="${cardId}">
         <div style="display:flex;justify-content:space-between;align-items:flex-start">
           <div style="flex:1">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-              <span style="font-family:var(--font-mono);font-size:var(--text-xl);font-weight:700;color:${sev.color}">${e.code}</span>
-              <span style="font-size:var(--text-xs);padding:2px 8px;border-radius:10px;background:${sev.bg};color:${sev.color};border:1px solid ${sev.border}">${sev.label}</span>
+              <span class="ec-code">${e.code}</span>
+              <span class="ec-badge">${sev.label}</span>
             </div>
             <div style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:4px">${e.manufacturer} · ${e.series}</div>
             <div style="font-size:var(--text-sm);color:var(--text-primary);line-height:1.5">${I18n.getLang() === 'ko' ? e.description_kr : e.description_en}</div>
@@ -323,7 +323,7 @@ const ErrorCodeSearch = (() => {
             <div>
               <div style="font-size:var(--text-xs);font-weight:600;color:var(--accent-cyan);margin-bottom:4px">${t('errorcode.related_parts', '관련 부품')}</div>
               <div style="display:flex;gap:4px;flex-wrap:wrap">
-                ${e.relatedParts.map(p => `<span style="padding:3px 8px;font-size:var(--text-xs);background:rgba(6,182,212,0.1);color:var(--accent-cyan);border-radius:10px;border:1px solid rgba(6,182,212,0.2)">${p}</span>`).join('')}
+                ${e.relatedParts.map(p => `<span class="ec-part-tag">${p}</span>`).join('')}
               </div>
             </div>
           ` : ''}

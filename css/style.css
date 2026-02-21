@@ -4,8 +4,7 @@
    Mobile-first, glove-friendly touch targets
    =================================================== */
 
-/* --- Google Font Import --- */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+/* Google Fonts loaded via <link> in index.html for faster LCP */
 
 /* --- CSS Custom Properties --- */
 :root {
@@ -42,6 +41,12 @@
   --status-normal: #10b981;
   --status-caution: #f59e0b;
   --status-danger: #ef4444;
+
+  /* Severity levels (SL1–SL4) */
+  --severity-sl1: #FFD700;
+  --severity-sl2: #FFA500;
+  --severity-sl3: #FF4500;
+  --severity-sl4: #FF0000;
 
   /* Glassmorphism */
   --glass-bg: rgba(17, 24, 39, 0.7);
@@ -434,9 +439,18 @@ body {
 }
 
 .btn-sm {
-  padding: 8px 16px;
+  padding: 10px 16px;
   font-size: var(--text-sm);
-  min-height: 40px;
+  min-height: 44px;
+}
+
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none;
+  transform: none;
 }
 
 .btn-group {
@@ -695,6 +709,16 @@ body {
   color: var(--text-secondary);
   font-weight: 400;
 }
+.choice-btn--danger { border-color: rgba(239, 68, 68, 0.3); }
+.choice-btn--info { border-color: rgba(59, 130, 246, 0.3); }
+
+/* Danger outline button */
+.btn-danger-outline {
+  width: 100%; margin-top: 8px; font-size: var(--text-sm);
+  padding: 10px; background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--accent-red);
+}
 
 /* --- Refrigerant Badge --- */
 .ref-badge {
@@ -750,7 +774,7 @@ body {
 
 .unit-toggle button {
   flex: 1;
-  padding: 8px;
+  padding: 10px 8px;
   background: transparent;
   border: none;
   color: var(--text-secondary);
@@ -759,7 +783,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 40px;
+  min-height: 44px;
 }
 
 .unit-toggle button.active {
@@ -823,6 +847,9 @@ body {
   position: relative;
   width: 48px;
   height: 28px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 .toggle-switch input {
@@ -913,6 +940,24 @@ body {
 /* ===================================================
    Sub-tab Navigation
    =================================================== */
+.sub-tab-bar-wrap {
+  position: relative;
+}
+.sub-tab-bar-wrap::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 32px;
+  background: linear-gradient(to right, transparent, var(--bg-base));
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+.sub-tab-bar-wrap.scrolled-end::after {
+  opacity: 0;
+}
+
 .sub-tab-bar {
   display: flex;
   gap: 6px;
@@ -921,13 +966,14 @@ body {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding-bottom: 2px;
+  padding-right: 24px;
 }
 
 .sub-tab-bar::-webkit-scrollbar { display: none; }
 
 .sub-tab-btn {
   flex-shrink: 0;
-  padding: 8px 14px;
+  padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--bg-card);
@@ -938,7 +984,7 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  min-height: 40px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -1111,6 +1157,21 @@ body {
 .legend-item { display: flex; align-items: center; gap: 4px; }
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
+/* Diagnosis result border by level */
+.diag-result-normal { border: 1px solid rgba(16, 185, 129, 0.3); }
+.diag-result-caution { border: 1px solid rgba(245, 158, 11, 0.3); }
+.diag-result-danger { border: 1px solid rgba(239, 68, 68, 0.3); }
+
+/* Photo thumbnail + remove button */
+.photo-thumb { position: relative; width: 72px; height: 72px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.photo-remove-btn {
+  position: absolute; top: 2px; right: 2px;
+  background: rgba(0, 0, 0, 0.7); border: none; color: #fff;
+  width: 20px; height: 20px; border-radius: 50%;
+  cursor: pointer; font-size: var(--text-xs);
+}
+
 .cv-active rect:first-of-type,
 .cv-active path:first-of-type,
 .cv-active circle:first-of-type { filter: url(#glow-lg); }
@@ -1194,7 +1255,12 @@ body {
   background: none; border: none;
   color: var(--text-secondary);
   font-size: var(--text-2xl); cursor: pointer;
-  padding: 4px 8px;
+  padding: 8px 12px;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Values summary grid */
@@ -1398,9 +1464,10 @@ body {
 .unit-toggle-3 button {
   background: transparent; border: none;
   color: var(--text-secondary);
-  padding: 6px 10px; font-size: var(--text-sm);
+  padding: 10px 10px; font-size: var(--text-sm);
   cursor: pointer; font-weight: 600;
   transition: all 0.2s;
+  min-height: 44px;
 }
 .unit-toggle-3 button.active {
   background: var(--accent-blue);
@@ -1487,6 +1554,10 @@ body {
   font-size: var(--text-xs);
   opacity: 0.85;
 }
+.severity-badge.severity-sl1 { border-color: var(--severity-sl1); }
+.severity-badge.severity-sl2 { border-color: var(--severity-sl2); }
+.severity-badge.severity-sl3 { border-color: var(--severity-sl3); }
+.severity-badge.severity-sl4 { border-color: var(--severity-sl4); }
 
 /* --- Fault Signature Arrows --- */
 .signature-grid {
@@ -1915,7 +1986,7 @@ body {
 
 /* --- Refrigerant Replacement Buttons --- */
 .ref-replace-btn {
-  padding: 6px 12px;
+  padding: 10px 12px;
   border-radius: 6px;
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.3);
@@ -1924,11 +1995,35 @@ body {
   cursor: pointer;
   font-family: var(--font-sans);
   transition: background 0.2s ease;
-  min-height: 36px;
+  min-height: 44px;
 }
 
 .ref-replace-btn:active {
   background: rgba(16, 185, 129, 0.2);
+}
+
+/* --- Error Code Cards --- */
+.ec-card { padding: 14px; margin-bottom: 8px; border-left: 3px solid var(--accent-blue); }
+.ec-severity-critical { border-left-color: var(--accent-red); }
+.ec-severity-warning { border-left-color: var(--accent-orange); }
+.ec-severity-info { border-left-color: var(--accent-blue); }
+
+.ec-code { font-family: var(--font-mono); font-size: var(--text-xl); font-weight: 700; }
+.ec-severity-critical .ec-code { color: var(--accent-red); }
+.ec-severity-warning .ec-code { color: var(--accent-orange); }
+.ec-severity-info .ec-code { color: var(--accent-blue); }
+
+.ec-badge {
+  font-size: var(--text-xs); padding: 2px 8px; border-radius: 10px;
+}
+.ec-severity-critical .ec-badge { background: rgba(239,68,68,0.12); color: var(--accent-red); border: 1px solid rgba(239,68,68,0.3); }
+.ec-severity-warning .ec-badge { background: rgba(245,158,11,0.12); color: var(--accent-orange); border: 1px solid rgba(245,158,11,0.3); }
+.ec-severity-info .ec-badge { background: rgba(59,130,246,0.12); color: var(--accent-blue); border: 1px solid rgba(59,130,246,0.3); }
+
+.ec-part-tag {
+  padding: 3px 8px; font-size: var(--text-xs);
+  background: rgba(6,182,212,0.1); color: var(--accent-cyan);
+  border-radius: 10px; border: 1px solid rgba(6,182,212,0.2);
 }
 
 /* --- Error Code Diagnostic Link Button --- */
@@ -2097,7 +2192,7 @@ body {
 }
 
 .ca-speed-btn {
-  padding: 4px 10px;
+  padding: 10px 10px;
   font-size: var(--text-xs);
   font-family: var(--font-mono);
   background: var(--bg-card);
@@ -2106,7 +2201,7 @@ body {
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 28px;
+  min-height: 44px;
 }
 
 .ca-speed-btn.active {
@@ -2123,8 +2218,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -2340,7 +2435,7 @@ body {
   .ca-val-num { font-size: var(--text-2xs); }
   .ca-val-num small { font-size: var(--text-2xs); }
   .ca-fault-label { font-size: var(--text-xs); padding: 8px 10px; }
-  .ca-speed-btn { padding: 3px 7px; font-size: var(--text-2xs); }
+  .ca-speed-btn { padding: 8px 7px; font-size: var(--text-2xs); min-height: 44px; }
 }
 
 /* --- Reduced motion accessibility --- */
@@ -2840,6 +2935,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  border-left-color: var(--severity-sl3); /* default */
   padding: 12px 14px;
   margin-bottom: 16px;
   border-radius: 10px;
@@ -2856,6 +2952,11 @@ body {
   font-size: var(--text-base);
   font-weight: 700;
 }
+
+.dr-severity.dr-severity-sl1 { border-left-color: var(--severity-sl1); }
+.dr-severity.dr-severity-sl2 { border-left-color: var(--severity-sl2); }
+.dr-severity.dr-severity-sl3 { border-left-color: var(--severity-sl3); }
+.dr-severity.dr-severity-sl4 { border-left-color: var(--severity-sl4); }
 
 .dr-severity-desc {
   width: 100%;
@@ -3045,6 +3146,22 @@ body {
   font-size: var(--text-xs);
   color: var(--text-muted);
   font-family: var(--font-mono);
+}
+
+/* --- Maintenance Checklist Items --- */
+.cl-item {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 12px; transition: all 0.2s ease;
+}
+.cl-item--checked { border-color: rgba(16, 185, 129, 0.3); }
+.cl-item-row { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.cl-item-check { font-size: var(--text-xl); flex-shrink: 0; margin-top: 2px; }
+.cl-item-text { font-size: var(--text-sm); line-height: 1.5; color: var(--text-primary); }
+.cl-item-text--done { color: var(--text-muted); text-decoration: line-through; }
+.cl-memo {
+  margin-top: 6px; margin-left: 32px; font-size: var(--text-sm);
+  color: var(--accent-cyan); background: rgba(6, 182, 212, 0.08);
+  padding: 4px 8px; border-radius: 4px;
 }
 
 /* --- Checklist --- */
@@ -3442,6 +3559,23 @@ body {
   body.printing-report .dr-secondary-title {
     color: #000;
   }
+
+  /* SVG icons in print */
+  body.printing-report .svg-icon,
+  body.printing-report .diag-icon-svg {
+    display: inline-flex !important;
+    visibility: visible !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body.printing-report .svg-icon svg,
+  body.printing-report .diag-icon-svg svg {
+    visibility: visible !important;
+  }
+  body.printing-report .icon-normal svg { color: #059669 !important; }
+  body.printing-report .icon-caution svg { color: #d97706 !important; }
+  body.printing-report .icon-danger svg { color: #dc2626 !important; }
+  body.printing-report .icon-info svg { color: #0369a1 !important; }
 }
 
 
@@ -3716,8 +3850,8 @@ body {
 .phi-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
   background: var(--bg-card);
   border: 2px solid var(--accent-blue);
   border-radius: 50%;
@@ -3726,8 +3860,8 @@ body {
 }
 
 .phi-slider::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
   background: var(--bg-card);
   border: 2px solid var(--accent-blue);
   border-radius: 50%;
@@ -4015,7 +4149,7 @@ body {
 
 .quick-tools {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--space-sm);
 }
 .quick-tool-btn {
@@ -4221,11 +4355,44 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: var(--space-lg);
   }
+
+  /* Tablet: result grids use more columns */
+  .result-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Tablet: glass cards get more padding */
+  .glass-card {
+    padding: 20px 24px;
+  }
+
+  /* Tablet: settings two-column */
+  .setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+  }
+
+  /* Tablet: computed values row wider */
+  .computed-row {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* Tablet: cycle values grid uses 4 columns */
+  .cycle-values-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 @media (min-width: 1024px) {
   .app-container {
     max-width: 960px;
+  }
+
+  /* Desktop: even wider form layout */
+  .result-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -4791,6 +4958,12 @@ body {
 .svg-icon--md { width: 24px; height: 24px; }
 .svg-icon--lg { width: 32px; height: 32px; }
 .svg-icon--xl { width: 48px; height: 48px; }
+
+/* Inline SVG icon colors */
+.svg-icon.icon-normal { color: var(--accent-green); }
+.svg-icon.icon-caution { color: var(--accent-orange); }
+.svg-icon.icon-danger { color: var(--accent-red); }
+.svg-icon.icon-info { color: var(--accent-blue); }
 
 /* Diagnostic result icon (replaces emoji) */
 .diag-icon-svg {

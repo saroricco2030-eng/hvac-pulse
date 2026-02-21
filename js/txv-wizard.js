@@ -190,12 +190,12 @@ const TXVWizard = (() => {
         </p>
 
         <div class="wizard-choice">
-          <button class="choice-btn" onclick="TXVWizard.startMode('starving')" style="border:1px solid rgba(239,68,68,0.3)">
+          <button class="choice-btn choice-btn--danger" onclick="TXVWizard.startMode('starving')">
             <span class="choice-icon">🔥</span>
             <span>${t('txv.starving', '스타빙 (Starving)')}</span>
             <span class="choice-desc">${t('txv.starving_desc', '과열도가 높음 — 냉매 공급 부족')}</span>
           </button>
-          <button class="choice-btn" onclick="TXVWizard.startMode('flooding')" style="border:1px solid rgba(59,130,246,0.3)">
+          <button class="choice-btn choice-btn--info" onclick="TXVWizard.startMode('flooding')">
             <span class="choice-icon">💧</span>
             <span>${t('txv.flooding', '플러딩 (Flooding)')}</span>
             <span class="choice-desc">${t('txv.flooding_desc', '과열도가 낮음 — 냉매 과다 공급')}</span>
@@ -204,7 +204,7 @@ const TXVWizard = (() => {
       </div>
 
       <div class="alert-box alert-info">
-        <span>ℹ️</span>
+        ${App.statusSvg('info')}
         <span>${t('txv.measure_hint', '과열도를 먼저 측정하세요. 정상 범위(5~15°F)보다 높으면 스타빙, 낮으면 플러딩입니다.')}</span>
       </div>`;
   }
@@ -263,7 +263,7 @@ const TXVWizard = (() => {
 
         <div class="btn-group">
           <button class="btn btn-success" onclick="TXVWizard.resolved()">
-            ✅ ${t('txv.resolved', '해결됨')}
+            ${App.statusSvg('normal')} ${t('txv.resolved', '해결됨')}
           </button>
           <button class="btn btn-secondary" onclick="TXVWizard.nextStep()">
             ${t('txv.not_resolved', '아니오')} →
@@ -326,7 +326,7 @@ const TXVWizard = (() => {
             ${currentMode === 'starving' ? '7' : '5'} ${t('txv.checkpoints_checked', '체크포인트를 모두 확인했지만 문제가 해결되지 않았습니다.')}
           </p>
           <div class="alert-box alert-warning" style="text-align:left">
-            <span>⚠️</span>
+            ${App.statusSvg('warning')}
             <div>
               <strong>${t('txv.additional_action', '추가 조치 권장')}:</strong>
               <ul style="margin:8px 0 0 16px;line-height:1.8">

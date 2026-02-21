@@ -78,10 +78,10 @@ const AdvancedDiagnostic = (() => {
 
     const levels = (typeof FaultSignatures !== 'undefined') ?
       FaultSignatures.SEVERITY_LEVELS : {
-        SL1: { icon: '🟡', label_kr: '경미', label_en: 'Minor', color: '#FFD700' },
-        SL2: { icon: '🟠', label_kr: '주의', label_en: 'Caution', color: '#FFA500' },
-        SL3: { icon: '🔴', label_kr: '심각', label_en: 'Severe', color: '#FF4500' },
-        SL4: { icon: '⛔', label_kr: '위험', label_en: 'Critical', color: '#FF0000' }
+        SL1: { label_kr: '경미', label_en: 'Minor', color: '#FFD700', svgStatus: 'caution' },
+        SL2: { label_kr: '주의', label_en: 'Caution', color: '#FFA500', svgStatus: 'warning' },
+        SL3: { label_kr: '심각', label_en: 'Severe', color: '#FF4500', svgStatus: 'danger' },
+        SL4: { label_kr: '위험', label_en: 'Critical', color: '#FF0000', svgStatus: 'danger' }
       };
 
     const sl = levels[severity.level];
@@ -94,8 +94,8 @@ const AdvancedDiagnostic = (() => {
       : severity.info?.desc_kr;
 
     return `
-      <div class="severity-badge severity-${severity.level.toLowerCase()}" style="border-color:${sl.color}">
-        <span class="severity-icon">${sl.icon}</span>
+      <div class="severity-badge severity-${severity.level.toLowerCase()}">
+        <span class="severity-icon">${App.statusSvg(sl.svgStatus || (severity.level === 'SL1' ? 'caution' : severity.level === 'SL2' ? 'warning' : 'danger'))}</span>
         <span class="severity-label">${slLabel} (${severity.level})</span>
         ${descText ? `<span class="severity-desc">${descText}</span>` : ''}
       </div>`;

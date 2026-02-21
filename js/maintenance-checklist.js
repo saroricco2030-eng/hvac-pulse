@@ -493,12 +493,12 @@ const MaintenanceChecklist = (() => {
         <!-- Items -->
         <div style="display:grid;gap:6px">
           ${checkStates.map((item, i) => `
-            <div style="background:var(--bg-card);border:1px solid ${item.checked ? 'rgba(16,185,129,0.3)' : 'var(--border)'};border-radius:var(--radius-md);padding:12px;transition:all 0.2s ease">
-              <div style="display:flex;align-items:flex-start;gap:10px;cursor:pointer" onclick="MaintenanceChecklist.toggleCheck(${i})">
-                <span style="font-size:var(--text-xl);flex-shrink:0;margin-top:2px">${item.checked ? '✅' : '⬜'}</span>
-                <span style="font-size:var(--text-sm);line-height:1.5;${item.checked ? 'color:var(--text-muted);text-decoration:line-through' : 'color:var(--text-primary)'}">${item.text}</span>
+            <div class="cl-item ${item.checked ? 'cl-item--checked' : ''}">
+              <div class="cl-item-row" onclick="MaintenanceChecklist.toggleCheck(${i})">
+                <span class="cl-item-check">${item.checked ? App.statusSvg('normal') : '☐'}</span>
+                <span class="cl-item-text ${item.checked ? 'cl-item-text--done' : ''}">${item.text}</span>
               </div>
-              ${item.memo ? `<div style="margin-top:6px;margin-left:32px;font-size:var(--text-sm);color:var(--accent-cyan);background:rgba(6,182,212,0.08);padding:4px 8px;border-radius:4px">${item.memo}</div>` : ''}
+              ${item.memo ? `<div class="cl-memo">${item.memo}</div>` : ''}
               <div style="margin-top:6px;margin-left:32px">
                 <input type="text" name="checklist-memo-${i}" placeholder="${t('checklist.add_memo', '메모 추가...')}" value="${item.memo || ''}"
                   onchange="MaintenanceChecklist.setMemo(${i}, this.value)"

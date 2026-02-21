@@ -297,7 +297,7 @@ const PTCalculator = (() => {
     const result = getPressureFromTemp(refName, tempVal);
     if (!result) {
       const el = document.getElementById('pt-result-area');
-      if (el) el.innerHTML = `<div class="alert-box alert-warning"><span>⚠️</span><span>${t('pt.no_data', '이 냉매의 P-T 데이터가 없습니다. CoolProp 엔진이 필요합니다.')}</span></div>`;
+      if (el) el.innerHTML = `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>${t('pt.no_data', '이 냉매의 P-T 데이터가 없습니다. CoolProp 엔진 로딩 중이면 잠시 후 다시 시도하거나, 기본 냉매(R-410A 등)를 선택하세요.')}</span></div>`;
       return;
     }
 
@@ -320,7 +320,7 @@ const PTCalculator = (() => {
           </div>
         </div>
         <div class="alert-box alert-info" style="margin-top:12px">
-          <span>ℹ️</span>
+          ${App.statusSvg('info')}
           <span>${t('pt.result.note', `${tempVal}°F (${tempC}°C) 에서의 포화압력. 과열도는 Dew, 과냉도는 Bubble 사용.`)}${result.source ? ' [' + result.source + ']' : ''}</span>
         </div>`;
     } else {
@@ -348,7 +348,7 @@ const PTCalculator = (() => {
       const bubbleTemp = getTempFromPressure(refName, pressVal, 'bubble');
       const dewTemp = getTempFromPressure(refName, pressVal, 'dew');
       if (bubbleTemp === null || dewTemp === null) {
-        el.innerHTML = `<div class="alert-box alert-warning"><span>⚠️</span><span>${t('pt.no_data', '이 냉매의 P-T 데이터가 없습니다.')}</span></div>`;
+        el.innerHTML = `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>${t('pt.no_data', '이 냉매의 P-T 데이터가 없습니다. CoolProp 엔진 로딩 중이면 잠시 후 다시 시도하거나, 기본 냉매(R-410A 등)를 선택하세요.')}</span></div>`;
         return;
       }
       el.innerHTML = `
@@ -363,13 +363,13 @@ const PTCalculator = (() => {
           </div>
         </div>
         <div class="alert-box alert-info" style="margin-top:12px">
-          <span>ℹ️</span>
+          ${App.statusSvg('info')}
           <span>${t('pt.result.zeotropic_note', `${pressVal} psig 에서의 포화온도. 비공비혼합물은 Bubble/Dew가 다릅니다.`)}</span>
         </div>`;
     } else {
       const satTemp = getTempFromPressure(refName, pressVal, 'pressure');
       if (satTemp === null) {
-        el.innerHTML = `<div class="alert-box alert-warning"><span>⚠️</span><span>${t('pt.no_data', '이 냉매의 P-T 데이터가 없습니다.')}</span></div>`;
+        el.innerHTML = `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>${t('pt.no_data', '이 냉매의 P-T 데이터가 없습니다. CoolProp 엔진 로딩 중이면 잠시 후 다시 시도하거나, 기본 냉매(R-410A 등)를 선택하세요.')}</span></div>`;
         return;
       }
       el.innerHTML = `
@@ -389,18 +389,17 @@ const PTCalculator = (() => {
 
     const result = calcSuperheat(refName, suctionP, suctionT);
     if (!result) {
-      el.innerHTML = `<div class="alert-box alert-warning"><span>⚠️</span><span>${t('pt.calc_fail', '계산 불가 — 냉매 데이터를 확인하세요.')}</span></div>`;
+      el.innerHTML = `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>${t('pt.calc_fail', '계산 불가 — 압력과 온도 값을 모두 입력했는지 확인하세요. 다른 냉매를 선택해도 됩니다.')}</span></div>`;
       return;
     }
 
     const status = getSuperheatStatus(result.superheat);
     const statusText = status === 'normal' ? t('status.normal', '정상') : status === 'caution' ? t('status.caution', '주의') : t('status.danger', '위험');
-    const statusIcon = status === 'normal' ? '✅' : status === 'caution' ? '⚠️' : '🔴';
 
     el.innerHTML = `
       <div class="result-box" style="text-align:center">
         <div class="result-value ${status}">${result.superheat.toFixed(1)}°F</div>
-        <div class="result-label">${t('pt.superheat', '과열도')} (Superheat) ${statusIcon} ${statusText}</div>
+        <div class="result-label">${t('pt.superheat', '과열도')} (Superheat) ${App.statusSvg(status)} ${statusText}</div>
         <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:8px">
           ${t('pt.sat_temp', '포화온도')} (Dew): ${result.satTemp}°F (${fToC(result.satTemp).toFixed(1)}°C)<br>
           ${t('pt.suction_actual', '석션라인 실측')}: ${suctionT}°F
@@ -409,7 +408,7 @@ const PTCalculator = (() => {
 
     // Update accordion preview
     const shPreview = document.getElementById('sh-preview');
-    if (shPreview) shPreview.textContent = `${result.superheat.toFixed(1)}°F ${statusIcon}`;
+    if (shPreview) shPreview.innerHTML = `${result.superheat.toFixed(1)}°F ${App.statusSvg(status)}`;
   }
 
   function calcSC() {
@@ -421,18 +420,17 @@ const PTCalculator = (() => {
 
     const result = calcSubcooling(refName, dischargeP, liquidT);
     if (!result) {
-      el.innerHTML = `<div class="alert-box alert-warning"><span>⚠️</span><span>${t('pt.calc_fail', '계산 불가 — 냉매 데이터를 확인하세요.')}</span></div>`;
+      el.innerHTML = `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>${t('pt.calc_fail', '계산 불가 — 압력과 온도 값을 모두 입력했는지 확인하세요. 다른 냉매를 선택해도 됩니다.')}</span></div>`;
       return;
     }
 
     const status = getSubcoolingStatus(result.subcooling);
     const statusText = status === 'normal' ? t('status.normal', '정상') : status === 'caution' ? t('status.caution', '주의') : t('status.danger', '위험');
-    const statusIcon = status === 'normal' ? '✅' : status === 'caution' ? '⚠️' : '🔴';
 
     el.innerHTML = `
       <div class="result-box" style="text-align:center">
         <div class="result-value ${status}">${result.subcooling.toFixed(1)}°F</div>
-        <div class="result-label">${t('pt.subcooling', '과냉도')} (Subcooling) ${statusIcon} ${statusText}</div>
+        <div class="result-label">${t('pt.subcooling', '과냉도')} (Subcooling) ${App.statusSvg(status)} ${statusText}</div>
         <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:8px">
           ${t('pt.sat_temp', '포화온도')} (Bubble): ${result.satTemp}°F (${fToC(result.satTemp).toFixed(1)}°C)<br>
           ${t('pt.liquid_actual', '리퀴드라인 실측')}: ${liquidT}°F
@@ -441,7 +439,7 @@ const PTCalculator = (() => {
 
     // Update accordion preview
     const scPreview = document.getElementById('sc-preview');
-    if (scPreview) scPreview.textContent = `${result.subcooling.toFixed(1)}°F ${statusIcon}`;
+    if (scPreview) scPreview.innerHTML = `${result.subcooling.toFixed(1)}°F ${App.statusSvg(status)}`;
   }
 
   // --- Refresh dropdown when CoolProp becomes available ---
