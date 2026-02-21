@@ -39,16 +39,10 @@ const I18n = (() => {
     if (typeof LANG_AR !== 'undefined') packs.ar = LANG_AR;
     if (typeof LANG_HI !== 'undefined') packs.hi = LANG_HI;
 
-    // Restore saved language preference
+    // Restore saved language preference (no auto-detect; default is English)
     const saved = localStorage.getItem('hvac-lang');
     if (saved && (saved === 'ko' || packs[saved])) {
       currentLang = saved;
-    } else {
-      // Auto-detect from browser language
-      const browserLang = (navigator.language || '').slice(0, 2).toLowerCase();
-      if (browserLang && packs[browserLang]) {
-        currentLang = browserLang;
-      }
     }
 
     // Apply if not Korean
