@@ -39,6 +39,12 @@ const I18n = (() => {
     if (typeof LANG_AR !== 'undefined') packs.ar = LANG_AR;
     if (typeof LANG_HI !== 'undefined') packs.hi = LANG_HI;
 
+    // One-time migration: clear language saved by old browser auto-detect bug
+    if (!localStorage.getItem('hvac-lang-migrated')) {
+      localStorage.removeItem('hvac-lang');
+      localStorage.setItem('hvac-lang-migrated', '1');
+    }
+
     // Restore saved language preference (no auto-detect; default is English)
     const saved = localStorage.getItem('hvac-lang');
     if (saved && (saved === 'ko' || packs[saved])) {
