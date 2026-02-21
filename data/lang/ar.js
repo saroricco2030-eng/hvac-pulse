@@ -46,6 +46,21 @@ const LANG_AR = {
   'onboarding.next': 'التالي',
   'onboarding.start': 'ابدأ الآن',
 
+  // Split onboarding keys (no HTML)
+  'onboarding.desc1a': 'أداة تشخيص شاملة للفنيين الميدانيين.',
+  'onboarding.desc1b': 'مجرد مقياس ضغط وميزان حرارة — قم بالتشخيص فوراً.',
+  'onboarding.feat.cross_t': 'التشخيص التقاطعي',
+  'onboarding.feat.cross_d': 'تصنيف فوري للأعطال عبر SH × SC',
+  'onboarding.feat.nist_t': 'NIST غير الغازي',
+  'onboarding.feat.nist_d': 'التشخيص بالحرارة فقط دون مقاييس ضغط',
+  'onboarding.feat.ph_t': 'مخطط P-H',
+  'onboarding.feat.ph_d': 'تصور ديناميكي حراري بمستوى NIST عبر CoolProp',
+  'onboarding.start_pre': 'ابدأ فوراً بـ',
+  'onboarding.start_quick': 'التشخيص السريع',
+  'onboarding.start_mid': 'في الشاشة الرئيسية، أو اختر أداة من تبويب',
+  'onboarding.start_tools': 'الأدوات',
+  'onboarding.start_post': '.',
+
   // =============================================
   // Search
   // =============================================

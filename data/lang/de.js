@@ -45,6 +45,21 @@ const LANG_DE = {
   'onboarding.next': 'Weiter',
   'onboarding.start': 'Loslegen',
 
+  // Split onboarding keys (no HTML)
+  'onboarding.desc1a': 'Ein All-in-One-Diagnosewerkzeug für Feldtechniker.',
+  'onboarding.desc1b': 'Nur ein Manometer und Thermometer – sofortige Diagnose.',
+  'onboarding.feat.cross_t': 'Kreuzdiagnose',
+  'onboarding.feat.cross_d': 'Sofortige Fehlerklassifikation über ÜH × UK',
+  'onboarding.feat.nist_t': 'NIST Nicht-invasiv',
+  'onboarding.feat.nist_d': 'Diagnose nur per Temperatur, ohne Manometer',
+  'onboarding.feat.ph_t': 'p-h Diagramm',
+  'onboarding.feat.ph_d': 'CoolProp NIST-Qualität thermodynamische Visualisierung',
+  'onboarding.start_pre': 'Beginnen Sie sofort mit der',
+  'onboarding.start_quick': 'Schnelldiagnose',
+  'onboarding.start_mid': 'auf der Startseite, oder wählen Sie ein Werkzeug aus dem Tab',
+  'onboarding.start_tools': 'Werkzeuge',
+  'onboarding.start_post': '.',
+
   // =============================================
   // Search
   // =============================================

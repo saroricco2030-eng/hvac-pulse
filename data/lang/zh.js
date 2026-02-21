@@ -48,6 +48,21 @@ const LANG_ZH = {
   'onboarding.next': '下一步',
   'onboarding.start': '开始使用',
 
+  // Split onboarding keys (no HTML)
+  'onboarding.desc1a': '专为现场技术人员打造的一站式诊断工具。',
+  'onboarding.desc1b': '只需压力表和温度计，即可立即诊断。',
+  'onboarding.feat.cross_t': '交叉诊断',
+  'onboarding.feat.cross_d': '通过过热度 × 过冷度即时判断故障',
+  'onboarding.feat.nist_t': 'NIST 非侵入式诊断',
+  'onboarding.feat.nist_d': '无需压力表，仅凭温度即可诊断',
+  'onboarding.feat.ph_t': 'P-H 图',
+  'onboarding.feat.ph_d': 'CoolProp NIST级热力学可视化',
+  'onboarding.start_pre': '在首页点击',
+  'onboarding.start_quick': '快速诊断',
+  'onboarding.start_mid': '立即开始，或从',
+  'onboarding.start_tools': '工具',
+  'onboarding.start_post': '标签选择功能。',
+
   // =============================================
   // Search
   // 搜索

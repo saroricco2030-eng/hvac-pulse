@@ -46,6 +46,21 @@ const LANG_PT = {
   'onboarding.next': 'Próximo',
   'onboarding.start': 'Começar',
 
+  // Split onboarding keys (no HTML)
+  'onboarding.desc1a': 'Uma ferramenta completa de diagnóstico para técnicos em campo.',
+  'onboarding.desc1b': 'Com apenas manômetro e termômetro — diagnostique imediatamente.',
+  'onboarding.feat.cross_t': 'Diagnóstico Cruzado',
+  'onboarding.feat.cross_d': 'Classificação instantânea de falhas via Superaq. × Sub-resf.',
+  'onboarding.feat.nist_t': 'NIST Não Invasivo',
+  'onboarding.feat.nist_d': 'Diagnostique apenas com temperatura, sem manômetros',
+  'onboarding.feat.ph_t': 'Diagrama P-H',
+  'onboarding.feat.ph_d': 'Visualização termodinâmica NIST via CoolProp',
+  'onboarding.start_pre': 'Comece imediatamente com o',
+  'onboarding.start_quick': 'Diagnóstico Rápido',
+  'onboarding.start_mid': 'na tela inicial, ou selecione uma ferramenta na aba',
+  'onboarding.start_tools': 'Ferramentas',
+  'onboarding.start_post': '.',
+
   // =============================================
   // Search
   // =============================================

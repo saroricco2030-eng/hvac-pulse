@@ -46,6 +46,21 @@ const LANG_JA = {
   'onboarding.next': '次へ',
   'onboarding.start': 'はじめる',
 
+  // Split onboarding keys (no HTML)
+  'onboarding.desc1a': '現場技術者のためのオールインワン診断ツール。',
+  'onboarding.desc1b': 'ゲージと温度計だけで即座に診断できます。',
+  'onboarding.feat.cross_t': 'クロス診断',
+  'onboarding.feat.cross_d': '過熱度×過冷却度による即時故障分類',
+  'onboarding.feat.nist_t': 'NIST 非侵襲診断',
+  'onboarding.feat.nist_d': 'ゲージなし、温度のみで診断',
+  'onboarding.feat.ph_t': 'P-H線図',
+  'onboarding.feat.ph_d': 'CoolProp NISTグレード熱力学可視化',
+  'onboarding.start_pre': 'ホーム画面の',
+  'onboarding.start_quick': 'クイック診断',
+  'onboarding.start_mid': 'からすぐに開始、または',
+  'onboarding.start_tools': 'ツール',
+  'onboarding.start_post': 'タブからツールを選択してください。',
+
   // =============================================
   // Search
   // =============================================

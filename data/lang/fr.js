@@ -46,6 +46,21 @@ const LANG_FR = {
   'onboarding.next': 'Suivant',
   'onboarding.start': 'Commencer',
 
+  // Split onboarding keys (no HTML)
+  'onboarding.desc1a': 'Un outil de diagnostic tout-en-un pour les techniciens terrain.',
+  'onboarding.desc1b': 'Avec seulement un manomètre et un thermomètre — diagnostiquez immédiatement.',
+  'onboarding.feat.cross_t': 'Diagnostic croisé',
+  'onboarding.feat.cross_d': 'Classification instantanée des pannes via Surchauffe × Sous-refroidissement',
+  'onboarding.feat.nist_t': 'NIST non-invasif',
+  'onboarding.feat.nist_d': 'Diagnostiquer avec la température uniquement, sans manomètre',
+  'onboarding.feat.ph_t': 'Diagramme P-H',
+  'onboarding.feat.ph_d': 'Visualisation thermodynamique CoolProp de qualité NIST',
+  'onboarding.start_pre': 'Démarrez immédiatement avec le',
+  'onboarding.start_quick': 'Diagnostic rapide',
+  'onboarding.start_mid': 'sur l\'écran d\'accueil, ou sélectionnez un outil dans l\'onglet',
+  'onboarding.start_tools': 'Outils',
+  'onboarding.start_post': '.',
+
   // =============================================
   // Search
   // =============================================

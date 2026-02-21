@@ -45,6 +45,21 @@ const LANG_HI = {
   'onboarding.next': 'अगला',
   'onboarding.start': 'शुरू करें',
 
+  // Split onboarding keys (no HTML)
+  'onboarding.desc1a': 'फील्ड टेक्नीशियन के लिए ऑल-इन-वन डायग्नोस्टिक टूल।',
+  'onboarding.desc1b': 'सिर्फ गेज और थर्मामीटर से — तुरंत डायग्नोसिस करें।',
+  'onboarding.feat.cross_t': 'क्रॉस-डायग्नोसिस',
+  'onboarding.feat.cross_d': 'SH × SC से तुरंत फॉल्ट पहचान',
+  'onboarding.feat.nist_t': 'NIST नॉन-इनवेसिव',
+  'onboarding.feat.nist_d': 'बिना गेज के, सिर्फ तापमान से डायग्नोसिस',
+  'onboarding.feat.ph_t': 'P-H डायग्राम',
+  'onboarding.feat.ph_d': 'CoolProp NIST-ग्रेड थर्मोडायनामिक विज़ुअलाइज़ेशन',
+  'onboarding.start_pre': 'होम स्क्रीन पर',
+  'onboarding.start_quick': 'क्विक डायग्नोसिस',
+  'onboarding.start_mid': 'से तुरंत शुरू करें, या',
+  'onboarding.start_tools': 'टूल्स',
+  'onboarding.start_post': 'टैब से कोई भी टूल चुनें।',
+
   // =============================================
   // Search
   // =============================================
