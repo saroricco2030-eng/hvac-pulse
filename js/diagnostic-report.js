@@ -131,7 +131,7 @@ const DiagnosticReport = (() => {
     }
     const refDisplay = refInfo
       ? `${refrigerant} (${refInfo.type || ''}, ${refInfo.safety || ''})`
-      : refrigerant || '미지정';
+      : refrigerant || t('report.ref_unspecified', '미지정');
 
     // Determine diagKey
     const diagKey = diagResult.diagKey ||
@@ -217,44 +217,44 @@ const DiagnosticReport = (() => {
     // Pressures
     const Ps = m.Ps ?? m.suctionPressure ?? d.suctionPressure ?? null;
     const Pd = m.Pd ?? m.dischargePressure ?? d.dischargePressure ?? null;
-    addRow('흡입압력 (Ps)', Ps, 'psig', null, 'Ps');
-    addRow('토출압력 (Pd)', Pd, 'psig', null, 'Pd');
+    addRow(t('report.m.suction_p', '흡입압력 (Ps)'), Ps, 'psig', null, 'Ps');
+    addRow(t('report.m.discharge_p', '토출압력 (Pd)'), Pd, 'psig', null, 'Pd');
 
     // Superheat
     const sh = d.superheat ?? m.SH ?? null;
-    addRow('과열도 (SH)', sh, '°F', NORMAL_RANGES.SH, 'SH');
+    addRow(t('report.m.superheat', '과열도 (SH)'), sh, '°F', NORMAL_RANGES.SH, 'SH');
 
     // Subcooling
     const sc = d.subcooling ?? m.SC ?? null;
-    addRow('과냉도 (SC)', sc, '°F', NORMAL_RANGES.SC, 'SC');
+    addRow(t('report.m.subcooling', '과냉도 (SC)'), sc, '°F', NORMAL_RANGES.SC, 'SC');
 
     // DLT
     const dlt = m.DLT ?? d.dlt ?? d.dischargeTemp ?? null;
-    addRow('토출온도 (DLT)', dlt, '°F', NORMAL_RANGES.DLT, 'DLT');
+    addRow(t('report.m.dlt', '토출온도 (DLT)'), dlt, '°F', NORMAL_RANGES.DLT, 'DLT');
 
     // Suction line temp
     const slt = m.suctionLineTemp ?? d.suctionLineTemp ?? null;
-    addRow('석션라인 온도', slt, '°F', null, 'SLT');
+    addRow(t('report.m.slt', '석션라인 온도'), slt, '°F', null, 'SLT');
 
     // Liquid line temp
     const llt = m.liquidLineTemp ?? d.liquidLineTemp ?? null;
-    addRow('리퀴드라인 온도', llt, '°F', null, 'LLT');
+    addRow(t('report.m.llt', '리퀴드라인 온도'), llt, '°F', null, 'LLT');
 
     // Return air
     const tret = m.Tret ?? d.returnAirTemp ?? null;
-    addRow('리턴공기 온도', tret, '°F', null, 'Tret');
+    addRow(t('report.m.return_air', '리턴공기 온도'), tret, '°F', null, 'Tret');
 
     // Supply air
     const tsup = m.Tsup ?? null;
-    addRow('공급공기 온도', tsup, '°F', null, 'Tsup');
+    addRow(t('report.m.supply_air', '공급공기 온도'), tsup, '°F', null, 'Tsup');
 
     // Outdoor
     const tamb = m.Tamb ?? d.outdoorTemp ?? null;
-    addRow('외기온도', tamb, '°F', null, 'Tamb');
+    addRow(t('report.m.outdoor', '외기온도'), tamb, '°F', null, 'Tamb');
 
     // Delta T
     const dt = m.DT ?? (tret != null && tsup != null ? tret - tsup : null);
-    addRow('ΔT (공기온도차)', dt, '°F', NORMAL_RANGES.DT, 'DT');
+    addRow(t('report.m.delta_t', 'ΔT (공기온도차)'), dt, '°F', NORMAL_RANGES.DT, 'DT');
 
     // DTD
     if (d.dtd != null) addRow('DTD', d.dtd, '°F', NORMAL_RANGES.DTD, 'DTD');
@@ -263,7 +263,7 @@ const DiagnosticReport = (() => {
     if (d.ctoa != null) addRow('CTOA', d.ctoa, '°F', NORMAL_RANGES.CTOA, 'CTOA');
 
     // Compression ratio
-    if (d.compressionRatio != null) addRow('압축비', d.compressionRatio, ':1', NORMAL_RANGES.CR, 'CR');
+    if (d.compressionRatio != null) addRow(t('report.m.comp_ratio', '압축비'), d.compressionRatio, ':1', NORMAL_RANGES.CR, 'CR');
 
     return rows.filter(r => r.value != null);
   }
@@ -318,13 +318,13 @@ const DiagnosticReport = (() => {
 
     // Diagnosis display
     const DIAG_NAMES = {
-      normal:              { title: '시스템 정상', level: 'normal' },
-      lowCharge:           { title: '냉매 부족 (누설 의심)', level: 'danger' },
-      overcharge:          { title: '냉매 과충전', level: 'danger' },
-      meteringRestriction: { title: '계량장치 제한 (TXV/필터)', level: 'caution' },
-      compressorWeak:      { title: '컴프레서 불량 (효율 저하)', level: 'danger' },
-      txvOverfeed:         { title: 'TXV 오버피딩', level: 'caution' },
-      lowAirflow:          { title: '에어플로우 부족', level: 'caution' }
+      normal:              { title: t('report.diag.normal', '시스템 정상'), level: 'normal' },
+      lowCharge:           { title: t('report.diag.lowCharge', '냉매 부족 (누설 의심)'), level: 'danger' },
+      overcharge:          { title: t('report.diag.overcharge', '냉매 과충전'), level: 'danger' },
+      meteringRestriction: { title: t('report.diag.meteringRestriction', '계량장치 제한 (TXV/필터)'), level: 'caution' },
+      compressorWeak:      { title: t('report.diag.compressorWeak', '컴프레서 불량 (효율 저하)'), level: 'danger' },
+      txvOverfeed:         { title: t('report.diag.txvOverfeed', 'TXV 오버피딩'), level: 'caution' },
+      lowAirflow:          { title: t('report.diag.lowAirflow', '에어플로우 부족'), level: 'caution' }
     };
 
     const diagDisplay = DIAG_NAMES[diagKey] || DIAG_NAMES.normal;
@@ -351,48 +351,51 @@ const DiagnosticReport = (() => {
     const items = [];
 
     if (diagKey === 'normal') {
-      items.push('과열도와 과냉도가 모두 정상 범위 내');
+      items.push(t('report.ev.sh_sc_normal', '과열도와 과냉도가 모두 정상 범위 내'));
       return items;
     }
 
     // SH evidence
     if (d.superheat != null) {
       const shClass = d.shClass || (d.superheat > 20 ? 'high' : d.superheat < 5 ? 'low' : 'normal');
+      const shVal = d.superheat.toFixed(1);
       if (shClass === 'high') {
-        items.push(`과열도 ${d.superheat.toFixed(1)}°F — 정상(8~14°F) 대비 현저히 높음`);
+        items.push(t('report.ev.sh_high', '과열도 {val}°F — 정상(8~14°F) 대비 현저히 높음').replace('{val}', shVal));
       } else if (shClass === 'low') {
-        items.push(`과열도 ${d.superheat.toFixed(1)}°F — 정상 대비 낮음 (액냉매 과다)`);
+        items.push(t('report.ev.sh_low', '과열도 {val}°F — 정상 대비 낮음 (액냉매 과다)').replace('{val}', shVal));
       } else {
-        items.push(`과열도 ${d.superheat.toFixed(1)}°F — 정상 범위`);
+        items.push(t('report.ev.sh_normal', '과열도 {val}°F — 정상 범위').replace('{val}', shVal));
       }
     }
 
     // SC evidence
     if (d.subcooling != null) {
       const scClass = d.scClass || (d.subcooling > 18 ? 'high' : d.subcooling < 5 ? 'low' : 'normal');
+      const scVal = d.subcooling.toFixed(1);
       if (scClass === 'high') {
-        items.push(`과냉도 ${d.subcooling.toFixed(1)}°F — 정상(8~14°F) 대비 높음 (고압측 냉매 과다)`);
+        items.push(t('report.ev.sc_high', '과냉도 {val}°F — 정상(8~14°F) 대비 높음 (고압측 냉매 과다)').replace('{val}', scVal));
       } else if (scClass === 'low') {
-        items.push(`과냉도 ${d.subcooling.toFixed(1)}°F — 정상 대비 현저히 낮음`);
+        items.push(t('report.ev.sc_low', '과냉도 {val}°F — 정상 대비 현저히 낮음').replace('{val}', scVal));
       } else {
-        items.push(`과냉도 ${d.subcooling.toFixed(1)}°F — 정상 범위`);
+        items.push(t('report.ev.sc_normal', '과냉도 {val}°F — 정상 범위').replace('{val}', scVal));
       }
     }
 
     // DLT evidence
     const dlt = d.dlt || d.dischargeTemp;
     if (dlt != null && dlt > 225) {
-      items.push(`토출온도 ${typeof dlt === 'number' ? dlt.toFixed(0) : dlt}°F — 압축기 과열 징후`);
+      const dltVal = typeof dlt === 'number' ? dlt.toFixed(0) : dlt;
+      items.push(t('report.ev.dlt_high', '토출온도 {val}°F — 압축기 과열 징후').replace('{val}', dltVal));
     }
 
     // Compression ratio
     if (d.compressionRatio != null && d.compressionRatio > 12) {
-      items.push(`압축비 ${d.compressionRatio.toFixed(1)}:1 — 과부하 (>12:1)`);
+      items.push(t('report.ev.cr_high', '압축비 {val}:1 — 과부하 (>12:1)').replace('{val}', d.compressionRatio.toFixed(1)));
     }
 
     // P-H effect from academic data
     if (faultInfo && faultInfo.ph_effect) {
-      items.push(`${t('report.ph_effect', 'P-H 효과')}: ${(I18n.getLang() !== 'ko' && faultInfo.ph_effect.desc_en) ? faultInfo.ph_effect.desc_en : faultInfo.ph_effect.desc_kr}`);
+      items.push(`${t('report.ev.ph_effect', 'P-H 효과')}: ${(I18n.getLang() !== 'ko' && faultInfo.ph_effect.desc_en) ? faultInfo.ph_effect.desc_en : faultInfo.ph_effect.desc_kr}`);
     }
 
     return items;
@@ -453,12 +456,12 @@ const DiagnosticReport = (() => {
     if (sh == null || sc == null) return [];
 
     const allDiags = {
-      lowCharge:           { title: '냉매 부족', shExpect: 'high', scExpect: 'low' },
-      overcharge:          { title: '냉매 과충전', shExpect: 'low', scExpect: 'high' },
-      meteringRestriction: { title: 'TXV/필터 막힘', shExpect: 'high', scExpect: 'high' },
-      compressorWeak:      { title: '컴프레서 불량', shExpect: 'low', scExpect: 'low' },
-      txvOverfeed:         { title: 'TXV 오버피딩', shExpect: 'low', scExpect: 'normal' },
-      lowAirflow:          { title: '에어플로우 부족', shExpect: 'high', scExpect: 'normal' }
+      lowCharge:           { title: t('report.diag2.lowCharge', '냉매 부족'), shExpect: 'high', scExpect: 'low' },
+      overcharge:          { title: t('report.diag2.overcharge', '냉매 과충전'), shExpect: 'low', scExpect: 'high' },
+      meteringRestriction: { title: t('report.diag2.meteringRestriction', 'TXV/필터 막힘'), shExpect: 'high', scExpect: 'high' },
+      compressorWeak:      { title: t('report.diag2.compressorWeak', '컴프레서 불량'), shExpect: 'low', scExpect: 'low' },
+      txvOverfeed:         { title: t('report.diag2.txvOverfeed', 'TXV 오버피딩'), shExpect: 'low', scExpect: 'normal' },
+      lowAirflow:          { title: t('report.diag2.lowAirflow', '에어플로우 부족'), shExpect: 'high', scExpect: 'normal' }
     };
 
     // Remove primary
@@ -509,7 +512,7 @@ const DiagnosticReport = (() => {
 
     return steps.map((step, i) => ({
       index: i,
-      text: step,
+      text: t(`report.rx.${diagKey}_${i}`, step),
       checked: !!checked[i]
     }));
   }
@@ -548,7 +551,9 @@ const DiagnosticReport = (() => {
     // Estimate normal COP for comparison
     const normalCOP = 3.5; // Typical residential AC COP
     const copPct = ((cycle.cop / normalCOP) * 100).toFixed(0);
-    const copDrop = cycle.cop < normalCOP ? `정상 대비 약 ${(100 - parseFloat(copPct)).toFixed(0)}% 저하` : '양호';
+    const copDrop = cycle.cop < normalCOP
+      ? t('report.eff.cop_drop', '정상 대비 약 {pct}% 저하').replace('{pct}', (100 - parseFloat(copPct)).toFixed(0))
+      : t('report.eff.cop_ok', '양호');
 
     return {
       cop: cycle.cop,
@@ -574,7 +579,7 @@ const DiagnosticReport = (() => {
       <!-- HEADER -->
       <div class="dr-header">
         <div class="dr-logo">🔬</div>
-        <div class="dr-title">HVAC Pulse 시스템 진단서</div>
+        <div class="dr-title">${t('report.title', 'HVAC Pulse 시스템 진단서')}</div>
         <div class="dr-subtitle">AI-Assisted Diagnostic Report</div>
       </div>
 
@@ -582,17 +587,17 @@ const DiagnosticReport = (() => {
 
       <!-- META INFO -->
       <div class="dr-meta">
-        <div class="dr-meta-row"><span class="dr-meta-label">진단일시</span><span class="dr-meta-value">${report.timestamp}</span></div>
+        <div class="dr-meta-row"><span class="dr-meta-label">${t('report.date', '진단일시')}</span><span class="dr-meta-value">${report.timestamp}</span></div>
         <div class="dr-meta-row"><span class="dr-meta-label">${t('report.equip_type', '장비유형')}</span><span class="dr-meta-value">${report.equip.icon} ${(I18n.getLang() !== 'ko' && report.equip.name_en) ? report.equip.name_en : report.equip.name_kr}</span></div>
-        <div class="dr-meta-row"><span class="dr-meta-label">냉매</span><span class="dr-meta-value">${report.refDisplay}</span></div>
+        <div class="dr-meta-row"><span class="dr-meta-label">${t('report.refrigerant', '냉매')}</span><span class="dr-meta-value">${report.refDisplay}</span></div>
       </div>
 
       <!-- MEASUREMENTS TABLE -->
       <div class="dr-section">
-        <div class="dr-section-title">측정 결과</div>
+        <div class="dr-section-title">${t('report.sec.measurements', '측정 결과')}</div>
         <table class="dr-table">
           <thead>
-            <tr><th>항목</th><th>측정값</th><th>정상범위</th><th>판정</th></tr>
+            <tr><th>${t('report.th.item', '항목')}</th><th>${t('report.th.measured', '측정값')}</th><th>${t('report.th.normal_range', '정상범위')}</th><th>${t('report.th.verdict', '판정')}</th></tr>
           </thead>
           <tbody>
             ${report.measureRows.map(r => `
@@ -609,22 +614,22 @@ const DiagnosticReport = (() => {
 
       <!-- DIAGNOSIS -->
       <div class="dr-section">
-        <div class="dr-section-title">진단 소견</div>
+        <div class="dr-section-title">${t('report.sec.diagnosis', '진단 소견')}</div>
 
         ${severityDisplay}
 
         <div class="dr-diagnosis-main">
           <div class="dr-diag-icon">${App.diagIcon(report.primary.level)}</div>
           <div class="dr-diag-body">
-            <div class="dr-diag-label">1차 소견</div>
+            <div class="dr-diag-label">${t('report.primary_label', '1차 소견')}</div>
             <div class="dr-diag-title">${report.primary.title}</div>
-            <div class="dr-diag-confidence">신뢰도: ${report.primary.confidence}%</div>
+            <div class="dr-diag-confidence">${t('report.confidence', '신뢰도')}: ${report.primary.confidence}%</div>
           </div>
         </div>
 
         <!-- Evidence -->
         <div class="dr-evidence">
-          <div class="dr-evidence-label">근거:</div>
+          <div class="dr-evidence-label">${t('report.evidence_label', '근거:')}</div>
           <ul class="dr-evidence-list">
             ${report.primary.evidence.map(e => `<li>${e}</li>`).join('')}
           </ul>
@@ -640,7 +645,7 @@ const DiagnosticReport = (() => {
           <div class="dr-secondary">
             ${report.secondaryCandidates.map((c, i) => `
               <div class="dr-secondary-item">
-                <span class="dr-secondary-rank">${i + 2}차 소견</span>
+                <span class="dr-secondary-rank">${t('report.secondary_label', '{n}차 소견').replace('{n}', i + 2)}</span>
                 <span class="dr-secondary-title">${c.title}</span>
                 <span class="dr-secondary-score">(${c.score}%)</span>
               </div>
@@ -651,7 +656,7 @@ const DiagnosticReport = (() => {
 
       <!-- PRESCRIPTION -->
       <div class="dr-section">
-        <div class="dr-section-title">처방 (수리 절차)</div>
+        <div class="dr-section-title">${t('report.sec.prescription', '처방 (수리 절차)')}</div>
         <div class="dr-checklist" data-diagkey="${report.diagKey}">
           ${report.prescription.map((step, i) => `
             <label class="dr-check-item ${step.checked ? 'checked' : ''}">
@@ -667,7 +672,7 @@ const DiagnosticReport = (() => {
       <!-- EFFICIENCY -->
       ${report.efficiency ? `
         <div class="dr-section">
-          <div class="dr-section-title">시스템 효율</div>
+          <div class="dr-section-title">${t('report.sec.efficiency', '시스템 효율')}</div>
           <div class="dr-efficiency-grid">
             <div class="dr-eff-item">
               <div class="dr-eff-value dr-mono">${report.efficiency.cop.toFixed(2)}</div>
@@ -676,11 +681,11 @@ const DiagnosticReport = (() => {
             </div>
             <div class="dr-eff-item">
               <div class="dr-eff-value dr-mono">${report.efficiency.refrigEffect.toFixed(1)}</div>
-              <div class="dr-eff-label">냉동효과 (kJ/kg)</div>
+              <div class="dr-eff-label">${t('report.eff.refrig_effect', '냉동효과 (kJ/kg)')}</div>
             </div>
             <div class="dr-eff-item">
               <div class="dr-eff-value dr-mono">${report.efficiency.compWork.toFixed(1)}</div>
-              <div class="dr-eff-label">압축일 (kJ/kg)</div>
+              <div class="dr-eff-label">${t('report.eff.comp_work', '압축일 (kJ/kg)')}</div>
             </div>
           </div>
         </div>
@@ -689,24 +694,24 @@ const DiagnosticReport = (() => {
       <!-- FOOTER -->
       <div class="dr-footer">
         <div class="dr-disclaimer">
-          ⚖️ 본 진단은 참고용이며 최종 판단은 현장 기술자의 전문적 판단에 따릅니다.
+          ⚖️ ${t('report.disclaimer', '본 진단은 참고용이며 최종 판단은 현장 기술자의 전문적 판단에 따릅니다.')}
         </div>
         <div class="dr-credits">
-          <span>📊 물성계산: CoolProp (MIT License) NIST급 정밀도</span>
-          <span>📚 진단근거: ASHRAE RP-1043, Bulgurcu(2014) IJR, Purdue, LBNL FDD</span>
+          <span>📊 ${t('report.credit_coolprop', '물성계산: CoolProp (MIT License) NIST급 정밀도')}</span>
+          <span>📚 ${t('report.credit_academic', '진단근거: ASHRAE RP-1043, Bulgurcu(2014) IJR, Purdue, LBNL FDD')}</span>
         </div>
       </div>
 
       <!-- ACTION BUTTONS -->
       <div class="dr-actions">
         <button class="dr-action-btn" onclick="DiagnosticReport.shareReport()">
-          <span>📤</span><span>공유</span>
+          <span>📤</span><span>${t('report.share_btn', '공유')}</span>
         </button>
         <button class="dr-action-btn" onclick="DiagnosticReport.printReport()">
           <span>🖨️</span><span>${t('report.print', 'PDF / 인쇄')}</span>
         </button>
         <button class="dr-action-btn" onclick="DiagnosticReport.saveToHistory()">
-          <span>💾</span><span>기록 저장</span>
+          <span>💾</span><span>${t('report.save_btn', '기록 저장')}</span>
         </button>
       </div>
     </div>`;
@@ -719,9 +724,9 @@ const DiagnosticReport = (() => {
 
   function renderStatus(status) {
     if (!status) return '<span class="dr-status-none">─</span>';
-    if (status === 'normal') return `<span class="dr-status-normal">${App.statusSvg('normal')} 정상</span>`;
-    if (status === 'high') return '<span class="dr-status-high">⬆ 비정상 ↑</span>';
-    if (status === 'low') return '<span class="dr-status-low">⬇ 비정상 ↓</span>';
+    if (status === 'normal') return `<span class="dr-status-normal">${App.statusSvg('normal')} ${t('report.status.normal', '정상')}</span>`;
+    if (status === 'high') return `<span class="dr-status-high">⬆ ${t('report.status.high', '비정상 ↑')}</span>`;
+    if (status === 'low') return `<span class="dr-status-low">⬇ ${t('report.status.low', '비정상 ↓')}</span>`;
     return '<span class="dr-status-none">─</span>';
   }
 
@@ -730,10 +735,10 @@ const DiagnosticReport = (() => {
 
     const levels = (typeof FaultSignatures !== 'undefined') ?
       FaultSignatures.SEVERITY_LEVELS : {
-        SL1: { label_kr: '경미', color: '#FFD700', svgStatus: 'caution' },
-        SL2: { label_kr: '주의', color: '#FFA500', svgStatus: 'warning' },
-        SL3: { label_kr: '심각', color: '#FF4500', svgStatus: 'danger' },
-        SL4: { label_kr: '위험', color: '#FF0000', svgStatus: 'danger' }
+        SL1: { label_kr: t('report.sev.SL1', '경미'), color: '#FFD700', svgStatus: 'caution' },
+        SL2: { label_kr: t('report.sev.SL2', '주의'), color: '#FFA500', svgStatus: 'warning' },
+        SL3: { label_kr: t('report.sev.SL3', '심각'), color: '#FF4500', svgStatus: 'danger' },
+        SL4: { label_kr: t('report.sev.SL4', '위험'), color: '#FF0000', svgStatus: 'danger' }
       };
 
     const sl = levels[severity.level];
@@ -753,11 +758,16 @@ const DiagnosticReport = (() => {
     const arrowMap = { up: '↑', down: '↓', same: '→' };
     const colorClass = { up: 'dr-sig-up', down: 'dr-sig-down', same: 'dr-sig-same' };
     const labels = {
-      suction_superheat: '과열도', suction_pressure: '흡입압', discharge_pressure: '토출압',
-      subcooling: '과냉도', discharge_temp: '토출온도', compressor_current: '전류', cop: 'COP'
+      suction_superheat: t('report.sig.suction_superheat', '과열도'),
+      suction_pressure: t('report.sig.suction_pressure', '흡입압'),
+      discharge_pressure: t('report.sig.discharge_pressure', '토출압'),
+      subcooling: t('report.sig.subcooling', '과냉도'),
+      discharge_temp: t('report.sig.discharge_temp', '토출온도'),
+      compressor_current: t('report.sig.compressor_current', '전류'),
+      cop: 'COP'
     };
 
-    let html = '<div class="dr-signatures"><div class="dr-sig-label">시그니처 패턴:</div><div class="dr-sig-grid">';
+    let html = `<div class="dr-signatures"><div class="dr-sig-label">${t('report.sig.title', '시그니처 패턴:')}</div><div class="dr-sig-grid">`;
     for (const [key, sig] of Object.entries(signatures)) {
       const label = labels[key] || key;
       const arrow = arrowMap[sig.direction] || '?';
@@ -771,7 +781,7 @@ const DiagnosticReport = (() => {
   function renderDifferentialHint(hints) {
     if (!hints || hints.length === 0) return '';
 
-    let html = '<div class="dr-differential"><div class="dr-diff-label">📋 감별진단:</div>';
+    let html = `<div class="dr-differential"><div class="dr-diff-label">📋 ${t('report.diff.title', '감별진단:')}</div>`;
     hints.forEach(hint => {
       html += `<div class="dr-diff-text">${hint.symptom_kr || ''}</div>`;
       if (hint.faults) {
@@ -819,7 +829,7 @@ const DiagnosticReport = (() => {
     const statusEl = document.querySelector('[id^="dr-check-status"]');
     if (statusEl) {
       if (allChecked && steps.length > 0) {
-        statusEl.innerHTML = `<div class="dr-check-complete">${App.statusSvg('normal')} 수리 완료 — 측정값을 다시 확인하세요</div>`;
+        statusEl.innerHTML = `<div class="dr-check-complete">${App.statusSvg('normal')} ${t('report.check_complete', '수리 완료 — 측정값을 다시 확인하세요')}</div>`;
       } else {
         statusEl.innerHTML = '';
       }
@@ -833,7 +843,7 @@ const DiagnosticReport = (() => {
 
   function shareReport() {
     if (!_lastReport) {
-      if (typeof App !== 'undefined') App.showToast('공유할 진단서가 없습니다.', 'warning');
+      if (typeof App !== 'undefined') App.showToast(t('report.no_report', '공유할 진단서가 없습니다.'), 'warning');
       return;
     }
 
@@ -841,7 +851,7 @@ const DiagnosticReport = (() => {
 
     if (navigator.share) {
       navigator.share({
-        title: 'HVAC Pulse 시스템 진단서',
+        title: t('report.title', 'HVAC Pulse 시스템 진단서'),
         text: text
       }).catch(() => {
         // Fallback: copy to clipboard
@@ -853,41 +863,41 @@ const DiagnosticReport = (() => {
   }
 
   function buildShareText(report) {
-    let text = `🔬 HVAC Pulse 시스템 진단서\n`;
+    let text = `🔬 ${t('report.title', 'HVAC Pulse 시스템 진단서')}\n`;
     text += `━━━━━━━━━━━━━━━━━━━\n`;
-    text += `진단일시: ${report.timestamp}\n`;
-    text += `${t('report.equip_label', '장비')}: ${(I18n.getLang() !== 'ko' && report.equip.name_en) ? report.equip.name_en : report.equip.name_kr}\n`;
-    text += `냉매: ${report.refDisplay}\n\n`;
+    text += `${t('report.date', '진단일시')}: ${report.timestamp}\n`;
+    text += `${t('report.equip_type', '장비유형')}: ${(I18n.getLang() !== 'ko' && report.equip.name_en) ? report.equip.name_en : report.equip.name_kr}\n`;
+    text += `${t('report.refrigerant', '냉매')}: ${report.refDisplay}\n\n`;
 
-    text += `━━━ 측정결과 ━━━\n`;
+    text += `━━━ ${t('report.share.measurements', '측정결과')} ━━━\n`;
     report.measureRows.forEach(r => {
       const val = typeof r.value === 'number' ? r.value.toFixed(1) : r.value;
       const status = r.status === 'high' ? '▲' : r.status === 'low' ? '▼' : r.status === 'normal' ? '✓' : '─';
       text += `${r.label}: ${val}${r.unit} ${status}\n`;
     });
 
-    text += `\n━━━ 진단소견 ━━━\n`;
+    text += `\n━━━ ${t('report.share.diagnosis', '진단소견')} ━━━\n`;
     const levelMark = report.primary.level === 'normal' ? '✓' : report.primary.level === 'danger' ? '✗' : '△';
     text += `${levelMark} ${report.primary.title}\n`;
-    text += `신뢰도: ${report.primary.confidence}%\n`;
+    text += `${t('report.confidence', '신뢰도')}: ${report.primary.confidence}%\n`;
 
     if (report.primary.severity) {
-      text += `심각도: ${report.primary.severity.level}\n`;
+      text += `${t('report.severity', '심각도')}: ${report.primary.severity.level}\n`;
     }
 
     if (report.efficiency) {
-      text += `\n━━━ 효율 ━━━\n`;
+      text += `\n━━━ ${t('report.share.efficiency', '효율')} ━━━\n`;
       text += `COP: ${report.efficiency.cop.toFixed(2)} (${report.efficiency.copNote})\n`;
     }
 
-    text += `\n※ 본 진단은 참고용입니다.\n`;
-    text += `📊 CoolProp(NIST급) · 📚 ASHRAE RP-1043, Bulgurcu(2014)\n`;
+    text += `\n※ ${t('report.share.disclaimer', '본 진단은 참고용입니다.')}\n`;
+    text += `📊 CoolProp(NIST) · 📚 ASHRAE RP-1043, Bulgurcu(2014)\n`;
     return text;
   }
 
   function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
-      if (typeof App !== 'undefined') App.showToast('진단서가 클립보드에 복사되었습니다.', 'success');
+      if (typeof App !== 'undefined') App.showToast(t('report.clipboard_copied', '진단서가 클립보드에 복사되었습니다.'), 'success');
     }).catch(() => {
       // Ultimate fallback
       const ta = document.createElement('textarea');
@@ -896,7 +906,7 @@ const DiagnosticReport = (() => {
       ta.select();
       document.execCommand('copy');
       document.body.removeChild(ta);
-      if (typeof App !== 'undefined') App.showToast('진단서가 클립보드에 복사되었습니다.', 'success');
+      if (typeof App !== 'undefined') App.showToast(t('report.clipboard_copied', '진단서가 클립보드에 복사되었습니다.'), 'success');
     });
   }
 
@@ -910,7 +920,7 @@ const DiagnosticReport = (() => {
 
   function saveToHistory() {
     if (!_lastReport) {
-      if (typeof App !== 'undefined') App.showToast('저장할 진단 결과가 없습니다.', 'warning');
+      if (typeof App !== 'undefined') App.showToast(t('report.no_save', '저장할 진단 결과가 없습니다.'), 'warning');
       return;
     }
     if (typeof DataBridge !== 'undefined') {
@@ -952,8 +962,8 @@ const DiagnosticReport = (() => {
 
     let html = `
       <div class="dr-equip-selector">
-        <div class="dr-equip-title">📋 진단서 생성</div>
-        <div class="dr-equip-subtitle">장비 유형을 선택하세요</div>
+        <div class="dr-equip-title">📋 ${t('report.gen_title', '진단서 생성')}</div>
+        <div class="dr-equip-subtitle">${t('report.equip_select', '장비 유형을 선택하세요')}</div>
         <div class="dr-equip-grid">`;
 
     for (const [key, equip] of Object.entries(EQUIPMENT_TYPES)) {
@@ -980,7 +990,7 @@ const DiagnosticReport = (() => {
     });
 
     if (!report) {
-      if (typeof App !== 'undefined') App.showToast('진단서 생성에 실패했습니다.', 'error');
+      if (typeof App !== 'undefined') App.showToast(t('report.gen_fail', '진단서 생성에 실패했습니다.'), 'error');
       return;
     }
 
