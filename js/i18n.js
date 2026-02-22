@@ -30,6 +30,7 @@ const I18n = (() => {
   function init() {
     // Register available language packs
     if (typeof LANG_EN !== 'undefined') packs.en = LANG_EN;
+    if (typeof LANG_KO !== 'undefined') packs.ko = LANG_KO;
     if (typeof LANG_JA !== 'undefined') packs.ja = LANG_JA;
     if (typeof LANG_ZH !== 'undefined') packs.zh = LANG_ZH;
     if (typeof LANG_ES !== 'undefined') packs.es = LANG_ES;

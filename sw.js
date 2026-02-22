@@ -2,7 +2,7 @@
 // HVAC Pulse — Service Worker
 // ===================================================
 
-const CACHE_VERSION = 56;
+const CACHE_VERSION = 57;
 const CACHE_NAME = `hvac-pulse-v${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
@@ -57,6 +57,7 @@ const STATIC_ASSETS = [
   // i18n (internationalization)
   './js/i18n.js',
   './data/lang/en.js',
+  './data/lang/ko.js',
   './data/lang/ja.js',
   './data/lang/zh.js',
   './data/lang/es.js',
