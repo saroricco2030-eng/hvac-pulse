@@ -156,7 +156,7 @@ const DiagnosticEngine = (() => {
     if (dtd > 40) {
       warnings.push({
         type: 'warning',
-        text: `DTD ${dtd.toFixed(1)}°F (>40°F) — ${t('warn.dtd_high', '에어플로우 심각 부족 또는 증발기 결빙 의심')}`
+        text: `DTD ${Settings.displayDelta(dtd)} (>${Settings.displayDelta(40)}) — ${t('warn.dtd_high', '에어플로우 심각 부족 또는 증발기 결빙 의심')}`
       });
     }
     if (compressionRatio > 12) {
@@ -168,13 +168,13 @@ const DiagnosticEngine = (() => {
     if (dlt > 275) {
       warnings.push({
         type: 'danger',
-        text: `${t('warn.dlt_label', '추정 DLT')} ${dlt.toFixed(0)}°F (>275°F) — ${t('warn.dlt_high', '오일 파괴 위험! 즉시 시스템 정지')}`
+        text: `${t('warn.dlt_label', '추정 DLT')} ${Settings.displayTemp(dlt)} (>${Settings.displayTemp(275)}) — ${t('warn.dlt_high', '오일 파괴 위험! 즉시 시스템 정지')}`
       });
     }
     if (suctionSatTemp < 32) {
       warnings.push({
         type: 'warning',
-        text: `${t('warn.sat_label', '흡입 포화온도')} ${suctionSatTemp.toFixed(1)}°F (<32°F) — ${t('warn.sat_low', '증발기 결빙 위험')}`
+        text: `${t('warn.sat_label', '흡입 포화온도')} ${Settings.displayTemp(suctionSatTemp)} (<${Settings.displayTemp(32)}) — ${t('warn.sat_low', '증발기 결빙 위험')}`
       });
     }
 

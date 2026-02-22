@@ -17,10 +17,11 @@ const GaugeDashboard = (() => {
       id: 'gauge-superheat',
       label: '과열도',
       labelEn: 'Superheat',
-      unit: '°F',
+      get unit() { return Settings.tempLabel(); },
       min: 0,
       max: 50,
-      normalText: '정상: 8~14°F',
+      isDelta: true,
+      get normalText() { return Settings.isMetric() ? `정상: ${(8*5/9).toFixed(0)}~${(14*5/9).toFixed(0)}°C` : '정상: 8~14°F'; },
       zones: [
         { from: 0,  to: 5,  color: '#ef4444' },  // danger low
         { from: 5,  to: 8,  color: '#f59e0b' },  // caution low
@@ -40,10 +41,11 @@ const GaugeDashboard = (() => {
       id: 'gauge-subcooling',
       label: '과냉도',
       labelEn: 'Subcooling',
-      unit: '°F',
+      get unit() { return Settings.tempLabel(); },
       min: 0,
       max: 30,
-      normalText: '정상: 8~14°F',
+      isDelta: true,
+      get normalText() { return Settings.isMetric() ? `정상: ${(8*5/9).toFixed(0)}~${(14*5/9).toFixed(0)}°C` : '정상: 8~14°F'; },
       zones: [
         { from: 0,  to: 3,  color: '#ef4444' },
         { from: 3,  to: 8,  color: '#f59e0b' },
@@ -63,10 +65,11 @@ const GaugeDashboard = (() => {
       id: 'gauge-dlt',
       label: '토출온도',
       labelEn: 'Discharge Temp',
-      unit: '°F',
+      get unit() { return Settings.tempLabel(); },
       min: 100,
       max: 300,
-      normalText: '정상: 140~200°F',
+      isDelta: false,
+      get normalText() { return Settings.isMetric() ? `정상: ${((140-32)*5/9).toFixed(0)}~${((200-32)*5/9).toFixed(0)}°C` : '정상: 140~200°F'; },
       zones: [
         { from: 100, to: 140, color: '#3b82f6' },  // cool (info)
         { from: 140, to: 200, color: '#10b981' },   // normal
@@ -226,7 +229,13 @@ const GaugeDashboard = (() => {
       const labelR = r - 24;
       const lx = cx + labelR * Math.cos(rad);
       const ly = cy + labelR * Math.sin(rad);
-      let displayVal = Number.isInteger(val) ? val : val.toFixed(1);
+      let displayVal;
+      if (key !== 'cop' && Settings.isMetric()) {
+        const cVal = cfg.isDelta ? val * 5 / 9 : (val - 32) * 5 / 9;
+        displayVal = Math.round(cVal);
+      } else {
+        displayVal = Number.isInteger(val) ? val : val.toFixed(1);
+      }
       ticksHtml += `<text x="${lx.toFixed(1)}" y="${(ly + 3).toFixed(1)}" text-anchor="middle" fill="#64748b" font-size="7" font-family="'JetBrains Mono', monospace">${displayVal}</text>`;
     }
 
@@ -235,7 +244,16 @@ const GaugeDashboard = (() => {
     const needleOpacity = value != null ? 1 : 0.2;
 
     // Value display
-    const displayValue = value != null ? (cfg.unit ? value.toFixed(1) : value.toFixed(2)) : '—';
+    let displayValue = '—';
+    if (value != null) {
+      if (key === 'cop') {
+        displayValue = value.toFixed(2);
+      } else if (Settings.isMetric()) {
+        displayValue = cfg.isDelta ? (value * 5 / 9).toFixed(1) : ((value - 32) * 5 / 9).toFixed(1);
+      } else {
+        displayValue = value.toFixed(1);
+      }
+    }
     const status = value != null ? cfg.getStatus(value) : 'info';
     const statusColor = status === 'normal' ? '#10b981' : status === 'caution' ? '#f59e0b' : status === 'danger' ? '#ef4444' : '#8896b3';
 

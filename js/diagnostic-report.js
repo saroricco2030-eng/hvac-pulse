@@ -181,12 +181,12 @@ const DiagnosticReport = (() => {
   // HVAC Normal Range Constants (°F-based)
   // ============================================================
   const NORMAL_RANGES = {
-    SH:   { type: 'range', lo: 8, hi: 14, display: '8~14°F' },
-    SC:   { type: 'range', lo: 8, hi: 14, display: '8~14°F' },
-    DLT:  { type: 'max', val: 225, display: '<225°F' },
-    DT:   { type: 'range', lo: 15, hi: 22, display: '15~22°F' },
-    DTD:  { type: 'range', lo: 30, hi: 40, display: '30~40°F' },
-    CTOA: { type: 'range', lo: 15, hi: 30, display: '15~30°F' },
+    SH:   { type: 'range', lo: 8, hi: 14, get display() { return Settings.isMetric() ? `${(8*5/9).toFixed(0)}~${(14*5/9).toFixed(0)}°C` : '8~14°F'; } },
+    SC:   { type: 'range', lo: 8, hi: 14, get display() { return Settings.isMetric() ? `${(8*5/9).toFixed(0)}~${(14*5/9).toFixed(0)}°C` : '8~14°F'; } },
+    DLT:  { type: 'max', val: 225, get display() { return Settings.isMetric() ? `<${((225-32)*5/9).toFixed(0)}°C` : '<225°F'; } },
+    DT:   { type: 'range', lo: 15, hi: 22, get display() { return Settings.isMetric() ? `${(15*5/9).toFixed(0)}~${(22*5/9).toFixed(0)}°C` : '15~22°F'; } },
+    DTD:  { type: 'range', lo: 30, hi: 40, get display() { return Settings.isMetric() ? `${(30*5/9).toFixed(0)}~${(40*5/9).toFixed(0)}°C` : '30~40°F'; } },
+    CTOA: { type: 'range', lo: 15, hi: 30, get display() { return Settings.isMetric() ? `${(15*5/9).toFixed(0)}~${(30*5/9).toFixed(0)}°C` : '15~30°F'; } },
     CR:   { type: 'max', val: 12, display: '<12:1' }
   };
 
@@ -202,6 +202,7 @@ const DiagnosticReport = (() => {
     function addRow(label, value, unit, normalRange, key) {
       if (value == null) return;
       let status = null;
+      // Status check uses raw °F values against °F thresholds
       if (normalRange) {
         if (normalRange.type === 'range') {
           if (value >= normalRange.lo && value <= normalRange.hi) status = 'normal';
@@ -211,7 +212,15 @@ const DiagnosticReport = (() => {
           status = value > normalRange.val ? 'high' : 'normal';
         }
       }
-      rows.push({ label, value, unit, normalRange: normalRange ? normalRange.display : null, status, key });
+      // Convert temp values for display
+      const isDelta = ['SH', 'SC', 'DT', 'DTD', 'CTOA'].includes(key);
+      const isTemp = isDelta || ['DLT', 'SLT', 'LLT', 'Tret', 'Tsup', 'Tamb'].includes(key);
+      let dv = value, du = unit;
+      if (isTemp && Settings.isMetric()) {
+        dv = isDelta ? value * 5 / 9 : (value - 32) * 5 / 9;
+        du = '°C';
+      }
+      rows.push({ label, value: dv, unit: du, normalRange: normalRange ? normalRange.display : null, status, key });
     }
 
     // Pressures
@@ -222,45 +231,45 @@ const DiagnosticReport = (() => {
 
     // Superheat
     const sh = d.superheat ?? m.SH ?? null;
-    addRow(t('report.m.superheat', '과열도 (SH)'), sh, '°F', NORMAL_RANGES.SH, 'SH');
+    addRow(t('report.m.superheat', '과열도 (SH)'), sh, Settings.tempLabel(), NORMAL_RANGES.SH, 'SH');
 
     // Subcooling
     const sc = d.subcooling ?? m.SC ?? null;
-    addRow(t('report.m.subcooling', '과냉도 (SC)'), sc, '°F', NORMAL_RANGES.SC, 'SC');
+    addRow(t('report.m.subcooling', '과냉도 (SC)'), sc, Settings.tempLabel(), NORMAL_RANGES.SC, 'SC');
 
     // DLT
     const dlt = m.DLT ?? d.dlt ?? d.dischargeTemp ?? null;
-    addRow(t('report.m.dlt', '토출온도 (DLT)'), dlt, '°F', NORMAL_RANGES.DLT, 'DLT');
+    addRow(t('report.m.dlt', '토출온도 (DLT)'), dlt, Settings.tempLabel(), NORMAL_RANGES.DLT, 'DLT');
 
     // Suction line temp
     const slt = m.suctionLineTemp ?? d.suctionLineTemp ?? null;
-    addRow(t('report.m.slt', '석션라인 온도'), slt, '°F', null, 'SLT');
+    addRow(t('report.m.slt', '석션라인 온도'), slt, Settings.tempLabel(), null, 'SLT');
 
     // Liquid line temp
     const llt = m.liquidLineTemp ?? d.liquidLineTemp ?? null;
-    addRow(t('report.m.llt', '리퀴드라인 온도'), llt, '°F', null, 'LLT');
+    addRow(t('report.m.llt', '리퀴드라인 온도'), llt, Settings.tempLabel(), null, 'LLT');
 
     // Return air
     const tret = m.Tret ?? d.returnAirTemp ?? null;
-    addRow(t('report.m.return_air', '리턴공기 온도'), tret, '°F', null, 'Tret');
+    addRow(t('report.m.return_air', '리턴공기 온도'), tret, Settings.tempLabel(), null, 'Tret');
 
     // Supply air
     const tsup = m.Tsup ?? null;
-    addRow(t('report.m.supply_air', '공급공기 온도'), tsup, '°F', null, 'Tsup');
+    addRow(t('report.m.supply_air', '공급공기 온도'), tsup, Settings.tempLabel(), null, 'Tsup');
 
     // Outdoor
     const tamb = m.Tamb ?? d.outdoorTemp ?? null;
-    addRow(t('report.m.outdoor', '외기온도'), tamb, '°F', null, 'Tamb');
+    addRow(t('report.m.outdoor', '외기온도'), tamb, Settings.tempLabel(), null, 'Tamb');
 
     // Delta T
     const dt = m.DT ?? (tret != null && tsup != null ? tret - tsup : null);
-    addRow(t('report.m.delta_t', 'ΔT (공기온도차)'), dt, '°F', NORMAL_RANGES.DT, 'DT');
+    addRow(t('report.m.delta_t', 'ΔT (공기온도차)'), dt, Settings.tempLabel(), NORMAL_RANGES.DT, 'DT');
 
     // DTD
-    if (d.dtd != null) addRow('DTD', d.dtd, '°F', NORMAL_RANGES.DTD, 'DTD');
+    if (d.dtd != null) addRow('DTD', d.dtd, Settings.tempLabel(), NORMAL_RANGES.DTD, 'DTD');
 
     // CTOA
-    if (d.ctoa != null) addRow('CTOA', d.ctoa, '°F', NORMAL_RANGES.CTOA, 'CTOA');
+    if (d.ctoa != null) addRow('CTOA', d.ctoa, Settings.tempLabel(), NORMAL_RANGES.CTOA, 'CTOA');
 
     // Compression ratio
     if (d.compressionRatio != null) addRow(t('report.m.comp_ratio', '압축비'), d.compressionRatio, ':1', NORMAL_RANGES.CR, 'CR');
@@ -358,26 +367,26 @@ const DiagnosticReport = (() => {
     // SH evidence
     if (d.superheat != null) {
       const shClass = d.shClass || (d.superheat > 20 ? 'high' : d.superheat < 5 ? 'low' : 'normal');
-      const shVal = d.superheat.toFixed(1);
+      const shVal = Settings.displayDelta(d.superheat);
       if (shClass === 'high') {
-        items.push(t('report.ev.sh_high', '과열도 {val}°F — 정상(8~14°F) 대비 현저히 높음').replace('{val}', shVal));
+        items.push(t('report.ev.sh_high', `과열도 {val} — 정상(${NORMAL_RANGES.SH.display}) 대비 현저히 높음`).replace('{val}', shVal));
       } else if (shClass === 'low') {
-        items.push(t('report.ev.sh_low', '과열도 {val}°F — 정상 대비 낮음 (액냉매 과다)').replace('{val}', shVal));
+        items.push(t('report.ev.sh_low', '과열도 {val} — 정상 대비 낮음 (액냉매 과다)').replace('{val}', shVal));
       } else {
-        items.push(t('report.ev.sh_normal', '과열도 {val}°F — 정상 범위').replace('{val}', shVal));
+        items.push(t('report.ev.sh_normal', '과열도 {val} — 정상 범위').replace('{val}', shVal));
       }
     }
 
     // SC evidence
     if (d.subcooling != null) {
       const scClass = d.scClass || (d.subcooling > 18 ? 'high' : d.subcooling < 5 ? 'low' : 'normal');
-      const scVal = d.subcooling.toFixed(1);
+      const scVal = Settings.displayDelta(d.subcooling);
       if (scClass === 'high') {
-        items.push(t('report.ev.sc_high', '과냉도 {val}°F — 정상(8~14°F) 대비 높음 (고압측 냉매 과다)').replace('{val}', scVal));
+        items.push(t('report.ev.sc_high', `과냉도 {val} — 정상(${NORMAL_RANGES.SC.display}) 대비 높음 (고압측 냉매 과다)`).replace('{val}', scVal));
       } else if (scClass === 'low') {
-        items.push(t('report.ev.sc_low', '과냉도 {val}°F — 정상 대비 현저히 낮음').replace('{val}', scVal));
+        items.push(t('report.ev.sc_low', '과냉도 {val} — 정상 대비 현저히 낮음').replace('{val}', scVal));
       } else {
-        items.push(t('report.ev.sc_normal', '과냉도 {val}°F — 정상 범위').replace('{val}', scVal));
+        items.push(t('report.ev.sc_normal', '과냉도 {val} — 정상 범위').replace('{val}', scVal));
       }
     }
 
@@ -385,7 +394,7 @@ const DiagnosticReport = (() => {
     const dlt = d.dlt || d.dischargeTemp;
     if (dlt != null && dlt > 225) {
       const dltVal = typeof dlt === 'number' ? dlt.toFixed(0) : dlt;
-      items.push(t('report.ev.dlt_high', '토출온도 {val}°F — 압축기 과열 징후').replace('{val}', dltVal));
+      items.push(t('report.ev.dlt_high', '토출온도 {val} — 압축기 과열 징후').replace('{val}', Settings.displayTemp(dlt)));
     }
 
     // Compression ratio

@@ -32,11 +32,11 @@ const RefrigerantCompare = (() => {
         <div class="section-title">${t('compare.condition', '비교 조건')}</div>
         <div class="input-row">
           <div class="form-group">
-            <label class="form-label" for="compare-evap-t">${t('compare.evap_temp', '증발온도 (°F)')}</label>
+            <label class="form-label" for="compare-evap-t">${t('compare.evap_temp', `증발온도 (${Settings.tempLabel()})`)}</label>
             <input type="number" id="compare-evap-t" class="form-input" value="40" step="1">
           </div>
           <div class="form-group">
-            <label class="form-label" for="compare-cond-t">${t('compare.cond_temp', '응축온도 (°F)')}</label>
+            <label class="form-label" for="compare-cond-t">${t('compare.cond_temp', `응축온도 (${Settings.tempLabel()})`)}</label>
             <input type="number" id="compare-cond-t" class="form-input" value="110" step="1">
           </div>
         </div>
@@ -148,11 +148,13 @@ const RefrigerantCompare = (() => {
       return;
     }
 
-    const evapT = parseFloat(document.getElementById('compare-evap-t')?.value) || 40;
-    const condT = parseFloat(document.getElementById('compare-cond-t')?.value) || 110;
+    const evapRaw = parseFloat(document.getElementById('compare-evap-t')?.value) || (Settings.isMetric() ? 4 : 40);
+    const condRaw = parseFloat(document.getElementById('compare-cond-t')?.value) || (Settings.isMetric() ? 43 : 110);
+    const evapT = Settings.userTempToF(evapRaw);
+    const condT = Settings.userTempToF(condRaw);
 
     const results = refs.map((refId, i) => calculateRefData(refId, evapT, condT, COLORS[i]));
-    renderComparison(results, evapT, condT);
+    renderComparison(results, evapRaw, condRaw);
   }
 
   function calculateRefData(refId, evapT_f, condT_f, color) {
@@ -232,7 +234,7 @@ const RefrigerantCompare = (() => {
 
     let html = `
       <div class="glass-card">
-        <div class="section-title">${t('compare.result_title', '비교 결과 ({evap}°F 증발 / {cond}°F 응축)').replace('{evap}', evapT).replace('{cond}', condT)}</div>
+        <div class="section-title">${t('compare.result_title', `비교 결과 ({evap}${Settings.tempLabel()} 증발 / {cond}${Settings.tempLabel()} 응축)`).replace('{evap}', evapT).replace('{cond}', condT)}</div>
 
         <!-- Comparison Table -->
         <div style="overflow-x:auto">
@@ -273,7 +275,7 @@ const RefrigerantCompare = (() => {
               </tr>
               <tr>
                 <td>${t('compare.glide', '글라이드')}</td>
-                ${results.map(r => `<td class="mono">${r.isZeotropic ? `~${r.glide_f}°F` : '—'}</td>`).join('')}
+                ${results.map(r => `<td class="mono">${r.isZeotropic ? `~${Settings.displayDelta(r.glide_f)}` : '—'}</td>`).join('')}
               </tr>
             </tbody>
           </table>

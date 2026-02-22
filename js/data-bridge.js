@@ -97,7 +97,7 @@ const DataBridge = (() => {
       warnings.push({
         type: 'info',
         icon: '📐',
-        text: t('bridge.warn_glide', `큰 온도 글라이드 (${ref.glide_f}°F) — Bubble/Dew 구분 필수. 누설 시 전량 교체 필요.`).replace('{glide}', ref.glide_f)
+        text: t('bridge.warn_glide', `큰 온도 글라이드 (${Settings.displayDelta(ref.glide_f)}) — Bubble/Dew 구분 필수. 누설 시 전량 교체 필요.`).replace('{glide}', Settings.displayDelta(ref.glide_f))
       });
     }
 
@@ -441,18 +441,18 @@ const DataBridge = (() => {
 
     // Symptom details (handles cross-diag, NIST, cycle sources)
     const parts = [];
-    if (diagResult.superheat != null) parts.push(`SH: ${diagResult.superheat.toFixed(1)}°F`);
-    if (diagResult.subcooling != null) parts.push(`SC: ${diagResult.subcooling.toFixed(1)}°F`);
+    if (diagResult.superheat != null) parts.push(`SH: ${Settings.displayDelta(diagResult.superheat)}`);
+    if (diagResult.subcooling != null) parts.push(`SC: ${Settings.displayDelta(diagResult.subcooling)}`);
     if (diagResult.compressionRatio != null) parts.push(`CR: ${diagResult.compressionRatio.toFixed(1)}:1`);
-    if (diagResult.dtd != null) parts.push(`DTD: ${diagResult.dtd.toFixed(1)}°F`);
-    if (diagResult.ctoa != null) parts.push(`CTOA: ${diagResult.ctoa.toFixed(1)}°F`);
+    if (diagResult.dtd != null) parts.push(`DTD: ${Settings.displayDelta(diagResult.dtd)}`);
+    if (diagResult.ctoa != null) parts.push(`CTOA: ${Settings.displayDelta(diagResult.ctoa)}`);
     // NIST-specific temperature data
     if (diagResult.source === 'NIST') {
-      if (diagResult.returnAirTemp != null) parts.push(`${t('bridge.rec_return', '리턴공기')}: ${diagResult.returnAirTemp}°F`);
-      if (diagResult.suctionLineTemp != null) parts.push(`${t('bridge.rec_suction', '석션라인')}: ${diagResult.suctionLineTemp}°F`);
-      if (diagResult.liquidLineTemp != null) parts.push(`${t('bridge.rec_liquid', '리퀴드라인')}: ${diagResult.liquidLineTemp}°F`);
-      if (diagResult.suctionDiff != null) parts.push(`${t('bridge.rec_suction_diff', '석션편차')}: ${diagResult.suctionDiff.toFixed(1)}°F`);
-      if (diagResult.liquidDiff != null) parts.push(`${t('bridge.rec_liquid_diff', '리퀴드편차')}: ${diagResult.liquidDiff.toFixed(1)}°F`);
+      if (diagResult.returnAirTemp != null) parts.push(`${t('bridge.rec_return', '리턴공기')}: ${Settings.displayTemp(diagResult.returnAirTemp)}`);
+      if (diagResult.suctionLineTemp != null) parts.push(`${t('bridge.rec_suction', '석션라인')}: ${Settings.displayTemp(diagResult.suctionLineTemp)}`);
+      if (diagResult.liquidLineTemp != null) parts.push(`${t('bridge.rec_liquid', '리퀴드라인')}: ${Settings.displayTemp(diagResult.liquidLineTemp)}`);
+      if (diagResult.suctionDiff != null) parts.push(`${t('bridge.rec_suction_diff', '석션편차')}: ${Settings.displayDelta(diagResult.suctionDiff)}`);
+      if (diagResult.liquidDiff != null) parts.push(`${t('bridge.rec_liquid_diff', '리퀴드편차')}: ${Settings.displayDelta(diagResult.liquidDiff)}`);
     }
     prefill.symptom = parts.join(' · ');
 

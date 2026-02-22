@@ -177,6 +177,7 @@ const App = (() => {
 
     // Populate home refrigerant dropdown
     initHomeRefDropdown();
+    updateRefRanges();
 
     // Setup home quick diagnosis button
     const quickDiagBtn = document.getElementById('home-quick-diag-btn');
@@ -520,6 +521,22 @@ const App = (() => {
   // =============================================
   // Home — Refrigerant Dropdown
   // =============================================
+  function updateRefRanges() {
+    const el = document.getElementById('home-ref-ranges');
+    if (!el) return;
+    const m = Settings.isMetric();
+    const d = (lo, hi) => m ? `${(lo*5/9).toFixed(0)}~${(hi*5/9).toFixed(0)}°C` : `${lo}~${hi}°F`;
+    const s = (v) => m ? `${(v*5/9).toFixed(0)}°C` : `${v}°F`;
+    el.innerHTML = `
+      <span class="ref-item"><strong style="color:var(--accent-green)">SH</strong> ${d(5,15)}</span>
+      <span class="ref-divider">·</span>
+      <span class="ref-item"><strong style="color:var(--accent-green)">SC</strong> ${d(8,14)}</span>
+      <span class="ref-divider">·</span>
+      <span class="ref-item"><strong style="color:var(--accent-green)">ΔT</strong> ${d(15,22)}</span>
+      <span class="ref-divider">·</span>
+      <span class="ref-item"><strong style="color:var(--accent-green)">DTD</strong> ${s(35)}</span>`;
+  }
+
   function initHomeRefDropdown() {
     const sel = document.getElementById('home-ref-select');
     if (!sel) return;
@@ -573,7 +590,7 @@ const App = (() => {
 
     const safeTitle = esc(result.title);
     const safeSummary = esc(result.summary);
-    const copyDetail = `SH ${sh}°F / SC ${sc}°F — ${result.summary}`;
+    const copyDetail = `SH ${Settings.displayDelta(sh)} / SC ${Settings.displayDelta(sc)} — ${result.summary}`;
 
     resultEl.innerHTML = `
       <div class="diag-result ${levelClass} anim-fade-up" style="padding:14px;border-radius:var(--radius-md)">
@@ -881,6 +898,7 @@ const App = (() => {
         unitToggleF.classList.add('active');
         unitToggleC.classList.remove('active');
         I18n.applyToStaticDOM();
+        updateRefRanges();
       });
 
       unitToggleC.addEventListener('click', () => {
@@ -888,6 +906,7 @@ const App = (() => {
         unitToggleC.classList.add('active');
         unitToggleF.classList.remove('active');
         I18n.applyToStaticDOM();
+        updateRefRanges();
       });
     }
   }

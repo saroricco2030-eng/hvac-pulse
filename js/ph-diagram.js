@@ -60,11 +60,11 @@ const PHDiagram = (() => {
         </div>
         <div class="input-row">
           <div class="form-group">
-            <label class="form-label" for="ph-superheat">${t('settings.matrix.col1', '과열도')} (°F)</label>
+            <label class="form-label" for="ph-superheat">${t('settings.matrix.col1', '과열도')} (${Settings.tempLabel()})</label>
             <input type="number" id="ph-superheat" class="form-input" placeholder="10" step="0.1" value="10">
           </div>
           <div class="form-group">
-            <label class="form-label" for="ph-subcooling">${t('settings.matrix.col2', '과냉도')} (°F)</label>
+            <label class="form-label" for="ph-subcooling">${t('settings.matrix.col2', '과냉도')} (${Settings.tempLabel()})</label>
             <input type="number" id="ph-subcooling" class="form-input" placeholder="10" step="0.1" value="10">
           </div>
         </div>
@@ -187,13 +187,15 @@ const PHDiagram = (() => {
 
     const sP = parseFloat(document.getElementById('ph-suction-p')?.value);
     const dP = parseFloat(document.getElementById('ph-discharge-p')?.value);
-    const sh = parseFloat(document.getElementById('ph-superheat')?.value);
-    const sc = parseFloat(document.getElementById('ph-subcooling')?.value);
+    const shRaw = parseFloat(document.getElementById('ph-superheat')?.value);
+    const scRaw = parseFloat(document.getElementById('ph-subcooling')?.value);
 
-    if ([sP, dP, sh, sc].some(isNaN)) {
+    if ([sP, dP, shRaw, scRaw].some(isNaN)) {
       App.showToast(t('validation.required', '모든 값을 입력해주세요.'), 'warning');
       return;
     }
+    const sh = Settings.userDeltaToF(shRaw);
+    const sc = Settings.userDeltaToF(scRaw);
 
     const coolpropName = getCoolPropName(currentRefrigerant);
     currentCycle = CoolPropEngine.calculateCyclePoints(coolpropName, sP, dP, sh, sc);

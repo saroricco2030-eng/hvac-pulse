@@ -423,9 +423,9 @@ const CycleAnimation = (() => {
 
     // Condenser card
     const condItems = [];
-    if (computed?.condensingSatTemp != null) condItems.push(makeItem('응축온도', computed.condensingSatTemp, '°F', 'info'));
-    if (measurements.SC != null) condItems.push(makeItem('과냉도', measurements.SC.toFixed(1), '°F', statusOf('SC', measurements.SC, measurements, computed)));
-    if (measurements.DLT != null) condItems.push(makeItem('토출온도', measurements.DLT, '°F', statusOf('DLT', measurements.DLT, measurements, computed)));
+    if (computed?.condensingSatTemp != null) condItems.push(makeItem('응축온도', Settings.displayTemp(computed.condensingSatTemp), '', 'info'));
+    if (measurements.SC != null) condItems.push(makeItem('과냉도', Settings.displayDelta(measurements.SC), '', statusOf('SC', measurements.SC, measurements, computed)));
+    if (measurements.DLT != null) condItems.push(makeItem('토출온도', Settings.displayTemp(measurements.DLT), '', statusOf('DLT', measurements.DLT, measurements, computed)));
     if (condItems.length) cards.push({ anchor: 'condenser', items: condItems });
 
     // TXV card
@@ -436,9 +436,9 @@ const CycleAnimation = (() => {
 
     // Evaporator card
     const evapItems = [];
-    if (computed?.suctionSatTemp != null) evapItems.push(makeItem('증발온도', computed.suctionSatTemp, '°F', 'info'));
-    if (measurements.SH != null) evapItems.push(makeItem('과열도', measurements.SH.toFixed(1), '°F', statusOf('SH', measurements.SH, measurements, computed)));
-    if (measurements.DT != null) evapItems.push(makeItem('ΔT', measurements.DT.toFixed(1), '°F', statusOf('DT', measurements.DT, measurements, computed)));
+    if (computed?.suctionSatTemp != null) evapItems.push(makeItem('증발온도', Settings.displayTemp(computed.suctionSatTemp), '', 'info'));
+    if (measurements.SH != null) evapItems.push(makeItem('과열도', Settings.displayDelta(measurements.SH), '', statusOf('SH', measurements.SH, measurements, computed)));
+    if (measurements.DT != null) evapItems.push(makeItem('ΔT', Settings.displayDelta(measurements.DT), '', statusOf('DT', measurements.DT, measurements, computed)));
     if (evapItems.length) cards.push({ anchor: 'evaporator', items: evapItems });
 
     // Render cards

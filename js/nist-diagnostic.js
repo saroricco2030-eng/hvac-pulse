@@ -243,10 +243,10 @@ const NISTDiagnostic = (() => {
     });
     if (hasError) return;
 
-    const returnAirTemp = parseFloat(document.getElementById('nist-return-t').value);
-    const suctionLineTemp = parseFloat(document.getElementById('nist-suction-t').value);
-    const liquidLineTemp = parseFloat(document.getElementById('nist-liquid-t').value);
-    const outdoorTemp = parseFloat(document.getElementById('nist-outdoor-t').value);
+    const returnAirTemp = Settings.userTempToF(parseFloat(document.getElementById('nist-return-t').value));
+    const suctionLineTemp = Settings.userTempToF(parseFloat(document.getElementById('nist-suction-t').value));
+    const liquidLineTemp = Settings.userTempToF(parseFloat(document.getElementById('nist-liquid-t').value));
+    const outdoorTemp = Settings.userTempToF(parseFloat(document.getElementById('nist-outdoor-t').value));
     const seerClass = document.getElementById('nist-seer')?.value || 'high';
 
     // NaN safety check (validateField covers most cases, but guard against edge scenarios)
@@ -263,7 +263,7 @@ const NISTDiagnostic = (() => {
     for (const tp of temps) {
       if (tp.val < tempRange.min || tp.val > tempRange.max) {
         const el = document.getElementById(tp.id);
-        if (el) App.validateField(el, t('validation.temp_range', '온도 범위를 확인하세요 (-50~200°F)'));
+        if (el) App.validateField(el, t('validation.temp_range', `온도 범위를 확인하세요 (${Settings.isMetric() ? '-46~93°C' : '-50~200°F'})`));
         return;
       }
     }
@@ -290,13 +290,13 @@ const NISTDiagnostic = (() => {
         <div class="nist-calc-grid">
           <div class="nist-calc-box">
             <div class="nist-calc-label">${t('nist.expected_suction', '예상 석션라인')}</div>
-            <div class="nist-calc-value">${r.expectedSuctionLine.toFixed(1)}°F</div>
-            <div class="nist-calc-formula">${r.returnAirTemp}°F - ${DTD}°F + ${NORMAL_SUPERHEAT}°F</div>
+            <div class="nist-calc-value">${Settings.displayTemp(r.expectedSuctionLine)}</div>
+            <div class="nist-calc-formula">${Settings.displayTemp(r.returnAirTemp)} - ${Settings.displayDelta(DTD)} + ${Settings.displayDelta(NORMAL_SUPERHEAT)}</div>
           </div>
           <div class="nist-calc-box">
             <div class="nist-calc-label">${t('nist.expected_liquid', '예상 리퀴드라인')}</div>
-            <div class="nist-calc-value" style="color:var(--accent-orange)">${r.expectedLiquidLine.toFixed(1)}°F</div>
-            <div class="nist-calc-formula">${r.outdoorTemp}°F + ${r.ctoa}°F - ${NORMAL_SUBCOOLING}°F</div>
+            <div class="nist-calc-value" style="color:var(--accent-orange)">${Settings.displayTemp(r.expectedLiquidLine)}</div>
+            <div class="nist-calc-formula">${Settings.displayTemp(r.outdoorTemp)} + ${Settings.displayDelta(r.ctoa)} - ${Settings.displayDelta(NORMAL_SUBCOOLING)}</div>
           </div>
         </div>
 
@@ -305,7 +305,7 @@ const NISTDiagnostic = (() => {
           <div class="nist-comparison-box status-${r.suctionStatus}">
             <div class="nist-calc-label">${t('nist.suction_diff', '석션라인 차이')}</div>
             <div class="nist-diff-value color-${r.suctionStatus}">
-              ${r.suctionDiff > 0 ? '+' : ''}${r.suctionDiff.toFixed(1)}°F
+              ${r.suctionDiff > 0 ? '+' : ''}${Settings.displayDelta(r.suctionDiff)}
             </div>
             <div class="badge badge-${r.suctionStatus}" style="margin-top:4px">
               ${statusBadge(r.suctionStatus)} ${statusLabel[r.suctionStatus]}
@@ -314,7 +314,7 @@ const NISTDiagnostic = (() => {
           <div class="nist-comparison-box status-${r.liquidStatus}">
             <div class="nist-calc-label">${t('nist.liquid_diff', '리퀴드라인 차이')}</div>
             <div class="nist-diff-value color-${r.liquidStatus}">
-              ${r.liquidDiff > 0 ? '+' : ''}${r.liquidDiff.toFixed(1)}°F
+              ${r.liquidDiff > 0 ? '+' : ''}${Settings.displayDelta(r.liquidDiff)}
             </div>
             <div class="badge badge-${r.liquidStatus}" style="margin-top:4px">
               ${statusBadge(r.liquidStatus)} ${statusLabel[r.liquidStatus]}
@@ -338,14 +338,14 @@ const NISTDiagnostic = (() => {
 
       <!-- Copy / Export -->
       <div class="diag-actions-row">
-        <button class="diag-action-btn btn-copy" onclick="App.copyDiagText(this,'${t('nist.title', 'NIST 비침습 진단').replace(/'/g,'&#39;')}','[${(r.diagnosis.i18nKey ? t(r.diagnosis.i18nKey + '.title', r.diagnosis.title) : r.diagnosis.title).replace(/'/g,'&#39;')}] ${t('nist.suction_diff','석션라인 차이')}:${r.suctionDiff > 0 ? '+' : ''}${r.suctionDiff.toFixed(1)}°F ${t('nist.liquid_diff','리퀴드라인 차이')}:${r.liquidDiff > 0 ? '+' : ''}${r.liquidDiff.toFixed(1)}°F')">
+        <button class="diag-action-btn btn-copy" onclick="App.copyDiagText(this,'${t('nist.title', 'NIST 비침습 진단').replace(/'/g,'&#39;')}','[${(r.diagnosis.i18nKey ? t(r.diagnosis.i18nKey + '.title', r.diagnosis.title) : r.diagnosis.title).replace(/'/g,'&#39;')}] ${t('nist.suction_diff','석션라인 차이')}:${r.suctionDiff > 0 ? '+' : ''}${Settings.displayDelta(r.suctionDiff)} ${t('nist.liquid_diff','리퀴드라인 차이')}:${r.liquidDiff > 0 ? '+' : ''}${Settings.displayDelta(r.liquidDiff)}')">
           <span class="diag-icon-svg">${App.SVG_ICONS.copy}</span> ${t('diag.copy_result', '결과 복사')}
         </button>
       </div>
 
       <div class="alert-box alert-info mt-12">
         <span class="diag-icon-svg icon-info" style="width:16px;height:16px;flex-shrink:0">${App.SVG_ICONS.alertCircle}</span>
-        <span>${t('nist.screening_note', 'NIST 진단은 선별 검사입니다. 이상 발견 시 게이지 연결하여 정밀 진단하세요. 판정 기준: ±5°F 이내 정상, ±5~10°F 주의, ±10°F 초과 이상.')}</span>
+        <span>${t('nist.screening_note', `NIST 진단은 선별 검사입니다. 이상 발견 시 게이지 연결하여 정밀 진단하세요. 판정 기준: ±${Settings.displayDelta(5)} 이내 정상, ±${Settings.displayDelta(5)}~${Settings.displayDelta(10)} 주의, ±${Settings.displayDelta(10)} 초과 이상.`)}</span>
       </div>
 
       <div id="nist-advanced-info"></div>

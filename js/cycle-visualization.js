@@ -551,11 +551,11 @@ const CycleVisualization = (() => {
     // For SH/SC, offer auto-calc if pressure is available
     if (pointId === 'SH' && measurements.Ps != null) {
       showCalcToggle = true;
-      inputLabel = t('cycle.suction_line_temp', '석션라인 실측온도') + ' (°F)';
+      inputLabel = t('cycle.suction_line_temp', '석션라인 실측온도') + ` (${Settings.tempLabel()})`;
       helpText = `Ps=${measurements.Ps} psig → ${t('cycle.auto_calc_from_sat', '포화온도에서 자동 계산')}`;
     } else if (pointId === 'SC' && measurements.Pd != null) {
       showCalcToggle = true;
-      inputLabel = t('cycle.liquid_line_temp', '리퀴드라인 실측온도') + ' (°F)';
+      inputLabel = t('cycle.liquid_line_temp', '리퀴드라인 실측온도') + ` (${Settings.tempLabel()})`;
       helpText = `Pd=${measurements.Pd} psig → ${t('cycle.auto_calc_from_sat', '포화온도에서 자동 계산')}`;
     } else if (pointId === 'SH' || pointId === 'SC') {
       inputLabel = `${mpName} ${t('cycle.direct_input', '직접 입력')} (${mp.unit})`;
@@ -764,8 +764,8 @@ const CycleVisualization = (() => {
       const sc = STATUS_COLORS[status];
 
       let extra = '';
-      if (pid === 'Pd' && computed.condensingSatTemp != null) extra = `<div style="font-size:var(--text-xs);color:var(--text-secondary)">${t('cycle.saturation', '포화')} ${computed.condensingSatTemp}°F</div>`;
-      if (pid === 'Ps' && computed.suctionSatTemp != null) extra = `<div style="font-size:var(--text-xs);color:var(--text-secondary)">${t('cycle.saturation', '포화')} ${computed.suctionSatTemp}°F</div>`;
+      if (pid === 'Pd' && computed.condensingSatTemp != null) extra = `<div style="font-size:var(--text-xs);color:var(--text-secondary)">${t('cycle.saturation', '포화')} ${Settings.displayTemp(computed.condensingSatTemp)}</div>`;
+      if (pid === 'Ps' && computed.suctionSatTemp != null) extra = `<div style="font-size:var(--text-xs);color:var(--text-secondary)">${t('cycle.saturation', '포화')} ${Settings.displayTemp(computed.suctionSatTemp)}</div>`;
 
       html += `
         <div class="cycle-val-item">
@@ -837,14 +837,14 @@ const CycleVisualization = (() => {
     // Extra warnings
     let warnings = '';
     if (measurements.DLT != null && measurements.DLT > 275) {
-      warnings += `<div class="alert-box alert-danger">${App.statusSvg('siren')}<span>DLT ${measurements.DLT}°F (>275°F) — ${t('cycle.warn_oil_breakdown', '오일 파괴 위험!')}</span></div>`;
+      warnings += `<div class="alert-box alert-danger">${App.statusSvg('siren')}<span>DLT ${Settings.displayTemp(measurements.DLT)} (>${Settings.displayTemp(275)}) — ${t('cycle.warn_oil_breakdown', '오일 파괴 위험!')}</span></div>`;
     }
     if (computed.compressionRatio != null && computed.compressionRatio > 12) {
       warnings += `<div class="alert-box alert-danger">${App.statusSvg('danger')}<span>${t('cycle.compression_ratio', '압축비')} ${computed.compressionRatio}:1 (>12:1) — ${t('cycle.warn_compressor_overload', '컴프레서 과부하!')}</span></div>`;
     }
     if (measurements.DT != null && (measurements.DT < 10 || measurements.DT > 28)) {
       const dtStatus = measurements.DT < 10 ? t('cycle.warn_dt_low', '과소 (결빙?)') : t('cycle.warn_dt_high', '과대 (에어플로우?)');
-      warnings += `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>ΔT ${measurements.DT}°F — ${dtStatus}</span></div>`;
+      warnings += `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>ΔT ${Settings.displayDelta(measurements.DT)} — ${dtStatus}</span></div>`;
     }
 
     // Diagnosis icon/title from diagnostic engine mapping
@@ -905,11 +905,11 @@ const CycleVisualization = (() => {
 
         <div class="computed-row" style="grid-template-columns:1fr 1fr;margin-bottom:12px">
           <div class="computed-item">
-            <div class="comp-value" style="color:${shClass==='normal'?'var(--accent-green)':shClass==='high'?'var(--accent-red)':'var(--accent-cyan)'}">${sh.toFixed(1)}°F ${shIcon}</div>
+            <div class="comp-value" style="color:${shClass==='normal'?'var(--accent-green)':shClass==='high'?'var(--accent-red)':'var(--accent-cyan)'}">${Settings.displayDelta(sh)} ${shIcon}</div>
             <div class="comp-label">${t('pt.superheat', '과열도')} (${shClass === 'normal' ? t('status.normal', '정상') : shClass === 'high' ? t('status.high', '높음') : t('status.low', '낮음')})</div>
           </div>
           <div class="computed-item">
-            <div class="comp-value" style="color:${scClass==='normal'?'var(--accent-green)':scClass==='high'?'var(--accent-red)':'var(--accent-cyan)'}">${sc.toFixed(1)}°F ${scIcon}</div>
+            <div class="comp-value" style="color:${scClass==='normal'?'var(--accent-green)':scClass==='high'?'var(--accent-red)':'var(--accent-cyan)'}">${Settings.displayDelta(sc)} ${scIcon}</div>
             <div class="comp-label">${t('pt.subcooling', '과냉도')} (${scClass === 'normal' ? t('status.normal', '정상') : scClass === 'high' ? t('status.high', '높음') : t('status.low', '낮음')})</div>
           </div>
         </div>

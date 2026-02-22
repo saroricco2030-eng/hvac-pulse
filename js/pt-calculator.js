@@ -266,7 +266,7 @@ const PTCalculator = (() => {
     html += ` <span style="font-size:var(--text-xs);color:var(--text-secondary)">${type} · GWP ${gwp} · ${safety}</span>`;
     html += ` <span class="engine-badge" style="font-size:var(--text-xs);padding:2px 6px;border-radius:4px;background:rgba(0,0,0,0.3);color:${sourceColor};border:1px solid ${sourceColor};margin-left:4px">${sourceLabel}</span>`;
     if (isZeo) {
-      html += ` <span class="zeotropic-indicator">${t('pt.zeotropic.indicator', '비공비 (글라이드 ~°F)')} ~${glide}°F</span>`;
+      html += ` <span class="zeotropic-indicator">${t('pt.zeotropic.indicator', '비공비 (글라이드)')} ~${Settings.displayDelta(glide)}</span>`;
     }
     infoEl.innerHTML = html;
 
@@ -291,10 +291,11 @@ const PTCalculator = (() => {
   function calcFromTemp() {
     const tempVal = parseFloat(document.getElementById('pt-temp-input')?.value);
     if (isNaN(tempVal)) { clearPTResults(); return; }
+    const tempVal_f = Settings.userTempToF(tempVal);
 
     const refName = getSelectedRef();
     const info = getRefInfo(refName);
-    const result = getPressureFromTemp(refName, tempVal);
+    const result = getPressureFromTemp(refName, tempVal_f);
     if (!result) {
       const el = document.getElementById('pt-result-area');
       if (el) el.innerHTML = `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>${t('pt.no_data', '이 냉매의 P-T 데이터가 없습니다. CoolProp 엔진 로딩 중이면 잠시 후 다시 시도하거나, 기본 냉매(R-410A 등)를 선택하세요.')}</span></div>`;
@@ -304,7 +305,7 @@ const PTCalculator = (() => {
     const el = document.getElementById('pt-result-area');
     if (!el) return;
 
-    const tempC = fToC(tempVal).toFixed(1);
+    const secondaryTemp = Settings.isMetric() ? `${tempVal_f.toFixed(1)}°F` : `${fToC(tempVal_f).toFixed(1)}°C`;
     const isZeo = info && info.isZeotropic;
 
     if (isZeo && result.bubble !== undefined && result.dew !== undefined) {
@@ -321,14 +322,14 @@ const PTCalculator = (() => {
         </div>
         <div class="alert-box alert-info" style="margin-top:12px">
           ${App.statusSvg('info')}
-          <span>${t('pt.result.note', `${tempVal}°F (${tempC}°C) 에서의 포화압력. 과열도는 Dew, 과냉도는 Bubble 사용.`)}${result.source ? ' [' + result.source + ']' : ''}</span>
+          <span>${t('pt.result.note', `${tempVal}${Settings.tempLabel()} (${secondaryTemp}) 에서의 포화압력. 과열도는 Dew, 과냉도는 Bubble 사용.`)}${result.source ? ' [' + result.source + ']' : ''}</span>
         </div>`;
     } else {
       const pVal = result.pressure !== undefined ? result.pressure : result.bubble;
       el.innerHTML = `
         <div class="result-box" style="text-align:center">
           <div class="result-value" style="color:var(--accent-blue)">${pVal.toFixed(1)}</div>
-          <div class="result-label">${t('pt.result.pressure', '포화압력')} (psig) @ ${tempVal}°F (${tempC}°C)${result.source ? ' [' + result.source + ']' : ''}</div>
+          <div class="result-label">${t('pt.result.pressure', '포화압력')} (psig) @ ${tempVal}${Settings.tempLabel()} (${secondaryTemp})${result.source ? ' [' + result.source + ']' : ''}</div>
         </div>`;
     }
   }
@@ -354,12 +355,12 @@ const PTCalculator = (() => {
       el.innerHTML = `
         <div class="result-grid">
           <div class="result-box">
-            <div class="result-value" style="color:var(--accent-orange)">${bubbleTemp.toFixed(1)}°F</div>
-            <div class="result-label">${t('pt.result.bubble_temp', 'Bubble 온도')} (${fToC(bubbleTemp).toFixed(1)}°C)</div>
+            <div class="result-value" style="color:var(--accent-orange)">${Settings.displayTemp(bubbleTemp)}</div>
+            <div class="result-label">${t('pt.result.bubble_temp', 'Bubble 온도')} (${Settings.isMetric() ? bubbleTemp.toFixed(1) + '°F' : fToC(bubbleTemp).toFixed(1) + '°C'})</div>
           </div>
           <div class="result-box">
-            <div class="result-value" style="color:var(--accent-cyan)">${dewTemp.toFixed(1)}°F</div>
-            <div class="result-label">${t('pt.result.dew_temp', 'Dew 온도')} (${fToC(dewTemp).toFixed(1)}°C)</div>
+            <div class="result-value" style="color:var(--accent-cyan)">${Settings.displayTemp(dewTemp)}</div>
+            <div class="result-label">${t('pt.result.dew_temp', 'Dew 온도')} (${Settings.isMetric() ? dewTemp.toFixed(1) + '°F' : fToC(dewTemp).toFixed(1) + '°C'})</div>
           </div>
         </div>
         <div class="alert-box alert-info" style="margin-top:12px">
@@ -374,8 +375,8 @@ const PTCalculator = (() => {
       }
       el.innerHTML = `
         <div class="result-box" style="text-align:center">
-          <div class="result-value" style="color:var(--accent-blue)">${satTemp.toFixed(1)}°F</div>
-          <div class="result-label">${t('pt.sat_temp', '포화온도')} @ ${pressVal} psig (${fToC(satTemp).toFixed(1)}°C)</div>
+          <div class="result-value" style="color:var(--accent-blue)">${Settings.displayTemp(satTemp)}</div>
+          <div class="result-label">${t('pt.sat_temp', '포화온도')} @ ${pressVal} psig (${Settings.isMetric() ? satTemp.toFixed(1) + '°F' : fToC(satTemp).toFixed(1) + '°C'})</div>
         </div>`;
     }
   }
@@ -386,8 +387,9 @@ const PTCalculator = (() => {
     const suctionT = parseFloat(document.getElementById('pt-sh-temp')?.value);
     const el = document.getElementById('pt-sh-result');
     if (!el || isNaN(suctionP) || isNaN(suctionT)) return;
+    const suctionT_f = Settings.userTempToF(suctionT);
 
-    const result = calcSuperheat(refName, suctionP, suctionT);
+    const result = calcSuperheat(refName, suctionP, suctionT_f);
     if (!result) {
       el.innerHTML = `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>${t('pt.calc_fail', '계산 불가 — 압력과 온도 값을 모두 입력했는지 확인하세요. 다른 냉매를 선택해도 됩니다.')}</span></div>`;
       return;
@@ -398,17 +400,17 @@ const PTCalculator = (() => {
 
     el.innerHTML = `
       <div class="result-box" style="text-align:center">
-        <div class="result-value ${status}">${result.superheat.toFixed(1)}°F</div>
+        <div class="result-value ${status}">${Settings.displayDelta(result.superheat)}</div>
         <div class="result-label">${t('pt.superheat', '과열도')} (Superheat) ${App.statusSvg(status)} ${statusText}</div>
         <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:8px">
-          ${t('pt.sat_temp', '포화온도')} (Dew): ${result.satTemp}°F (${fToC(result.satTemp).toFixed(1)}°C)<br>
-          ${t('pt.suction_actual', '석션라인 실측')}: ${suctionT}°F
+          ${t('pt.sat_temp', '포화온도')} (Dew): ${Settings.displayTemp(result.satTemp)}<br>
+          ${t('pt.suction_actual', '석션라인 실측')}: ${suctionT}${Settings.tempLabel()}
         </div>
       </div>`;
 
     // Update accordion preview
     const shPreview = document.getElementById('sh-preview');
-    if (shPreview) shPreview.innerHTML = `${result.superheat.toFixed(1)}°F ${App.statusSvg(status)}`;
+    if (shPreview) shPreview.innerHTML = `${Settings.displayDelta(result.superheat)} ${App.statusSvg(status)}`;
   }
 
   function calcSC() {
@@ -417,8 +419,9 @@ const PTCalculator = (() => {
     const liquidT = parseFloat(document.getElementById('pt-sc-temp')?.value);
     const el = document.getElementById('pt-sc-result');
     if (!el || isNaN(dischargeP) || isNaN(liquidT)) return;
+    const liquidT_f = Settings.userTempToF(liquidT);
 
-    const result = calcSubcooling(refName, dischargeP, liquidT);
+    const result = calcSubcooling(refName, dischargeP, liquidT_f);
     if (!result) {
       el.innerHTML = `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>${t('pt.calc_fail', '계산 불가 — 압력과 온도 값을 모두 입력했는지 확인하세요. 다른 냉매를 선택해도 됩니다.')}</span></div>`;
       return;
@@ -429,17 +432,17 @@ const PTCalculator = (() => {
 
     el.innerHTML = `
       <div class="result-box" style="text-align:center">
-        <div class="result-value ${status}">${result.subcooling.toFixed(1)}°F</div>
+        <div class="result-value ${status}">${Settings.displayDelta(result.subcooling)}</div>
         <div class="result-label">${t('pt.subcooling', '과냉도')} (Subcooling) ${App.statusSvg(status)} ${statusText}</div>
         <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:8px">
-          ${t('pt.sat_temp', '포화온도')} (Bubble): ${result.satTemp}°F (${fToC(result.satTemp).toFixed(1)}°C)<br>
-          ${t('pt.liquid_actual', '리퀴드라인 실측')}: ${liquidT}°F
+          ${t('pt.sat_temp', '포화온도')} (Bubble): ${Settings.displayTemp(result.satTemp)}<br>
+          ${t('pt.liquid_actual', '리퀴드라인 실측')}: ${liquidT}${Settings.tempLabel()}
         </div>
       </div>`;
 
     // Update accordion preview
     const scPreview = document.getElementById('sc-preview');
-    if (scPreview) scPreview.innerHTML = `${result.subcooling.toFixed(1)}°F ${App.statusSvg(status)}`;
+    if (scPreview) scPreview.innerHTML = `${Settings.displayDelta(result.subcooling)} ${App.statusSvg(status)}`;
   }
 
   // --- Refresh dropdown when CoolProp becomes available ---

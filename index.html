@@ -293,15 +293,7 @@
     <!-- 4. Normal Range Reference (compact) -->
     <div class="glass-card">
       <div class="section-title" data-i18n="home.normalrange.title">정상 범위</div>
-      <div class="ref-compact">
-        <span class="ref-item"><strong style="color:var(--accent-green)">SH</strong> 5~15°F</span>
-        <span class="ref-divider">·</span>
-        <span class="ref-item"><strong style="color:var(--accent-green)">SC</strong> 8~14°F</span>
-        <span class="ref-divider">·</span>
-        <span class="ref-item"><strong style="color:var(--accent-green)">ΔT</strong> 15~22°F</span>
-        <span class="ref-divider">·</span>
-        <span class="ref-item"><strong style="color:var(--accent-green)">DTD</strong> 35°F</span>
-      </div>
+      <div class="ref-compact" id="home-ref-ranges"></div>
     </div>
 
     <!-- 5. Engine Status -->
@@ -947,7 +939,7 @@ window.renderRefTable = function() {
       <td class="center" style="color:var(--text-secondary)">${r.type || ''}</td>
       <td class="center" style="font-family:var(--font-mono)">${r.gwp !== undefined ? r.gwp : '—'}</td>
       <td class="center" style="color:${safetyColor};font-weight:600">${safety}</td>
-      <td class="center">${r.isZeotropic ? `~${r.glide_f || r.glide || 0}°F` : '—'}</td>
+      <td class="center">${r.isZeotropic ? `~${Settings.displayDelta(r.glide_f || r.glide || 0)}` : '—'}</td>
     `;
     tbody.appendChild(tr);
   });
