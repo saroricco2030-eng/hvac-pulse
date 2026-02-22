@@ -826,9 +826,43 @@ const App = (() => {
   }
 
   // =============================================
-  // Settings (Temperature Unit Toggle)
+  // Settings (Theme + Temperature Unit Toggle)
   // =============================================
+  function setTheme(theme) {
+    localStorage.setItem('hvac-theme', theme);
+    if (theme === 'light') {
+      document.documentElement.dataset.theme = 'light';
+    } else {
+      delete document.documentElement.dataset.theme;
+    }
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = theme === 'light' ? '#F8FAFC' : '#040C12';
+  }
+
   function initSettings() {
+    // --- Theme toggle ---
+    const themeDark = document.getElementById('setting-theme-dark');
+    const themeLight = document.getElementById('setting-theme-light');
+    const savedTheme = localStorage.getItem('hvac-theme') ||
+      (matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark');
+
+    if (themeDark && themeLight) {
+      themeDark.classList.toggle('active', savedTheme === 'dark');
+      themeLight.classList.toggle('active', savedTheme === 'light');
+
+      themeDark.addEventListener('click', () => {
+        setTheme('dark');
+        themeDark.classList.add('active');
+        themeLight.classList.remove('active');
+      });
+      themeLight.addEventListener('click', () => {
+        setTheme('light');
+        themeLight.classList.add('active');
+        themeDark.classList.remove('active');
+      });
+    }
+
+    // --- Temperature unit toggle ---
     const unitPref = Settings.get(Settings.KEYS.UNIT_TEMP);
     const unitToggleF = document.getElementById('setting-unit-f');
     const unitToggleC = document.getElementById('setting-unit-c');

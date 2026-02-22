@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <meta name="theme-color" content="#0a0e1a">
+  <meta name="theme-color" content="#040C12">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,6 +30,9 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="./css/style.css">
+  <!-- Flash prevention: set theme before paint -->
+  <style>body{background:#040C12}html[data-theme="light"] body{background:#F8FAFC}</style>
+  <script>!function(){var t=localStorage.getItem('hvac-theme');if(t==='light'||(!t&&matchMedia('(prefers-color-scheme:light)').matches))document.documentElement.dataset.theme='light'}()</script>
 </head>
 <body>
 
@@ -727,6 +730,16 @@
     <div id="lang-section"></div>
 
     <div class="glass-card">
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title" data-i18n="settings.theme.title">화면 모드</div>
+          <div class="setting-desc" data-i18n="settings.theme.desc">다크 / 라이트 테마</div>
+        </div>
+        <div class="unit-toggle">
+          <button id="setting-theme-dark" class="active">Dark</button>
+          <button id="setting-theme-light">Light</button>
+        </div>
+      </div>
       <div class="setting-item">
         <div class="setting-info">
           <div class="setting-title" data-i18n="settings.unit_temp.title">온도 단위</div>
