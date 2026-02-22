@@ -683,6 +683,8 @@ const LANG_EN = {
   'validation.return_t': 'Enter return air temperature',
   'validation.outdoor_t': 'Enter outdoor temperature',
   'validation.pressure_compare': 'Discharge pressure must be higher than suction pressure',
+  'validation.pressure_range': 'Check pressure range (0~800 psig)',
+  'validation.temp_range': 'Check temperature range (-50~200°F)',
   'error.calc_error': 'Calculation error — Verify your inputs and refrigerant selection. Pressure or temperature values may be missing or out of range.',
 
   // =============================================
@@ -946,6 +948,7 @@ const LANG_EN = {
   'toast.delete_fail': 'Delete failed',
   'toast.import_success': 'Data imported successfully.',
   'toast.import_fail': 'Import failed — Check file format.',
+  'toast.file_too_large': 'File is too large (max 10MB).',
 
   // Error code extras
   'errorcode.codes_label': 'error codes',

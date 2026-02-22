@@ -683,6 +683,8 @@ const LANG_KO = {
   'validation.return_t': '환기 온도를 입력하세요',
   'validation.outdoor_t': '외기 온도를 입력하세요',
   'validation.pressure_compare': '토출압력은 흡입압력보다 높아야 합니다',
+  'validation.pressure_range': '압력 범위를 확인하세요 (0~800 psig)',
+  'validation.temp_range': '온도 범위를 확인하세요 (-50~200°F)',
   'error.calc_error': '계산 오류 — 입력값과 냉매 선택을 확인하세요. 압력 또는 온도 값이 누락되었거나 범위를 벗어났을 수 있습니다.',
 
   // =============================================
@@ -941,6 +943,7 @@ const LANG_KO = {
   'toast.delete_fail': '삭제 실패',
   'toast.import_success': '데이터를 가져왔습니다.',
   'toast.import_fail': '가져오기 실패 — 파일 형식을 확인하세요.',
+  'toast.file_too_large': '파일이 너무 큽니다 (최대 10MB).',
   'toast.saved': '저장되었습니다.',
   'toast.save_fail': '저장 실패',
 

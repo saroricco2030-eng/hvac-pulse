@@ -13,7 +13,7 @@ const Auth = (() => {
   // =============================================
   function init() {
     if (!isFirebaseConfigured()) {
-      console.log('Auth: Firebase not configured — local-only mode');
+      // Firebase not configured — local-only mode
       renderSection();
       return;
     }

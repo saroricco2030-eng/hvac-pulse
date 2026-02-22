@@ -675,7 +675,6 @@ const App = (() => {
 
     CoolPropEngine.init().then(ready => {
       if (ready) {
-        console.log('CoolProp WASM engine ready');
         showToast(t('toast.coolprop_ready', 'CoolProp 엔진 로드 완료 — NIST급 계산 활성화'), 'success');
         const badge = document.getElementById('home-engine-status');
         if (badge) {
@@ -692,7 +691,6 @@ const App = (() => {
           PHInteractive.onEngineReady();
         }
       } else {
-        console.log('CoolProp WASM not available, using legacy P-T data');
         const badge = document.getElementById('home-engine-status');
         if (badge) {
           badge.textContent = t('app.engine_legacy', '레거시 P-T 데이터 모드');
@@ -1016,8 +1014,6 @@ const App = (() => {
 
     navigator.serviceWorker.register('./sw.js')
       .then(reg => {
-        console.log('SW registered:', reg.scope);
-
         // Check for updates every 30 minutes
         setInterval(() => reg.update(), 30 * 60 * 1000);
 
@@ -1033,7 +1029,7 @@ const App = (() => {
           });
         });
       })
-      .catch(err => console.log('SW registration failed:', err));
+      .catch(err => console.warn('SW registration failed:', err));
   }
 
   // =============================================

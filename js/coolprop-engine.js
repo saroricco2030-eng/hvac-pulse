@@ -26,7 +26,7 @@ const CoolPropEngine = (() => {
           return false;
         }
 
-        console.log('CoolProp: Factory loaded, initializing WASM...');
+        // Factory loaded, initializing WASM
 
         // Call the Emscripten factory function to get module instance
         cpInstance = await factory();
@@ -34,7 +34,7 @@ const CoolPropEngine = (() => {
         // Verify PropsSI is available (embind-registered)
         if (typeof cpInstance.PropsSI === 'function') {
           ready = true;
-          console.log('CoolProp: WASM engine initialized (PropsSI ready)');
+          // WASM engine initialized (PropsSI ready)
           return true;
         }
 
@@ -44,7 +44,7 @@ const CoolPropEngine = (() => {
             cpInstance.PropsSI = cpInstance.cwrap('PropsSI', 'number',
               ['string', 'string', 'number', 'string', 'number', 'string']);
             ready = true;
-            console.log('CoolProp: WASM engine initialized (cwrap)');
+            // WASM engine initialized (cwrap)
             return true;
           } catch (e) {
             console.warn('CoolProp: cwrap failed', e);
