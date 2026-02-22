@@ -496,7 +496,7 @@ const MaintenanceChecklist = (() => {
             <div class="cl-item ${item.checked ? 'cl-item--checked' : ''}">
               <div class="cl-item-row" onclick="MaintenanceChecklist.toggleCheck(${i})">
                 <span class="cl-item-check">${item.checked ? App.statusSvg('normal') : '☐'}</span>
-                <span class="cl-item-text ${item.checked ? 'cl-item-text--done' : ''}">${item.text}</span>
+                <span class="cl-item-text ${item.checked ? 'cl-item-text--done' : ''}">${I18n.resolveUnits(item.text)}</span>
               </div>
               ${item.memo ? `<div class="cl-memo">${item.memo}</div>` : ''}
               <div style="margin-top:6px;margin-left:32px">
