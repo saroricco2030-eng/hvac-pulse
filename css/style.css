@@ -129,9 +129,12 @@ html[data-theme="light"] {
   --glow-orange: 0 2px 8px rgba(217, 119, 6, 0.12);
 }
 /* Light — hardcoded dark backgrounds that need override */
-html[data-theme="light"] .tab-bar { background: rgba(255, 255, 255, 0.92); border-top-color: #E2E8F0; }
-html[data-theme="light"] .tab-item { color: #94A3B8; }
-html[data-theme="light"] .tab-item.active { color: #0891B2; }
+html[data-theme="light"] .tab-bar { background: rgba(255,255,255,0.92); border-top-color: #E2E8F0; }
+html[data-theme="light"] .ca-val-card { background: rgba(255,255,255,0.9); border-color: rgba(0,0,0,0.1); }
+html[data-theme="light"] .phi-popover { background: rgba(255,255,255,0.95); border-color: rgba(0,0,0,0.1); }
+html[data-theme="light"] .onboarding-overlay { background: rgba(248,250,252,0.97); }
+html[data-theme="light"] .search-overlay { background: rgba(248,250,252,0.95); }
+html[data-theme="light"] .auth-modal-overlay { background: rgba(0,0,0,0.25); }
 
 /* --- Reset & Base --- */
 *, *::before, *::after {
