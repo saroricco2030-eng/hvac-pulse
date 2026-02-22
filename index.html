@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://www.gstatic.com">
 
   <!-- Google Fonts (moved from CSS @import for faster LCP) -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=Outfit:wght@200;300;700&display=swap">
 
   <!-- Styles -->
   <link rel="stylesheet" href="./css/style.css">
@@ -41,22 +41,70 @@
   </div>
 </noscript>
 
-<!-- Splash Screen -->
+<!-- Splash Screen — animated cycle ring + pulse -->
 <div id="splash-screen" class="splash-screen">
-  <div class="splash-content">
-    <div class="splash-icon">
-      <svg viewBox="0 0 120 120" width="80" height="80">
-        <circle cx="60" cy="60" r="55" fill="none" stroke="#06b6d4" stroke-width="2" stroke-dasharray="12,6" opacity="0.4"/>
-        <g transform="translate(60,55)" stroke="#06b6d4" stroke-width="3" fill="none" opacity="0.9">
-          <line x1="0" y1="-28" x2="0" y2="28"/>
-          <line x1="-24" y1="-14" x2="24" y2="14"/>
-          <line x1="-24" y1="14" x2="24" y2="-14"/>
-        </g>
-        <text x="60" y="100" text-anchor="middle" fill="#e8ecf4" font-family="system-ui,sans-serif" font-size="11" font-weight="700">HVAC Pulse</text>
-      </svg>
+  <div class="splash-bg-base"></div>
+  <div class="splash-bg-glow"></div>
+  <div class="splash-bg-vig"></div>
+  <svg class="splash-svg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="sp-gt" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" style="stop-color:var(--sp-gt1)"/><stop offset="50%" style="stop-color:var(--sp-gt2)"/><stop offset="100%" style="stop-color:var(--sp-gt3)"/>
+      </linearGradient>
+      <linearGradient id="sp-gr" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" style="stop-color:var(--sp-gr1)"/><stop offset="100%" style="stop-color:var(--sp-gr2)"/>
+      </linearGradient>
+      <linearGradient id="sp-gb" x1="1" y1="0" x2="0" y2="0">
+        <stop offset="0%" style="stop-color:var(--sp-gb1)"/><stop offset="50%" style="stop-color:var(--sp-gb2)"/><stop offset="100%" style="stop-color:var(--sp-gb3)"/>
+      </linearGradient>
+      <linearGradient id="sp-gp" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" style="stop-color:var(--sp-pulse)" stop-opacity="0.15"/>
+        <stop offset="10%" style="stop-color:var(--sp-pulse)" stop-opacity="0.7"/>
+        <stop offset="50%" style="stop-color:var(--sp-pulse)"/>
+        <stop offset="90%" style="stop-color:var(--sp-pulse)" stop-opacity="0.7"/>
+        <stop offset="100%" style="stop-color:var(--sp-pulse)" stop-opacity="0.15"/>
+      </linearGradient>
+      <filter id="sp-f1" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <!-- Cycle arcs (sequential draw) -->
+    <g fill="none" stroke-linecap="round" filter="url(#sp-f1)">
+      <path class="sp-arc a1" d="M320,420 A180,180 0 0,1 680,420" stroke="url(#sp-gt)" stroke-width="2.5" opacity="0.9"/>
+      <path class="sp-arc a2" d="M680,420 A180,180 0 0,1 500,600" stroke="url(#sp-gr)" stroke-width="2.5" opacity="0.85"/>
+      <path class="sp-arc a3" d="M500,600 A180,180 0 0,1 320,420" stroke="url(#sp-gb)" stroke-width="2" opacity="0.8"/>
+    </g>
+    <!-- Cycle points (pop-in) -->
+    <g filter="url(#sp-f1)">
+      <g class="sp-cp c1"><circle cx="340" cy="300" r="7" class="sp-fill-comp"/><circle cx="340" cy="300" r="3.5" fill="#fff" opacity="0.8"/></g>
+      <g class="sp-cp c2"><circle cx="660" cy="300" r="7" class="sp-fill-cond"/><circle cx="660" cy="300" r="3.5" fill="#fff" opacity="0.8"/></g>
+      <g class="sp-cp c3"><circle cx="620" cy="560" r="6" class="sp-fill-exp"/><circle cx="620" cy="560" r="3" fill="#fff" opacity="0.7"/></g>
+      <g class="sp-cp c4"><circle cx="380" cy="560" r="6" class="sp-fill-evap"/><circle cx="380" cy="560" r="3" fill="#fff" opacity="0.7"/></g>
+    </g>
+    <!-- Direction arrows -->
+    <g class="sp-arrows" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="520,242 530,240 528,250" class="sp-arr-top" stroke-width="1.5"/>
+      <polyline points="684,450 686,460 676,458" class="sp-arr-right" stroke-width="1.5"/>
+      <polyline points="470,602 460,600 462,590" class="sp-arr-bottom" stroke-width="1.5"/>
+      <polyline points="316,390 314,380 324,382" class="sp-arr-left" stroke-width="1.5"/>
+    </g>
+    <!-- Pulse line (L→R draw) -->
+    <path class="sp-pulse" d="M160,420 L380,420 L410,420 L435,360 L460,480 L500,310 L540,520 L565,370 L590,420 L620,420 L840,420"
+          fill="none" stroke="url(#sp-gp)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#sp-f1)"/>
+    <!-- Peak dot + heartbeat ring -->
+    <circle class="sp-peak" cx="500" cy="310" r="4" style="fill:var(--sp-pulse)" filter="url(#sp-f1)"/>
+    <circle class="sp-hb" cx="500" cy="310" r="15" fill="none" style="stroke:var(--sp-pulse)" stroke-width="0.8" transform-origin="500 310"/>
+  </svg>
+  <div class="splash-bottom">
+    <div class="sp-t-main">HVAC</div>
+    <div class="sp-t-sub">PULSE</div>
+    <div class="sp-t-div"></div>
+    <div class="sp-t-tag">HVAC-R DIAGNOSTIC SYSTEM</div>
+    <div class="sp-load">
+      <div class="sp-load-bar"></div>
+      <div class="sp-load-txt">INITIALIZING</div>
     </div>
-    <div class="splash-text" data-i18n="splash.title">HVAC Pulse</div>
-    <div class="splash-sub" data-i18n="splash.loading">Loading...</div>
   </div>
 </div>
 

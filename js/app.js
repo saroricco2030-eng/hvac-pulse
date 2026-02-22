@@ -923,8 +923,8 @@ const App = (() => {
 
     setTimeout(() => {
       splash.classList.add('fade-out');
-      setTimeout(() => splash.remove(), 500);
-    }, 800);
+      setTimeout(() => splash.remove(), 600);
+    }, 4500);
   }
 
   // =============================================
