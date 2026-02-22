@@ -1467,5 +1467,25 @@ const LANG_EN = {
   'phi.fault_ed.non_condensable.p1': 'Overall pressure rise → Indirect effect.',
   'phi.fault_ed.non_condensable.p2': 'Discharge pressure and temperature rise significantly.',
   'phi.fault_ed.non_condensable.p3': 'Condensation efficiency drops → Subcooling varies.',
-  'phi.fault_ed.non_condensable.p4': 'Entire cycle shifts upward.'
+  'phi.fault_ed.non_condensable.p4': 'Entire cycle shifts upward.',
+
+  // =============================================
+  // PDF Export
+  // =============================================
+  'report.pdf_download': 'Download PDF',
+  'report.pdf_generating': 'Generating PDF...',
+  'report.pdf_success': 'PDF downloaded',
+  'report.pdf_fallback': 'PDF library not loaded. Using print dialog instead.',
+
+  // =============================================
+  // Cloud Sync
+  // =============================================
+  'sync.success': 'Cloud sync complete',
+  'sync.fail': 'Sync failed — please try again later',
+  'sync.status_syncing': 'Syncing...',
+  'sync.status_error': 'Sync failed',
+  'sync.status_just': 'Just synced',
+  'sync.status_min': '{n} min ago',
+  'sync.status_hr': '{n} hr ago',
+  'sync.status_day': '{n} day(s) ago'
 };

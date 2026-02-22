@@ -734,8 +734,8 @@ const DiagnosticReport = (() => {
         <button class="dr-action-btn" onclick="DiagnosticReport.shareReport()">
           <span>📤</span><span>${t('report.share_btn', '공유')}</span>
         </button>
-        <button class="dr-action-btn" onclick="DiagnosticReport.printReport()">
-          <span>🖨️</span><span>${t('report.print', 'PDF / 인쇄')}</span>
+        <button class="dr-action-btn" onclick="DiagnosticReport.exportPDF()">
+          <span>📥</span><span>${t('report.pdf_download', 'PDF 다운로드')}</span>
         </button>
         <button class="dr-action-btn" onclick="DiagnosticReport.saveToHistory()">
           <span>💾</span><span>${t('report.save_btn', '기록 저장')}</span>
@@ -945,6 +945,80 @@ const DiagnosticReport = (() => {
     setTimeout(() => document.body.classList.remove('printing-report'), 1000);
   }
 
+  async function exportPDF() {
+    // Fallback if libraries not loaded
+    if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
+      printReport();
+      if (typeof App !== 'undefined') App.showToast(t('report.pdf_fallback', 'PDF 라이브러리 미로드. 인쇄 대화상자로 대체합니다.'), 'info');
+      return;
+    }
+
+    const el = document.querySelector('.diag-report');
+    if (!el) {
+      if (typeof App !== 'undefined') App.showToast(t('report.no_report', '공유할 진단서가 없습니다.'), 'warning');
+      return;
+    }
+
+    if (typeof App !== 'undefined') App.showToast(t('report.pdf_generating', 'PDF 생성 중...'), 'info');
+
+    // Save original styles
+    const origBg = el.style.background;
+    const origColor = el.style.color;
+
+    // Apply print-friendly styles
+    el.style.background = '#fff';
+    el.style.color = '#111';
+
+    try {
+      const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+      const { jsPDF } = jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const imgW = pageW - margin * 2;
+      const imgH = (canvas.height * imgW) / canvas.width;
+      const usableH = pageH - margin * 2;
+
+      if (imgH <= usableH) {
+        pdf.addImage(imgData, 'JPEG', margin, margin, imgW, imgH);
+      } else {
+        // Multi-page: slice canvas into pages
+        const totalPages = Math.ceil(imgH / usableH);
+        for (let page = 0; page < totalPages; page++) {
+          if (page > 0) pdf.addPage();
+          const srcY = Math.round((page * usableH * canvas.width) / imgW);
+          const srcH = Math.min(Math.round((usableH * canvas.width) / imgW), canvas.height - srcY);
+          const destH = (srcH * imgW) / canvas.width;
+
+          const sliceCanvas = document.createElement('canvas');
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = srcH;
+          const ctx = sliceCanvas.getContext('2d');
+          ctx.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
+
+          const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.95);
+          pdf.addImage(sliceData, 'JPEG', margin, margin, imgW, destH);
+        }
+      }
+
+      const ref = _lastReport?.refrigerant || 'Unknown';
+      const date = new Date().toISOString().slice(0, 10);
+      pdf.save(`HVAC-Pulse_${ref}_${date}.pdf`);
+
+      if (typeof App !== 'undefined') App.showToast(t('report.pdf_success', 'PDF 다운로드 완료'), 'normal');
+    } catch (err) {
+      console.error('[DiagReport] PDF generation failed:', err);
+      printReport();
+      if (typeof App !== 'undefined') App.showToast(t('report.pdf_fallback', 'PDF 생성 실패. 인쇄 대화상자로 대체합니다.'), 'info');
+    } finally {
+      el.style.background = origBg;
+      el.style.color = origColor;
+    }
+  }
+
   function saveToHistory() {
     if (!_lastReport) {
       if (typeof App !== 'undefined') App.showToast(t('report.no_save', '저장할 진단 결과가 없습니다.'), 'warning');
@@ -1049,6 +1123,7 @@ const DiagnosticReport = (() => {
     toggleCheck,
     shareReport,
     printReport,
+    exportPDF,
     saveToHistory,
     getLastReport: () => _lastReport
   };

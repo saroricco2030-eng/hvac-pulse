@@ -106,33 +106,8 @@ const PHDiagram = (() => {
   function populateRefSelect() {
     const sel = document.getElementById('ph-ref-select');
     if (!sel) return;
-
-    sel.innerHTML = '';
-    const lang = typeof I18n !== 'undefined' ? I18n.getLang() : 'ko';
-    if (typeof RefrigerantCatalog !== 'undefined') {
-      const grouped = RefrigerantCatalog.getGroupedByCategory();
-      for (const [catKey, groupData] of Object.entries(grouped)) {
-        const cat = groupData.category;
-        const group = document.createElement('optgroup');
-        const catName = (lang !== 'ko' && cat.name_en) ? cat.name_en : cat.name_kr;
-        group.label = `${cat.icon} ${catName}`;
-        groupData.refrigerants.forEach(r => {
-          const opt = document.createElement('option');
-          opt.value = r.id;
-          const rName = (lang !== 'ko' && r.name_en) ? r.name_en : r.name_kr;
-          opt.textContent = `${rName} (${r.safety})`;
-          group.appendChild(opt);
-        });
-        sel.appendChild(group);
-      }
-    } else {
-      // Fallback to legacy
-      getRefrigerantList().forEach(key => {
-        const opt = document.createElement('option');
-        opt.value = key;
-        opt.textContent = key;
-        sel.appendChild(opt);
-      });
+    if (typeof PTCalculator !== 'undefined') {
+      PTCalculator.populateRefDropdown(sel, currentRefrigerant);
     }
   }
 

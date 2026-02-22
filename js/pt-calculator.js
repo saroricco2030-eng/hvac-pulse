@@ -232,40 +232,66 @@ const PTCalculator = (() => {
     if (tshBtn) tshBtn.addEventListener('click', calcTargetSH);
   }
 
-  // --- Build category-based dropdown ---
-  function populateRefDropdown(selectEl) {
+  // --- Build category-based dropdown (shared utility) ---
+  function populateRefDropdown(selectEl, selected) {
     selectEl.innerHTML = '';
+    const lang = typeof I18n !== 'undefined' ? I18n.getLang() : 'ko';
 
     if (typeof RefrigerantCatalog !== 'undefined') {
       const grouped = RefrigerantCatalog.getGroupedByCategory();
       for (const [catKey, groupData] of Object.entries(grouped)) {
         const cat = groupData.category;
         const optgroup = document.createElement('optgroup');
-        const lang = typeof I18n !== 'undefined' ? I18n.getLang() : 'ko';
         optgroup.label = `${cat.icon} ${(lang !== 'ko' && cat.name_en) ? cat.name_en : cat.name_kr}`;
         groupData.refrigerants.forEach(r => {
           const opt = document.createElement('option');
           opt.value = r.id;
           const rName = (lang !== 'ko' && r.name_en) ? r.name_en : r.name_kr;
           opt.textContent = `${rName} (${r.safety})`;
-          // Indicate CoolProp vs Legacy
           if (!r.hasLegacyData && !(typeof CoolPropEngine !== 'undefined' && CoolPropEngine.isReady())) {
             opt.textContent += ' *';
           }
+          if (selected && r.id === selected) opt.selected = true;
           optgroup.appendChild(opt);
         });
         selectEl.appendChild(optgroup);
       }
     } else {
-      // Legacy fallback
       getRefrigerantList().forEach(key => {
         const ref = REFRIGERANT_DB[key];
         const opt = document.createElement('option');
         opt.value = key;
         opt.textContent = `${key} (${ref.safety})`;
+        if (selected && key === selected) opt.selected = true;
         selectEl.appendChild(opt);
       });
     }
+  }
+
+  // Return category-based <option> HTML string (for innerHTML use)
+  function buildRefOptionsHTML(selected) {
+    const lang = typeof I18n !== 'undefined' ? I18n.getLang() : 'ko';
+    let html = '';
+    if (typeof RefrigerantCatalog !== 'undefined') {
+      const grouped = RefrigerantCatalog.getGroupedByCategory();
+      for (const [, groupData] of Object.entries(grouped)) {
+        const cat = groupData.category;
+        const catName = (lang !== 'ko' && cat.name_en) ? cat.name_en : cat.name_kr;
+        html += `<optgroup label="${cat.icon} ${catName}">`;
+        groupData.refrigerants.forEach(r => {
+          const rName = (lang !== 'ko' && r.name_en) ? r.name_en : r.name_kr;
+          const sel = (selected && r.id === selected) ? ' selected' : '';
+          html += `<option value="${r.id}"${sel}>${rName} (${r.safety})</option>`;
+        });
+        html += '</optgroup>';
+      }
+    } else {
+      getRefrigerantList().forEach(key => {
+        const sel = (selected && key === selected) ? ' selected' : '';
+        html += `<option value="${key}"${sel}>${key}</option>`;
+      });
+    }
+    return html;
   }
 
   function updateRefInfo() {
@@ -575,6 +601,7 @@ const PTCalculator = (() => {
     cToF,
     initUI,
     onEngineReady,
-    populateRefDropdown
+    populateRefDropdown,
+    buildRefOptionsHTML
   };
 })();

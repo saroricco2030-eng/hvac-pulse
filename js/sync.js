@@ -71,11 +71,11 @@ const CloudSync = (() => {
       lastSyncTime = Date.now();
       localStorage.setItem('hvac-last-sync', String(lastSyncTime));
       lastSyncStatus = 'success';
-      App.showToast('클라우드 동기화 완료', 'success');
+      App.showToast(t('sync.success', '클라우드 동기화 완료'), 'success');
     } catch (err) {
       console.error('CloudSync: sync failed', err);
       lastSyncStatus = 'error';
-      App.showToast('동기화 실패 — 나중에 다시 시도해주세요', 'error');
+      App.showToast(t('sync.fail', '동기화 실패 — 나중에 다시 시도해주세요'), 'error');
     } finally {
       syncing = false;
       if (typeof Auth !== 'undefined') Auth.renderSection();
@@ -297,14 +297,14 @@ const CloudSync = (() => {
   // Status text (for UI display)
   // =============================================
   function getStatusText() {
-    if (lastSyncStatus === 'syncing') return '동기화 중...';
-    if (lastSyncStatus === 'error') return '동기화 실패';
+    if (lastSyncStatus === 'syncing') return t('sync.status_syncing', '동기화 중...');
+    if (lastSyncStatus === 'error') return t('sync.status_error', '동기화 실패');
     if (lastSyncTime) {
       const diff = Date.now() - lastSyncTime;
-      if (diff < 60000) return '방금 동기화됨';
-      if (diff < 3600000) return `${Math.floor(diff / 60000)}분 전 동기화`;
-      if (diff < 86400000) return `${Math.floor(diff / 3600000)}시간 전 동기화`;
-      return `${Math.floor(diff / 86400000)}일 전 동기화`;
+      if (diff < 60000) return t('sync.status_just', '방금 동기화됨');
+      if (diff < 3600000) return t('sync.status_min', `${Math.floor(diff / 60000)}분 전 동기화`).replace('{n}', Math.floor(diff / 60000));
+      if (diff < 86400000) return t('sync.status_hr', `${Math.floor(diff / 3600000)}시간 전 동기화`).replace('{n}', Math.floor(diff / 3600000));
+      return t('sync.status_day', `${Math.floor(diff / 86400000)}일 전 동기화`).replace('{n}', Math.floor(diff / 86400000));
     }
     return '';
   }

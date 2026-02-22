@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="HVAC Pulse — 과열도/과냉도 계산, 교차 진단, NIST 비침습 진단, TXV 트러블슈팅, 정비 관리">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://www.gstatic.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; font-src 'self' https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; frame-src 'self' https://*.firebaseapp.com; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.gstatic.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://www.gstatic.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; font-src 'self' https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; frame-src 'self' https://*.firebaseapp.com; base-uri 'self'; form-action 'self'">
   <meta name="author" content="HVAC Pulse">
   <meta name="copyright" content="Copyright (c) 2024-2026 HVAC Pulse. All rights reserved.">
   <meta name="robots" content="noindex, nofollow">
@@ -988,6 +988,10 @@ document.addEventListener('DOMContentLoaded', () => window.renderRefTable());
   onerror="console.warn('Firebase Auth SDK load failed')"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"
   onerror="console.warn('Firebase Firestore SDK load failed')"></script>
+
+<!-- PDF Export (lazy-loaded via defer) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js" defer></script>
 
 <!-- ===================================== -->
 <!-- JS Modules (order matters) -->

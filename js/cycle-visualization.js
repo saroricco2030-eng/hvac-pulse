@@ -133,6 +133,9 @@ const CycleVisualization = (() => {
   }
 
   function getRefrigerantOptions() {
+    if (typeof PTCalculator !== 'undefined' && PTCalculator.buildRefOptionsHTML) {
+      return PTCalculator.buildRefOptionsHTML(selectedRefrigerant);
+    }
     return getRefrigerantList().map(key => {
       const r = REFRIGERANT_DB[key];
       const sel = key === selectedRefrigerant ? ' selected' : '';

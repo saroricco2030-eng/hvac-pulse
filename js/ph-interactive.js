@@ -415,33 +415,8 @@ const PHInteractive = (() => {
   function populateRefSelect() {
     const sel = document.getElementById('phi-ref-select');
     if (!sel) return;
-    sel.innerHTML = '';
-
-    const lang = typeof I18n !== 'undefined' ? I18n.getLang() : 'ko';
-    if (typeof RefrigerantCatalog !== 'undefined') {
-      const grouped = RefrigerantCatalog.getGroupedByCategory();
-      for (const [, groupData] of Object.entries(grouped)) {
-        const cat = groupData.category;
-        const group = document.createElement('optgroup');
-        const catName = (lang !== 'ko' && cat.name_en) ? cat.name_en : cat.name_kr;
-        group.label = `${cat.icon} ${catName}`;
-        groupData.refrigerants.forEach(r => {
-          const opt = document.createElement('option');
-          opt.value = r.id;
-          const rName = (lang !== 'ko' && r.name_en) ? r.name_en : r.name_kr;
-          opt.textContent = `${rName} (${r.safety})`;
-          if (r.id === currentRef) opt.selected = true;
-          group.appendChild(opt);
-        });
-        sel.appendChild(group);
-      }
-    } else {
-      ['R-22','R-410A','R-32','R-134a','R-404A','R-407C','R-290'].forEach(k => {
-        const opt = document.createElement('option');
-        opt.value = k; opt.textContent = k;
-        if (k === currentRef) opt.selected = true;
-        sel.appendChild(opt);
-      });
+    if (typeof PTCalculator !== 'undefined') {
+      PTCalculator.populateRefDropdown(sel, currentRef);
     }
   }
 

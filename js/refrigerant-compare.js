@@ -111,28 +111,14 @@ const RefrigerantCompare = (() => {
   }
 
   function buildRefOptions(selected) {
-    const lang = typeof I18n !== 'undefined' ? I18n.getLang() : 'ko';
-    let html = '';
-    if (typeof RefrigerantCatalog !== 'undefined') {
-      const grouped = RefrigerantCatalog.getGroupedByCategory();
-      for (const [catKey, groupData] of Object.entries(grouped)) {
-        const cat = groupData.category;
-        const catName = (lang !== 'ko' && cat.name_en) ? cat.name_en : cat.name_kr;
-        html += `<optgroup label="${cat.icon} ${catName}">`;
-        groupData.refrigerants.forEach(r => {
-          const sel = r.id === selected ? ' selected' : '';
-          const rName = (lang !== 'ko' && r.name_en) ? r.name_en : r.name_kr;
-          html += `<option value="${r.id}"${sel}>${rName} (${r.safety})</option>`;
-        });
-        html += '</optgroup>';
-      }
-    } else {
-      getRefrigerantList().forEach(key => {
-        const sel = key === selected ? ' selected' : '';
-        html += `<option value="${key}"${sel}>${key}</option>`;
-      });
+    if (typeof PTCalculator !== 'undefined' && PTCalculator.buildRefOptionsHTML) {
+      return PTCalculator.buildRefOptionsHTML(selected);
     }
-    return html;
+    // Legacy fallback
+    return getRefrigerantList().map(key => {
+      const sel = key === selected ? ' selected' : '';
+      return `<option value="${key}"${sel}>${key}</option>`;
+    }).join('');
   }
 
   // --- Run comparison ---

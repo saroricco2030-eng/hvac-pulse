@@ -51,9 +51,9 @@ const I18n = (() => {
       currentLang = saved;
     }
 
-    // Apply if not Korean
+    // Apply translations and unit labels (Korean also needs unit resolution)
+    applyToStaticDOM();
     if (currentLang !== 'ko') {
-      applyToStaticDOM();
       startObserver();
     }
   }
@@ -117,22 +117,31 @@ const I18n = (() => {
   // =============================================
   function applyToStaticDOM() {
     if (currentLang === 'ko') {
-      // Restore Korean text (with current unit labels)
+      // Apply unit labels to Korean text (cache original if first run)
       document.querySelectorAll('[data-i18n]').forEach(el => {
-        const koText = el.dataset.i18nKo;
-        if (koText) restoreElement(el, resolveUnits(koText));
+        const koText = el.dataset.i18nKo || getTextOnly(el);
+        if (koText) {
+          if (!el.dataset.i18nKo) el.dataset.i18nKo = koText;
+          restoreElement(el, resolveUnits(koText));
+        }
       });
-      // Restore Korean placeholders
+      // Placeholders — resolve units
       document.querySelectorAll('[data-i18n-ph]').forEach(el => {
-        const koPh = el.dataset.i18nKoPh;
-        if (koPh) el.placeholder = koPh;
+        const koPh = el.dataset.i18nKoPh || el.placeholder;
+        if (koPh) {
+          if (!el.dataset.i18nKoPh) el.dataset.i18nKoPh = koPh;
+          el.placeholder = resolveUnits(koPh);
+        }
       });
-      // Restore Korean help tooltips
+      // Help tooltips — resolve units
       document.querySelectorAll('[data-i18n-help]').forEach(el => {
-        const koHelp = el.dataset.i18nKoHelp;
-        if (koHelp) el.dataset.help = koHelp;
+        const koHelp = el.dataset.i18nKoHelp || el.dataset.help;
+        if (koHelp) {
+          if (!el.dataset.i18nKoHelp) el.dataset.i18nKoHelp = koHelp;
+          el.dataset.help = resolveUnits(koHelp);
+        }
       });
-      // Restore Korean aria-labels
+      // Aria-labels
       document.querySelectorAll('[data-i18n-aria]').forEach(el => {
         const koAria = el.dataset.i18nKoAria;
         if (koAria) el.setAttribute('aria-label', koAria);
