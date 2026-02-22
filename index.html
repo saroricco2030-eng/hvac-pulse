@@ -508,6 +508,38 @@
               <div id="pt-sc-result"></div>
             </div>
           </div>
+
+          <div class="accordion-divider"></div>
+
+          <!-- 섹션 4: Target Superheat (Fixed Orifice) -->
+          <div class="accordion-section" id="acc-pt-targetsh">
+            <button class="accordion-header" onclick="toggleAccordion('acc-pt-targetsh')">
+              <span class="accordion-title" data-i18n="pt.targetsh.title">목표 과열도 (Fixed Orifice)</span>
+              <span class="accordion-preview" id="targetsh-preview">—</span>
+              <svg class="accordion-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="accordion-body">
+              <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:10px" data-i18n="pt.targetsh.desc">
+                피스톤/모세관 시스템 전용. 습구온도 + 외기온도로 목표 과열도 계산 (ACCA/Title 24)
+              </p>
+              <div class="input-row">
+                <div class="form-group">
+                  <label class="form-label form-label-row" for="pt-tsh-iwb" data-i18n="pt.targetsh.iwb.label">실내 습구온도<span class="help-trigger" data-help="리턴 그릴에서 측정한 습구온도. 유효범위 50–76°F (10–24.4°C)" data-i18n-help="pt.targetsh.iwb.help">?</span></label>
+                  <input type="number" id="pt-tsh-iwb" class="form-input" placeholder="IWB" data-i18n-ph="pt.targetsh.iwb.placeholder" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label class="form-label form-label-row" for="pt-tsh-oat" data-i18n="pt.targetsh.oat.label">외기 건구온도<span class="help-trigger" data-help="실외기 주변 건구온도. 유효범위 55–115°F (12.8–46.1°C)" data-i18n-help="pt.targetsh.oat.help">?</span></label>
+                  <input type="number" id="pt-tsh-oat" class="form-input" placeholder="OAT" data-i18n-ph="pt.targetsh.oat.placeholder" step="0.1">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label form-label-row" for="pt-tsh-actual" data-i18n="pt.targetsh.actual.label">실측 과열도 (선택)<span class="help-trigger" data-help="실제 측정한 과열도 값. 입력 시 목표값과 비교하여 PASS/FAIL 판정합니다." data-i18n-help="pt.targetsh.actual.help">?</span></label>
+                <input type="number" id="pt-tsh-actual" class="form-input" placeholder="Optional" data-i18n-ph="pt.targetsh.actual.placeholder" step="0.1">
+              </div>
+              <button id="pt-calc-tsh-btn" class="btn btn-primary btn-ripple" data-i18n="pt.targetsh.calculate">목표 과열도 계산</button>
+              <div id="pt-targetsh-result"></div>
+            </div>
+          </div>
         </div>
       </div>
 

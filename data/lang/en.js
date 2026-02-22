@@ -155,6 +155,34 @@ const LANG_EN = {
   'pt.sc.sattemp_label': 'Saturation Temp (Bubble)',
   'pt.sc.measured_label': 'Liquid Line Measured',
 
+  // Target Superheat (Fixed Orifice)
+  'pt.targetsh.title': 'Target Superheat (Fixed Orifice)',
+  'pt.targetsh.desc': 'For piston/capillary systems. Calculates target superheat from wet bulb + outdoor temp (ACCA/Title 24).',
+  'pt.targetsh.iwb.label': 'Indoor Wet Bulb ({tempUnit})',
+  'pt.targetsh.iwb.help': 'Wet bulb temp measured at return grille. Valid range: 50–76°F (10–24.4°C).',
+  'pt.targetsh.iwb.placeholder': 'IWB',
+  'pt.targetsh.oat.label': 'Outdoor Dry Bulb ({tempUnit})',
+  'pt.targetsh.oat.help': 'Dry bulb temp near outdoor unit. Valid range: 55–115°F (12.8–46.1°C).',
+  'pt.targetsh.oat.placeholder': 'OAT',
+  'pt.targetsh.actual.label': 'Actual Superheat ({tempUnit}) — Optional',
+  'pt.targetsh.actual.help': 'Measured superheat value. If entered, compares against target for PASS/FAIL verdict.',
+  'pt.targetsh.actual.placeholder': 'Optional',
+  'pt.targetsh.calculate': 'Calculate Target Superheat',
+  'pt.targetsh.result_target': 'Target Superheat',
+  'pt.targetsh.result_actual': 'Actual Superheat',
+  'pt.targetsh.diff': 'Difference',
+  'pt.targetsh.pass': 'PASS',
+  'pt.targetsh.pass_desc': 'Within ±5°F tolerance (ACCA/Title 24 standard).',
+  'pt.targetsh.fail_high': 'HIGH — Possible undercharge',
+  'pt.targetsh.fail_high_desc': 'Actual superheat is too high. Check refrigerant charge, airflow, or metering device.',
+  'pt.targetsh.fail_low': 'LOW — Possible overcharge',
+  'pt.targetsh.fail_low_desc': 'Actual superheat is too low. Check for overcharge or restricted airflow.',
+  'pt.targetsh.invalid_iwb': 'Indoor Wet Bulb must be 50–76°F (10–24.4°C).',
+  'pt.targetsh.invalid_oat': 'Outdoor temp must be 55–115°F (12.8–46.1°C).',
+  'pt.targetsh.too_low': 'Target < 5°F — Conditions not suitable for charging test.',
+  'pt.targetsh.missing_input': 'Enter both Indoor Wet Bulb and Outdoor Dry Bulb temperatures.',
+  'pt.targetsh.formula_note': 'ACCA formula: (3×IWB − OAT − 80) / 2. Valid: IWB 50–76°F, OAT 55–115°F. Tolerance ±5°F.',
+
   // =============================================
   // Cross Diagnostic Engine
   // =============================================

@@ -158,6 +158,31 @@ const PTCalculator = (() => {
     };
   }
 
+  // --- Target Superheat (Fixed Orifice / ACCA) ---
+  // Formula: (3 × IWB − OAT − 80) / 2  (all °F)
+  // Valid: IWB 50-76°F, OAT 55-115°F, result ≥ 5°F
+  function calcTargetSuperheat(iwb_f, oat_f) {
+    if (iwb_f < 50 || iwb_f > 76) {
+      return { targetSH: null, isValid: false, message: t('pt.targetsh.invalid_iwb', 'Indoor Wet Bulb must be 50–76°F (10–24.4°C)') };
+    }
+    if (oat_f < 55 || oat_f > 115) {
+      return { targetSH: null, isValid: false, message: t('pt.targetsh.invalid_oat', 'Outdoor temp must be 55–115°F (12.8–46.1°C)') };
+    }
+    const target = (3 * iwb_f - oat_f - 80) / 2;
+    if (target < 5) {
+      return { targetSH: parseFloat(target.toFixed(1)), isValid: false, message: t('pt.targetsh.too_low', 'Target < 5°F — conditions not suitable for charging test') };
+    }
+    return { targetSH: parseFloat(target.toFixed(1)), isValid: true, message: null };
+  }
+
+  // Compare actual vs target (±5°F tolerance per ACCA/Title 24)
+  function evaluateSuperheat(actualSH_f, targetSH_f) {
+    const diff = actualSH_f - targetSH_f;
+    if (Math.abs(diff) <= 5) return { verdict: 'pass', diff: parseFloat(diff.toFixed(1)) };
+    if (diff > 5) return { verdict: 'fail_high', diff: parseFloat(diff.toFixed(1)) };
+    return { verdict: 'fail_low', diff: parseFloat(diff.toFixed(1)) };
+  }
+
   // --- Get status color class ---
   function getSuperheatStatus(sh) {
     if (sh >= 5 && sh <= 15) return 'normal';
@@ -201,6 +226,10 @@ const PTCalculator = (() => {
     const scBtn = document.getElementById('pt-calc-sc-btn');
     if (shBtn) shBtn.addEventListener('click', calcSH);
     if (scBtn) scBtn.addEventListener('click', calcSC);
+
+    // Target Superheat listener
+    const tshBtn = document.getElementById('pt-calc-tsh-btn');
+    if (tshBtn) tshBtn.addEventListener('click', calcTargetSH);
   }
 
   // --- Build category-based dropdown ---
@@ -445,6 +474,83 @@ const PTCalculator = (() => {
     if (scPreview) scPreview.innerHTML = `${Settings.displayDelta(result.subcooling)} ${App.statusSvg(status)}`;
   }
 
+  // --- Target Superheat UI handler ---
+  function calcTargetSH() {
+    const iwbRaw = parseFloat(document.getElementById('pt-tsh-iwb')?.value);
+    const oatRaw = parseFloat(document.getElementById('pt-tsh-oat')?.value);
+    const actualRaw = document.getElementById('pt-tsh-actual')?.value;
+    const el = document.getElementById('pt-targetsh-result');
+    if (!el) return;
+
+    if (isNaN(iwbRaw) || isNaN(oatRaw)) {
+      el.innerHTML = `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>${t('pt.targetsh.missing_input', 'Enter both Indoor Wet Bulb and Outdoor Dry Bulb temperatures.')}</span></div>`;
+      return;
+    }
+
+    const iwb_f = Settings.userTempToF(iwbRaw);
+    const oat_f = Settings.userTempToF(oatRaw);
+    const result = calcTargetSuperheat(iwb_f, oat_f);
+
+    if (!result.isValid) {
+      const showVal = result.targetSH !== null ? ` (${Settings.displayDelta(result.targetSH)})` : '';
+      el.innerHTML = `<div class="alert-box alert-warning">${App.statusSvg('warning')}<span>${result.message}${showVal}</span></div>`;
+      // Update preview
+      const prev = document.getElementById('targetsh-preview');
+      if (prev) prev.innerHTML = `— ${App.statusSvg('warning')}`;
+      return;
+    }
+
+    // Build result HTML
+    let html = '<div class="result-grid">';
+    html += `<div class="result-box"><div class="result-value" style="color:var(--accent-blue)">${Settings.displayDelta(result.targetSH)}</div><div class="result-label">${t('pt.targetsh.result_target', 'Target Superheat')}</div></div>`;
+
+    const hasActual = actualRaw !== '' && actualRaw !== undefined && !isNaN(parseFloat(actualRaw));
+    if (hasActual) {
+      const actualSH_f = Settings.userDeltaToF(parseFloat(actualRaw));
+      html += `<div class="result-box"><div class="result-value">${Settings.displayDelta(actualSH_f)}</div><div class="result-label">${t('pt.targetsh.result_actual', 'Actual Superheat')}</div></div>`;
+    }
+    html += '</div>';
+
+    // Verdict (only when actual provided)
+    if (hasActual) {
+      const actualSH_f = Settings.userDeltaToF(parseFloat(actualRaw));
+      const ev = evaluateSuperheat(actualSH_f, result.targetSH);
+      const sign = ev.diff >= 0 ? '+' : '';
+      let cls, icon, label, desc;
+      if (ev.verdict === 'pass') {
+        cls = 'normal'; icon = App.statusSvg('normal');
+        label = t('pt.targetsh.pass', 'PASS');
+        desc = t('pt.targetsh.pass_desc', 'Within ±5°F tolerance');
+      } else if (ev.verdict === 'fail_high') {
+        cls = 'danger'; icon = App.statusSvg('danger');
+        label = t('pt.targetsh.fail_high', 'HIGH — Possible undercharge');
+        desc = t('pt.targetsh.fail_high_desc', 'Actual superheat is too high. Check refrigerant charge, airflow, or metering device.');
+      } else {
+        cls = 'danger'; icon = App.statusSvg('danger');
+        label = t('pt.targetsh.fail_low', 'LOW — Possible overcharge');
+        desc = t('pt.targetsh.fail_low_desc', 'Actual superheat is too low. Check for overcharge or restricted airflow.');
+      }
+      html += `<div class="result-box ${cls}" style="margin-top:12px;text-align:center">`;
+      html += `<div style="font-size:var(--text-lg);font-weight:700">${icon} ${label}</div>`;
+      html += `<div style="font-size:var(--text-sm);margin-top:4px">${t('pt.targetsh.diff', 'Difference')}: ${sign}${Settings.displayDelta(ev.diff)}</div>`;
+      html += `<div style="font-size:var(--text-xs);color:var(--text-secondary);margin-top:4px">${desc}</div>`;
+      html += '</div>';
+
+      // Preview
+      const prev = document.getElementById('targetsh-preview');
+      if (prev) prev.innerHTML = `${Settings.displayDelta(result.targetSH)} ${icon}`;
+    } else {
+      // No actual — just show target
+      const prev = document.getElementById('targetsh-preview');
+      if (prev) prev.innerHTML = `${Settings.displayDelta(result.targetSH)}`;
+    }
+
+    // Reference note
+    html += `<div class="alert-box alert-info" style="margin-top:12px">${App.statusSvg('info')}<span>${t('pt.targetsh.formula_note', 'ACCA formula: (3×IWB − OAT − 80) / 2. Valid: IWB 50–76°F, OAT 55–115°F. Tolerance ±5°F.')}</span></div>`;
+
+    el.innerHTML = html;
+  }
+
   // --- Refresh dropdown when CoolProp becomes available ---
   function onEngineReady() {
     const refSelect = document.getElementById('pt-ref-select');
@@ -461,6 +567,8 @@ const PTCalculator = (() => {
     getTempFromPressure,
     calcSuperheat,
     calcSubcooling,
+    calcTargetSuperheat,
+    evaluateSuperheat,
     getSuperheatStatus,
     getSubcoolingStatus,
     fToC,
