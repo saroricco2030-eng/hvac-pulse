@@ -1452,25 +1452,23 @@ body {
 .sp-load-bar::after { content: ''; position: absolute; left: -40%; top: 0; width: 40%; height: 100%; background: linear-gradient(90deg, transparent, rgba(34,211,238,0.5), transparent); animation: sp-slide 1.5s ease-in-out 3.8s infinite; }
 @keyframes sp-slide { 0% { left: -40%; } 100% { left: 100%; } }
 .sp-load-txt { font-size: 9px; font-weight: 300; letter-spacing: 3px; color: rgba(255,255,255,0.15); }
-/* === Light mode overrides === */
-@media (prefers-color-scheme: light) {
-  .splash-screen { --sp-gt1:#22D3EE;--sp-gt2:#818CF8;--sp-gt3:#A78BFA; --sp-gr1:#C084FC;--sp-gr2:#F9A8D4; --sp-gb1:#FDA4AF;--sp-gb2:#FDE68A;--sp-gb3:#67E8F9; --sp-pulse:#0891B2; }
-  .splash-bg-base { background: linear-gradient(160deg, #EFF6FF 0%, #F5F3FF 30%, #ECFDF5 55%, #FFF7ED 100%); }
-  .splash-bg-glow { background: radial-gradient(ellipse 55% 45% at 50% 40%, rgba(165,243,252,0.18) 0%, transparent 100%), radial-gradient(ellipse 40% 30% at 35% 35%, rgba(196,181,253,0.12) 0%, transparent 100%), radial-gradient(ellipse 35% 25% at 65% 50%, rgba(251,191,36,0.06) 0%, transparent 100%); }
-  .splash-bg-vig { background: radial-gradient(ellipse 75% 75% at 50% 45%, transparent 0%, rgba(248,250,252,0.3) 100%); }
-  .sp-arc.a1 { opacity: 0.75; } .sp-arc.a2 { opacity: 0.7; } .sp-arc.a3 { opacity: 0.65; }
-  .sp-fill-comp { fill: #0891B2; opacity: 0.6; } .sp-fill-cond { fill: #7C3AED; opacity: 0.5; }
-  .sp-fill-exp  { fill: #EC4899; opacity: 0.45; } .sp-fill-evap { fill: #D97706; opacity: 0.5; }
-  .sp-arrows { opacity: 0.18; }
-  .sp-arr-top { stroke: #818CF8; } .sp-arr-right { stroke: #C084FC; }
-  .sp-arr-bottom { stroke: #FBBF24; } .sp-arr-left { stroke: #22D3EE; }
-  .sp-t-main { color: #1E293B; } .sp-t-sub { color: #0891B2; }
-  .sp-t-div { background: linear-gradient(90deg, transparent, rgba(8,145,178,0.2), transparent); }
-  .sp-t-tag { color: rgba(51,65,85,0.3); }
-  .sp-load-bar { background: rgba(51,65,85,0.05); }
-  .sp-load-bar::after { background: linear-gradient(90deg, transparent, rgba(8,145,178,0.4), transparent); }
-  .sp-load-txt { color: rgba(51,65,85,0.2); }
-}
+/* === Splash — Light mode (synced with data-theme toggle) === */
+html[data-theme="light"] .splash-screen { --sp-gt1:#22D3EE;--sp-gt2:#818CF8;--sp-gt3:#A78BFA; --sp-gr1:#C084FC;--sp-gr2:#F9A8D4; --sp-gb1:#FDA4AF;--sp-gb2:#FDE68A;--sp-gb3:#67E8F9; --sp-pulse:#0891B2; }
+html[data-theme="light"] .splash-bg-base { background: linear-gradient(160deg, #EFF6FF 0%, #F5F3FF 30%, #ECFDF5 55%, #FFF7ED 100%); }
+html[data-theme="light"] .splash-bg-glow { background: radial-gradient(ellipse 55% 45% at 50% 40%, rgba(165,243,252,0.18) 0%, transparent 100%), radial-gradient(ellipse 40% 30% at 35% 35%, rgba(196,181,253,0.12) 0%, transparent 100%), radial-gradient(ellipse 35% 25% at 65% 50%, rgba(251,191,36,0.06) 0%, transparent 100%); }
+html[data-theme="light"] .splash-bg-vig { background: radial-gradient(ellipse 75% 75% at 50% 45%, transparent 0%, rgba(248,250,252,0.3) 100%); }
+html[data-theme="light"] .sp-arc.a1 { opacity: 0.75; } html[data-theme="light"] .sp-arc.a2 { opacity: 0.7; } html[data-theme="light"] .sp-arc.a3 { opacity: 0.65; }
+html[data-theme="light"] .sp-fill-comp { fill: #0891B2; opacity: 0.6; } html[data-theme="light"] .sp-fill-cond { fill: #7C3AED; opacity: 0.5; }
+html[data-theme="light"] .sp-fill-exp  { fill: #EC4899; opacity: 0.45; } html[data-theme="light"] .sp-fill-evap { fill: #D97706; opacity: 0.5; }
+html[data-theme="light"] .sp-arrows { opacity: 0.18; }
+html[data-theme="light"] .sp-arr-top { stroke: #818CF8; } html[data-theme="light"] .sp-arr-right { stroke: #C084FC; }
+html[data-theme="light"] .sp-arr-bottom { stroke: #FBBF24; } html[data-theme="light"] .sp-arr-left { stroke: #22D3EE; }
+html[data-theme="light"] .sp-t-main { color: #1E293B; } html[data-theme="light"] .sp-t-sub { color: #0891B2; }
+html[data-theme="light"] .sp-t-div { background: linear-gradient(90deg, transparent, rgba(8,145,178,0.2), transparent); }
+html[data-theme="light"] .sp-t-tag { color: rgba(51,65,85,0.3); }
+html[data-theme="light"] .sp-load-bar { background: rgba(51,65,85,0.05); }
+html[data-theme="light"] .sp-load-bar::after { background: linear-gradient(90deg, transparent, rgba(8,145,178,0.4), transparent); }
+html[data-theme="light"] .sp-load-txt { color: rgba(51,65,85,0.2); }
 
 /* Offline Bar */
 .offline-bar {
