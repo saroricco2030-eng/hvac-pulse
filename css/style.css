@@ -128,6 +128,10 @@ html[data-theme="light"] {
   --glow-red: 0 2px 8px rgba(220, 38, 38, 0.12);
   --glow-orange: 0 2px 8px rgba(217, 119, 6, 0.12);
 }
+/* Light — hardcoded dark backgrounds that need override */
+html[data-theme="light"] .tab-bar { background: rgba(255, 255, 255, 0.92); border-top-color: #E2E8F0; }
+html[data-theme="light"] .tab-item { color: #94A3B8; }
+html[data-theme="light"] .tab-item.active { color: #0891B2; }
 
 /* --- Reset & Base --- */
 *, *::before, *::after {
