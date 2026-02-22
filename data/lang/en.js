@@ -285,6 +285,13 @@ const LANG_EN = {
   'warn.sat_label': 'Suction Sat. Temp',
   'warn.sat_low': 'Evaporator icing risk',
 
+  // Zeotropic glide compensation
+  'diag.glide.medium': 'Zeotropic glide',
+  'diag.glide.high': 'Large glide warning',
+  'diag.glide.adj_note': 'Threshold +{adj} adjustment applied',
+  'diag.glide.high_note': 'Diagnostic confidence may be reduced.',
+  'diag.glide.report_note': 'Zeotropic glide {glide} — thresholds adjusted by +{adj} (SH>{shHigh}, SC>{scHigh}).',
+
   // Quick diagnosis
   'quick.normal_summary': 'Readings are within normal range',
 

@@ -133,9 +133,22 @@ const DiagnosticEngine = (() => {
     const compressionRatio = suctionAbsolute > 0 ? (dischargePressure + ATM_PSI) / suctionAbsolute : CR_FALLBACK;
     const dlt = condensingSatTemp + superheat + (compressionRatio * DLT_CR_FACTOR);
 
+    // --- Zeotropic glide compensation (Plan C hybrid) ---
+    let glideAdj = 0;
+    let glideLevel = 'none';  // none | low | medium | high
+    let refGlide = 0;
+    const refInfo = (typeof RefrigerantCatalog !== 'undefined') ? RefrigerantCatalog.getById(refName) : null;
+    if (refInfo && refInfo.isZeotropic && refInfo.glide_f > 3) {
+      refGlide = refInfo.glide_f;
+      glideAdj = parseFloat((refGlide * 0.25).toFixed(1));
+      glideLevel = refGlide > 8 ? 'high' : 'medium';
+    }
+    const adjSH_HIGH = SH_HIGH + glideAdj;
+    const adjSC_HIGH = SC_HIGH + glideAdj;
+
     // --- Classify ---
-    const shClass = superheat > SH_HIGH ? 'high' : superheat < SH_LOW ? 'low' : 'normal';
-    const scClass = subcooling > SC_HIGH ? 'high' : subcooling < SC_LOW ? 'low' : 'normal';
+    const shClass = superheat > adjSH_HIGH ? 'high' : superheat < SH_LOW ? 'low' : 'normal';
+    const scClass = subcooling > adjSC_HIGH ? 'high' : subcooling < SC_LOW ? 'low' : 'normal';
 
     // --- Diagnosis matrix ---
     let diagKey = 'normal';
@@ -177,6 +190,18 @@ const DiagnosticEngine = (() => {
         text: `${t('warn.sat_label', '흡입 포화온도')} ${Settings.displayTemp(suctionSatTemp)} (<${Settings.displayTemp(32)}) — ${t('warn.sat_low', '증발기 결빙 위험')}`
       });
     }
+    // Glide compensation warnings
+    if (glideLevel === 'medium') {
+      warnings.push({
+        type: 'info',
+        text: `${t('diag.glide.medium', '비공비 냉매 글라이드')} ${Settings.displayDelta(refGlide)} — ${t('diag.glide.adj_note', '임계값 +{adj} 보정 적용').replace('{adj}', Settings.displayDelta(glideAdj))}`
+      });
+    } else if (glideLevel === 'high') {
+      warnings.push({
+        type: 'warning',
+        text: `${t('diag.glide.high', '큰 글라이드 주의')} ${Settings.displayDelta(refGlide)} — ${t('diag.glide.adj_note', '임계값 +{adj} 보정 적용').replace('{adj}', Settings.displayDelta(glideAdj))}. ${t('diag.glide.high_note', '진단 신뢰도가 낮아질 수 있습니다.')}`
+      });
+    }
 
     return {
       superheat,
@@ -191,7 +216,8 @@ const DiagnosticEngine = (() => {
       scClass,
       diagKey,
       diagnosis,
-      warnings
+      warnings,
+      glideInfo: glideAdj > 0 ? { glide: refGlide, adjustment: glideAdj, level: glideLevel } : null
     };
   }
 

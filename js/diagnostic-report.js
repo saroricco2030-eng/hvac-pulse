@@ -274,6 +274,18 @@ const DiagnosticReport = (() => {
     // Compression ratio
     if (d.compressionRatio != null) addRow(t('report.m.comp_ratio', '압축비'), d.compressionRatio, ':1', NORMAL_RANGES.CR, 'CR');
 
+    // Glide compensation note
+    if (d.glideInfo) {
+      const g = d.glideInfo;
+      const shH = 20 + g.adjustment, scH = 18 + g.adjustment;
+      const note = t('diag.glide.report_note', 'Zeotropic glide {glide} — thresholds adjusted by +{adj} (SH>{shHigh}, SC>{scHigh}).')
+        .replace('{glide}', Settings.displayDelta(g.glide))
+        .replace('{adj}', Settings.displayDelta(g.adjustment))
+        .replace('{shHigh}', Settings.displayDelta(shH))
+        .replace('{scHigh}', Settings.displayDelta(scH));
+      rows.push({ label: t('diag.glide.medium', '비공비 냉매 글라이드'), value: note, unit: '', status: 'info', key: 'GLIDE' });
+    }
+
     return rows.filter(r => r.value != null);
   }
 
@@ -448,7 +460,13 @@ const DiagnosticReport = (() => {
     else if (pattern.sc === 'low' && sc < 5) base += 4;
     else if (pattern.sc === 'normal' && sc >= 8 && sc <= 14) base += 6;
 
-    return Math.min(base, 95);
+    // Zeotropic glide penalty
+    if (d.glideInfo) {
+      if (d.glideInfo.level === 'high') base -= 10;
+      else if (d.glideInfo.level === 'medium') base -= 5;
+    }
+
+    return Math.min(Math.max(base, 50), 95);
   }
 
 
