@@ -2,7 +2,7 @@
 // HVAC Pulse — Service Worker
 // ===================================================
 
-const CACHE_VERSION = 55;
+const CACHE_VERSION = 56;
 const CACHE_NAME = `hvac-pulse-v${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
@@ -93,7 +93,7 @@ self.addEventListener('install', event => {
           });
         });
       })
-      .then(() => self.skipWaiting())
+      // Don't skipWaiting here — let the user trigger update via toast
   );
 });
 

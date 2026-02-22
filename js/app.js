@@ -981,6 +981,26 @@ const App = (() => {
   }
 
   // =============================================
+  // SW Update Toast — lets user choose when to reload
+  // =============================================
+  function showUpdateToast(newWorker) {
+    const bar = document.createElement('div');
+    bar.id = 'sw-update-bar';
+    bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:var(--accent-blue,#3b82f6);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;font-size:14px;box-shadow:0 -2px 8px rgba(0,0,0,.3)';
+    bar.innerHTML = `
+      <span>${t('sw.update_ready', '새 버전이 준비되었습니다.')}</span>
+      <button id="sw-update-btn" style="background:#fff;color:var(--accent-blue,#3b82f6);border:none;padding:6px 16px;border-radius:6px;font-weight:600;cursor:pointer;margin-left:12px;white-space:nowrap">
+        ${t('sw.update_now', '지금 업데이트')}
+      </button>`;
+    document.body.appendChild(bar);
+
+    document.getElementById('sw-update-btn').addEventListener('click', () => {
+      bar.remove();
+      newWorker.postMessage('SKIP_WAITING');
+    });
+  }
+
+  // =============================================
   // Service Worker Registration
   // =============================================
   function registerSW() {
@@ -1007,8 +1027,8 @@ const App = (() => {
 
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // New SW is ready — send skipWaiting and let controllerchange handle reload
-              newWorker.postMessage('SKIP_WAITING');
+              // New version ready — show persistent update toast instead of auto-reload
+              showUpdateToast(newWorker);
             }
           });
         });

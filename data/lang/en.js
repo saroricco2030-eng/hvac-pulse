@@ -1487,5 +1487,11 @@ const LANG_EN = {
   'sync.status_just': 'Just synced',
   'sync.status_min': '{n} min ago',
   'sync.status_hr': '{n} hr ago',
-  'sync.status_day': '{n} day(s) ago'
+  'sync.status_day': '{n} day(s) ago',
+
+  // =============================================
+  // Service Worker Update
+  // =============================================
+  'sw.update_ready': 'A new version is ready.',
+  'sw.update_now': 'Update now'
 };
