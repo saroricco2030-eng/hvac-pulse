@@ -68,11 +68,32 @@ const I18n = (() => {
         str.indexOf('psig') === -1 && str.indexOf('bar(') === -1 && str.indexOf('kPa(') === -1) return str;
     const tl = typeof Settings !== 'undefined' ? Settings.tempLabel() : '°F';
     const pl = typeof Settings !== 'undefined' ? Settings.pressureLabel() : 'psig';
-    return str
+    str = str
       .replace(/\{tempUnit\}/g, tl)
       .replace(/\{pressUnit\}/g, pl)
       .replace(/\(°[FC]\)/g, '(' + tl + ')')
       .replace(/\((psig|bar\(a\)|kPa\(a\))\)/g, '(' + pl + ')');
+
+    // Convert numeric °F values to °C when in metric mode
+    // Heuristic: value < 45 = delta temp (SH/SC/ΔT), value ≥ 45 = absolute temp
+    if (tl === '°C') {
+      const dC = v => (v * 5 / 9).toFixed(1).replace(/\.0$/, '');
+      const aC = v => Math.round((v - 32) * 5 / 9);
+      const conv = v => (v < 45 ? dC(v) : String(aC(v)));
+      // Dual format: "50–76°F (10–24.4°C)" → keep °C part only
+      str = str.replace(/(\d+(?:\.\d+)?)\s*[–\-~]\s*(\d+(?:\.\d+)?)°F\s*\((\d+(?:\.\d+)?)\s*[–\-~]\s*(\d+(?:\.\d+)?)°C\)/g,
+        (_, _a, _b, c, d) => c + '–' + d + '°C');
+      // Range: "5~15°F" or "150–220°F"
+      str = str.replace(/(\d+(?:\.\d+)?)\s*([~–\-])\s*(\d+(?:\.\d+)?)°F/g,
+        (_, a, sep, b) => conv(parseFloat(a)) + sep + conv(parseFloat(b)) + '°C');
+      // Prefixed: "±5°F", ">3°F", "<5°F"
+      str = str.replace(/([±><])\s*(\d+(?:\.\d+)?)°F/g,
+        (_, pfx, v) => pfx + conv(parseFloat(v)) + '°C');
+      // Standalone: "225°F"
+      str = str.replace(/(\d+(?:\.\d+)?)°F/g,
+        (_, v) => conv(parseFloat(v)) + '°C');
+    }
+    return str;
   }
 
   // =============================================
@@ -410,6 +431,7 @@ const I18n = (() => {
   return {
     init,
     t,
+    resolveUnits,
     setLanguage,
     getLang: () => currentLang,
     getLanguages: () => LANGUAGES,

@@ -497,12 +497,12 @@ const CycleVisualization = (() => {
 
       <div class="cycle-panel-section">
         <div class="cycle-panel-label">${t('cycle.normal_state', '정상 상태')}</div>
-        <ul class="cycle-panel-list green">${data.normalConditions.map(c => `<li>${c}</li>`).join('')}</ul>
+        <ul class="cycle-panel-list green">${data.normalConditions.map(c => `<li>${I18n.resolveUnits(c)}</li>`).join('')}</ul>
       </div>
 
       <div class="cycle-panel-section">
         <div class="cycle-panel-label">${t('cycle.failure_symptoms', '고장 시 증상')}</div>
-        <ul class="cycle-panel-list red">${data.failureSymptoms.map(s => `<li>${s}</li>`).join('')}</ul>
+        <ul class="cycle-panel-list red">${data.failureSymptoms.map(s => `<li>${I18n.resolveUnits(s)}</li>`).join('')}</ul>
       </div>
 
       <div class="cycle-panel-section">

@@ -280,12 +280,14 @@ const PHInteractive = (() => {
   function getTranslatedContent(key) {
     const base = EDUCATIONAL_CONTENT[key];
     if (!base) return null;
+    const tl = typeof Settings !== 'undefined' ? Settings.tempLabel() : '°F';
     return {
       ...base,
       title: t('phi.' + key + '.title', base.title),
       description: t('phi.' + key + '.desc', base.description),
       details: base.details.map((d, i) => t('phi.' + key + '.d' + (i + 1), d)),
       valueLabel: base.valueLabel ? t('phi.' + key + '.vlabel', base.valueLabel) : '',
+      valueUnit: base.valueUnit === '°F' ? tl : base.valueUnit,
       normalRange: base.normalRange ? t('phi.' + key + '.range', base.normalRange) : ''
     };
   }
