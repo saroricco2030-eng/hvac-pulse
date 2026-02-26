@@ -600,6 +600,8 @@ const LANG_KO = {
   'settings.language': '언어',
   'settings.langDesc': '앱 표시 언어 선택',
   'settings.langChanged': '언어가 변경되었습니다.',
+  'settings.theme.title': '화면 모드',
+  'settings.theme.desc': '다크 / 라이트 테마',
   'settings.unit_temp.title': '온도 단위',
   'settings.unit_temp.desc': '표시 온도 단위 선택',
   'settings.pressure_unit.title': '압력 단위',

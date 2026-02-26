@@ -600,6 +600,8 @@ const LANG_EN = {
   'settings.language': 'Language',
   'settings.langDesc': 'Select app display language',
   'settings.langChanged': 'Language has been changed.',
+  'settings.theme.title': 'Screen Mode',
+  'settings.theme.desc': 'Dark / Light theme',
   'settings.unit_temp.title': 'Temperature Unit',
   'settings.unit_temp.desc': 'Select display temperature unit',
   'settings.pressure_unit.title': 'Pressure Unit',
