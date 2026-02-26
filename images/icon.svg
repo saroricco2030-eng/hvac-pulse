@@ -24,10 +24,10 @@
         font-size="140" font-weight="700" letter-spacing="10"
         fill="#FFFFFF">HVAC</text>
   <!-- Accent divider (splash .sp-t-div style) -->
-  <rect x="118" y="280" width="276" height="1.2" rx="0.6" fill="url(#div)"/>
-  <!-- PULSE — thin, cyan, wide-spaced (splash .sp-t-sub style) -->
-  <text x="265" y="330" text-anchor="middle"
+  <rect x="100" y="282" width="312" height="1.2" rx="0.6" fill="url(#div)"/>
+  <!-- PULSE — cyan, wide-spaced (splash .sp-t-sub style) -->
+  <text x="266" y="345" text-anchor="middle"
         font-family="-apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
-        font-size="52" font-weight="300" letter-spacing="18"
+        font-size="76" font-weight="400" letter-spacing="20"
         fill="#22D3EE">PULSE</text>
 </svg>
