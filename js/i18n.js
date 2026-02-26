@@ -172,20 +172,21 @@ const I18n = (() => {
     }
 
     const pack = packs[currentLang] || packs.en;
+    const fallback = packs.en;
 
     // Single query: all elements with any i18n attribute
     document.querySelectorAll('[data-i18n],[data-i18n-ph],[data-i18n-help],[data-i18n-aria]').forEach(el => {
       // Text content
       if (el.dataset.i18n) {
-        const raw = pack?.[el.dataset.i18n];
+        const raw = pack?.[el.dataset.i18n] || fallback?.[el.dataset.i18n];
         if (raw) {
-          if (!el.dataset.i18nKo) el.dataset.i18nKo = getTextOnly(el);
+          if (!el.dataset.i18nKo) el.dataset.i18nKo = packs.ko?.[el.dataset.i18n] || getTextOnly(el);
           setTextPreservingChildren(el, resolveUnits(raw));
         }
       }
       // Placeholder
       if (el.dataset.i18nPh) {
-        const translated = pack?.[el.dataset.i18nPh];
+        const translated = pack?.[el.dataset.i18nPh] || fallback?.[el.dataset.i18nPh];
         if (translated) {
           if (!el.dataset.i18nKoPh) el.dataset.i18nKoPh = el.placeholder;
           el.placeholder = translated;
@@ -193,7 +194,7 @@ const I18n = (() => {
       }
       // Help tooltip
       if (el.dataset.i18nHelp) {
-        const translated = pack?.[el.dataset.i18nHelp];
+        const translated = pack?.[el.dataset.i18nHelp] || fallback?.[el.dataset.i18nHelp];
         if (translated) {
           if (!el.dataset.i18nKoHelp) el.dataset.i18nKoHelp = el.dataset.help;
           el.dataset.help = translated;
@@ -201,7 +202,7 @@ const I18n = (() => {
       }
       // Aria-label
       if (el.dataset.i18nAria) {
-        const translated = pack?.[el.dataset.i18nAria];
+        const translated = pack?.[el.dataset.i18nAria] || fallback?.[el.dataset.i18nAria];
         if (translated) {
           if (!el.dataset.i18nKoAria) el.dataset.i18nKoAria = el.getAttribute('aria-label');
           el.setAttribute('aria-label', translated);
@@ -260,25 +261,24 @@ const I18n = (() => {
         mutation.addedNodes.forEach(node => {
           if (node.nodeType === Node.ELEMENT_NODE) {
             // Translate data-i18n elements in new nodes
+            const pack = packs[currentLang] || packs.en;
+            const fallback = packs.en;
             node.querySelectorAll?.('[data-i18n]')?.forEach(el => {
               const key = el.dataset.i18n;
-              const pack = packs[currentLang] || packs.en;
-              const raw = pack?.[key];
+              const raw = pack?.[key] || fallback?.[key];
               if (raw) {
-                if (!el.dataset.i18nKo) el.dataset.i18nKo = getTextOnly(el);
+                if (!el.dataset.i18nKo) el.dataset.i18nKo = packs.ko?.[key] || getTextOnly(el);
                 setTextPreservingChildren(el, resolveUnits(raw));
               }
             });
             node.querySelectorAll?.('[data-i18n-ph]')?.forEach(el => {
               const key = el.dataset.i18nPh;
-              const pack = packs[currentLang] || packs.en;
-              const translated = pack?.[key];
+              const translated = pack?.[key] || fallback?.[key];
               if (translated) el.placeholder = translated;
             });
             node.querySelectorAll?.('[data-i18n-help]')?.forEach(el => {
               const key = el.dataset.i18nHelp;
-              const pack = packs[currentLang] || packs.en;
-              const translated = pack?.[key];
+              const translated = pack?.[key] || fallback?.[key];
               if (translated) {
                 if (!el.dataset.i18nKoHelp) el.dataset.i18nKoHelp = el.dataset.help;
                 el.dataset.help = translated;
@@ -286,8 +286,7 @@ const I18n = (() => {
             });
             node.querySelectorAll?.('[data-i18n-aria]')?.forEach(el => {
               const key = el.dataset.i18nAria;
-              const pack = packs[currentLang] || packs.en;
-              const translated = pack?.[key];
+              const translated = pack?.[key] || fallback?.[key];
               if (translated) {
                 if (!el.dataset.i18nKoAria) el.dataset.i18nKoAria = el.getAttribute('aria-label');
                 el.setAttribute('aria-label', translated);
