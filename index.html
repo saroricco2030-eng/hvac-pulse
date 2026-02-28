@@ -8,17 +8,27 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="HVAC Pulse — 과열도/과냉도 계산, 교차 진단, NIST 비침습 진단, TXV 트러블슈팅, 정비 관리">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.gstatic.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://www.gstatic.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; font-src 'self' https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; frame-src 'self' https://*.firebaseapp.com; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.gstatic.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://www.gstatic.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; font-src 'self' https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; frame-src 'self' https://*.firebaseapp.com; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <meta name="author" content="HVAC Pulse">
   <meta name="copyright" content="Copyright (c) 2024-2026 HVAC Pulse. All rights reserved.">
   <meta name="robots" content="noindex, nofollow">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="application">
+  <meta property="og:title" content="HVAC Pulse — HVAC Diagnostic Tool">
+  <meta property="og:description" content="All-in-one HVAC diagnostic tool for field technicians. Superheat/subcooling, cross-diagnostics, P-T calculator.">
+  <meta property="og:image" content="./images/icon-512.png">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="apple-mobile-web-app-title" content="HVAC Pulse">
 
   <title>HVAC Pulse</title>
 
   <!-- PWA Manifest -->
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="./images/icon-192.png">
-  <link rel="apple-touch-icon" href="./images/icon-192.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="./images/icon-96.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="./images/icon-152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="./images/icon-192.png">
 
   <!-- Resource hints -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -983,15 +993,25 @@ document.addEventListener('DOMContentLoaded', () => window.renderRefTable());
 <!-- Firebase SDK (optional — cloud sync) -->
 <!-- ===================================== -->
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"
+  integrity="sha384-nMqKrgk2MOVr+J6K7dYFdt02ATuHV/Bqbpl7SQl+GYXyf1CHx9oLuiXNpVdd0rJh"
+  crossorigin="anonymous"
   onerror="console.warn('Firebase App SDK load failed — local-only mode')"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"
+  integrity="sha384-I1LYojsZ5RM1cOda44Z2h42Qa6YfsQ1XkXxREnhp4ueYBR/4d1pG1K+NZM537Vsj"
+  crossorigin="anonymous"
   onerror="console.warn('Firebase Auth SDK load failed')"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"
+  integrity="sha384-DRaDw8zunay8Id8djbfyBTcL38QknHkXONVwo0TBWCAQGSpIANj+4OSCTdxxaY5T"
+  crossorigin="anonymous"
   onerror="console.warn('Firebase Firestore SDK load failed')"></script>
 
-<!-- PDF Export (lazy-loaded via defer) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js" defer></script>
+<!-- PDF Export (lazy-loaded via defer, SRI-protected) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+  integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H"
+  crossorigin="anonymous" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"
+  integrity="sha384-5MXQT3yrGpx6/FO6Z5JlMsn1xsN/OggV+b88W2CfpNqmvPfmv7JW/O8x78GzptfE"
+  crossorigin="anonymous" defer></script>
 
 <!-- ===================================== -->
 <!-- JS Modules (order matters) -->

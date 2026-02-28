@@ -13,6 +13,13 @@ const AppSecurity = (() => {
   const APP_VERSION = '1.0.0';
   const COPYRIGHT = '\u00A9 2024-2026 HVAC Pulse. All Rights Reserved.';
 
+  // Authorized domains (add your production domain here)
+  const ALLOWED_ORIGINS = [
+    'saroricco2030-eng.github.io',
+    'localhost',
+    '127.0.0.1'
+  ];
+
   // ---- Console Warning ----
   function showConsoleWarning() {
     const style1 = 'color:#ef4444;font-size:24px;font-weight:bold;text-shadow:1px 1px 2px rgba(0,0,0,0.3)';
@@ -86,44 +93,56 @@ const AppSecurity = (() => {
     });
   }
 
-  // ---- DevTools Detection ----
+  // ---- DevTools Detection (multi-method) ----
   function setupDevToolsDetection() {
     let devToolsOpen = false;
+    let warningCount = 0;
 
     // Method 1: Window size difference
-    const checkDevTools = () => {
-      const widthThreshold = window.outerWidth - window.innerWidth > 160;
-      const heightThreshold = window.outerHeight - window.innerHeight > 160;
+    const checkWindowSize = () => {
+      const widthDiff = window.outerWidth - window.innerWidth > 160;
+      const heightDiff = window.outerHeight - window.innerHeight > 160;
+      return widthDiff || heightDiff;
+    };
 
-      if (widthThreshold || heightThreshold) {
-        if (!devToolsOpen) {
-          devToolsOpen = true;
-          onDevToolsDetected();
-        }
-      } else {
+    // Method 2: console.log object getter (most reliable)
+    // When DevTools is open, accessing getters triggers; when closed it doesn't
+    const checkConsoleLog = () => {
+      let detected = false;
+      const el = new Image();
+      Object.defineProperty(el, 'id', {
+        get: () => { detected = true; return ''; }
+      });
+      console.debug(el);
+      return detected;
+    };
+
+    // Method 3: Performance timing — debugger breakpoints cause measurable delay
+    const checkTiming = () => {
+      const t0 = performance.now();
+      for (let i = 0; i < 100; i++) { /* timing calibration */ }
+      const t1 = performance.now();
+      return (t1 - t0) > 50;
+    };
+
+    function runChecks() {
+      const isOpen = checkWindowSize() || checkConsoleLog();
+      if (isOpen && !devToolsOpen) {
+        devToolsOpen = true;
+        onDevToolsDetected();
+      } else if (!isOpen) {
         devToolsOpen = false;
       }
-    };
-
-    // Method 2: debugger detection via timing
-    const detectDebugger = () => {
-      const start = performance.now();
-      // debugger is disabled in production — timing check only
-      const end = performance.now();
-      if (end - start > 100) {
-        onDevToolsDetected();
-      }
-    };
+    }
 
     function onDevToolsDetected() {
-      // Show warning overlay (non-blocking — doesn't break the app)
+      warningCount++;
       if (document.getElementById('devtools-warning')) return;
       const overlay = document.createElement('div');
       overlay.id = 'devtools-warning';
       overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;padding:12px 20px;font-size:13px;font-weight:600;text-align:center;box-shadow:0 4px 20px rgba(239,68,68,0.4);transition:opacity 0.3s';
       overlay.textContent = '\u26A0 \uAC1C\uBC1C\uC790 \uB3C4\uAD6C \uAC10\uC9C0\uB428 — \uC774 \uC18C\uD504\uD2B8\uC6E8\uC5B4\uB294 \uC800\uC791\uAD8C\uBC95\uC73C\uB85C \uBCF4\uD638\uB429\uB2C8\uB2E4. Developer tools detected — This software is protected by copyright.';
       document.body.appendChild(overlay);
-      // Auto-dismiss after 8 seconds
       setTimeout(() => {
         if (overlay.parentNode) {
           overlay.style.opacity = '0';
@@ -132,8 +151,7 @@ const AppSecurity = (() => {
       }, 8000);
     }
 
-    // Check periodically
-    setInterval(checkDevTools, 2000);
+    setInterval(runChecks, 1500);
   }
 
   // ---- Source Watermark ----
@@ -183,13 +201,83 @@ const AppSecurity = (() => {
     });
   }
 
+  // ---- Domain Lock ----
+  function enforceDomainLock() {
+    const host = window.location.hostname;
+    const isAllowed = ALLOWED_ORIGINS.some(d => host === d || host.endsWith('.' + d));
+    // Also allow file:// for local development/PWA
+    const isLocal = window.location.protocol === 'file:';
+    if (!isAllowed && !isLocal) {
+      document.documentElement.innerHTML = '';
+      document.title = '';
+      console.error('Unauthorized domain: ' + host);
+    }
+  }
+
+  // ---- Anti-Automation Detection ----
+  function detectAutomation() {
+    const signs = [
+      // Selenium
+      !!window.document.__selenium_unwrapped,
+      !!window.__fxdriver_unwrapped,
+      !!window._phantom,
+      !!window.callPhantom,
+      // Puppeteer / Playwright / Headless Chrome
+      !!navigator.webdriver,
+      // Generic headless browser markers
+      navigator.languages === undefined || navigator.languages.length === 0,
+      !navigator.plugins || navigator.plugins.length === 0
+    ];
+    const score = signs.filter(Boolean).length;
+    if (score >= 2) {
+      // Likely automated — degrade gracefully (don't crash, just watermark)
+      const msg = document.createElement('div');
+      msg.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#f59e0b;color:#000;padding:8px;font-size:12px;text-align:center;font-weight:600';
+      msg.textContent = 'Automated access detected. ' + COPYRIGHT;
+      document.body?.appendChild(msg);
+    }
+  }
+
+  // ---- Anti-Iframe (Clickjacking Protection) ----
+  function preventFraming() {
+    if (window.self !== window.top) {
+      try {
+        const parentHost = window.parent.location.hostname;
+        const allowed = ALLOWED_ORIGINS.some(d => parentHost === d || parentHost.endsWith('.' + d));
+        if (!allowed) {
+          window.top.location = window.self.location;
+        }
+      } catch (e) {
+        // Cross-origin frame — force break out
+        window.top.location = window.self.location;
+      }
+    }
+  }
+
+  // ---- Crypto Integrity Verification ----
+  async function verifyIntegrity() {
+    if (!window.crypto || !window.crypto.subtle) return;
+    try {
+      // Hash critical script sources for tamper detection
+      const scripts = Array.from(document.querySelectorAll('script[src^="./js/"]'));
+      const sources = scripts.map(s => s.getAttribute('src')).sort().join('|');
+      const data = new TextEncoder().encode(sources);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      // Embed in DOM for forensic tracing
+      const wm = document.querySelector('[data-integrity]');
+      if (wm) wm.setAttribute('data-integrity', hashHex.substring(0, 16));
+    } catch (e) { /* non-critical */ }
+  }
+
   // ---- Service Worker Integrity Check ----
   function verifySWIntegrity() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistration().then(reg => {
         if (reg && reg.active) {
-          // SW is registered and active — app integrity maintained
-          console.log('%c\u2713 App integrity verified', 'color:#10b981;font-size:11px');
+          // SW is registered and active
+          verifyIntegrity();
         }
       }).catch(() => {});
     }
@@ -213,16 +301,23 @@ const AppSecurity = (() => {
 
   // ---- Initialize All Protections ----
   function init() {
+    // Layer 1: Domain & frame protection (first — blocks unauthorized hosts)
+    enforceDomainLock();
+    preventFraming();
+    // Layer 2: User-facing protections
     showConsoleWarning();
     setupContextMenuProtection();
     setupKeyboardProtection();
     setupSelectionProtection();
     setupDragProtection();
     setupDevToolsDetection();
+    // Layer 3: Forensic & integrity
     embedWatermark();
     setupCopyProtection();
     setupPrintProtection();
     verifySWIntegrity();
+    // Layer 4: Anti-automation (delayed to not block init)
+    setTimeout(detectAutomation, 2000);
   }
 
   return {

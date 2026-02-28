@@ -10,8 +10,38 @@
   "theme_color": "#040C12",
   "icons": [
     {
+      "src": "./images/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./images/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./images/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./images/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "./images/icon-192.png",
       "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./images/icon-384.png",
+      "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
@@ -22,8 +52,38 @@
       "purpose": "any"
     },
     {
+      "src": "./images/icon-maskable-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./images/icon-maskable-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./images/icon-maskable-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./images/icon-maskable-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
       "src": "./images/icon-maskable-192.png",
       "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./images/icon-maskable-384.png",
+      "sizes": "384x384",
       "type": "image/png",
       "purpose": "maskable"
     },
@@ -44,6 +104,7 @@
   "dir": "ltr",
   "prefer_related_applications": false,
   "id": "/hvac-pulse",
+  "description_en": "All-in-one HVAC diagnostic tool for field technicians — superheat/subcooling, cross-diagnostics, P-T calculator, maintenance tracker",
   "shortcuts": [
     {
       "name": "빠른 진단",

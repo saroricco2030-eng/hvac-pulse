@@ -2,7 +2,7 @@
 // HVAC Pulse — Service Worker
 // ===================================================
 
-const CACHE_VERSION = 59;
+const CACHE_VERSION = 60;
 const CACHE_NAME = `hvac-pulse-v${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
@@ -10,9 +10,19 @@ const STATIC_ASSETS = [
   './index.html',
   './css/style.css',
   './manifest.json',
+  './images/icon-72.png',
+  './images/icon-96.png',
+  './images/icon-144.png',
+  './images/icon-152.png',
   './images/icon-192.png',
+  './images/icon-384.png',
   './images/icon-512.png',
+  './images/icon-maskable-72.png',
+  './images/icon-maskable-96.png',
+  './images/icon-maskable-144.png',
+  './images/icon-maskable-152.png',
   './images/icon-maskable-192.png',
+  './images/icon-maskable-384.png',
   './images/icon-maskable-512.png',
   './images/icon-maskable.svg',
   './images/icon.svg',
